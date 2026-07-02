@@ -56,27 +56,22 @@ export function Layout() {
 
   const isAdmin = user?.roles.includes('admin') ?? false;
 
-  // Default to non-admin view; persist choice in localStorage
-  const [viewingAdmin, setViewingAdmin] = useState<boolean>(() => {
-    if (!isAdmin) return false;
-    // If user ONLY has admin role, default to admin
-    const hasOtherRole = user?.roles.some(r => r !== 'admin') ?? false;
-    if (!hasOtherRole) return true;
-    return localStorage.getItem('viewingAdmin') === 'true';
-  });
+  // Default to non-admin view when user has both admin + other roles
+  const hasOtherRole = user?.roles.some((r) => r !== 'admin') ?? false;
+  const [viewingAdmin, setViewingAdmin] = useState<boolean>(
+    isAdmin && !hasOtherRole  // only-admin user → start in admin view
+  );
 
   const activeRole: AppRole = viewingAdmin ? 'admin' : baseRole;
   const navItems = NAV[activeRole] ?? NAV.parent;
   const bottomNav = navItems.slice(0, 5);
 
   function switchToAdmin() {
-    localStorage.setItem('viewingAdmin', 'true');
     setViewingAdmin(true);
     navigate('/admin', { replace: true });
   }
 
   function switchToUser() {
-    localStorage.setItem('viewingAdmin', 'false');
     setViewingAdmin(false);
     navigate('/dashboard', { replace: true });
   }

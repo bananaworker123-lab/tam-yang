@@ -18,7 +18,7 @@ export function ProfilePage() {
 
   async function logout() {
     await api.post('/auth/logout').catch(() => {});
-    qc.clear();
+    qc.setQueryData(['me'], null);  // clear user immediately, no refetch
     navigate('/', { replace: true });
   }
 

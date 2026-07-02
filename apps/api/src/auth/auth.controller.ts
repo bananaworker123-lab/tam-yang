@@ -22,9 +22,11 @@ export class AuthController {
   }
 
   @Post('logout')
-  logout(@Req() req: Request): { ok: true } {
-    req.session.destroy(() => undefined);
-    return { ok: true };
+  logout(@Req() req: Request, @Res() res: Response): void {
+    // cookie-session stores everything in the cookie itself — clear by nulling the session.
+    // express-session's .destroy() does not exist on cookie-session.
+    (req as any).session = null;
+    res.json({ ok: true });
   }
 
   /**
