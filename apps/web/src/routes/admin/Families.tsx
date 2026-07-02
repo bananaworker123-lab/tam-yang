@@ -22,7 +22,7 @@ export function AdminFamiliesPage() {
         {families.map((f) => (
           <Card key={f.id}>
             <div className="flex items-center justify-between">
-              <div className="font-display font-bold text-ink">{f.name}</div>
+              <div className="font-display font-bold text-ink">{f.name || <span className="text-faint italic">Unnamed family</span>}</div>
               <div className="text-xs text-faint">{f.members.length} members</div>
             </div>
             <div className="h-px bg-line my-3" />
