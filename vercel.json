@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "pnpm build",
+  "buildCommand": "pnpm --filter @homework-tracker/shared-types build && pnpm --filter @homework-tracker/shared-errors build && pnpm --filter @homework-tracker/shared-auth build && pnpm --filter @homework-tracker/web build",
   "outputDirectory": "apps/web/dist",
   "installCommand": "pnpm install",
   "functions": {
