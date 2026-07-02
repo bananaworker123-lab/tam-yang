@@ -8,7 +8,7 @@ type Dict = Record<string, { en: string; th: string }>;
 // Flat translation dictionary. Add keys here to translate more strings.
 const DICT: Dict = {
   // brand / login
-  'app.name': { en: 'Homeroom', th: 'Homeroom' },
+  'app.name': { en: 'Tam-Yang', th: 'Tam-Yang' },
   'login.headline': { en: 'Track homework, all in one place', th: 'ติดตามการบ้าน ในที่เดียว' },
   'login.sub': {
     en: "See what your kids have done, what's missing, with one shared class master list.",

@@ -86,7 +86,7 @@ export function Layout() {
           <div className="w-8 h-8 rounded-[9px] bg-accent flex items-center justify-center shadow shadow-accent/30 flex-none">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
           </div>
-          <span className="font-display font-bold text-[17px] text-ink">Homeroom</span>
+          <span className="font-display font-bold text-[17px] text-ink">Tam-Yang</span>
         </div>
 
         {/* User card */}
@@ -155,7 +155,7 @@ export function Layout() {
           <div className="w-7 h-7 rounded-[8px] bg-accent flex items-center justify-center shadow shadow-accent/30">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
           </div>
-          <span className="font-display font-bold text-[16px] text-ink">Homeroom</span>
+          <span className="font-display font-bold text-[16px] text-ink">Tam-Yang</span>
 
           <div className="ml-auto flex items-center gap-2">
             {/* Mobile role switcher */}

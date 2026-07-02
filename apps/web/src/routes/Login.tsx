@@ -20,7 +20,7 @@ export function LoginPage() {
           <div className="w-12 h-12 rounded-2xl bg-accent flex items-center justify-center shadow-lg shadow-accent/40">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
           </div>
-          <span className="font-display font-bold text-3xl text-ink">Homeroom</span>
+          <span className="font-display font-bold text-3xl text-ink">Tam-Yang</span>
         </div>
         <div>
           <h1 className="font-display font-bold text-2xl text-ink">Track homework, all in one place</h1>
