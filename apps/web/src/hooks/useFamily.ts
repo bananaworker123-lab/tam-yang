@@ -25,8 +25,8 @@ export function useInviteMember() {
   const { user } = useAuth();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ email, role }: { email: string; role: 'parent' | 'child' }) =>
-      api.post(`/families/${user?.familyId}/invites`, { email, role }),
+    mutationFn: (role: 'parent' | 'child') =>
+      api.post<{ inviteId: string; token: string }>(`/families/${user?.familyId}/invites`, { role }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['family'] }),
   });
 }

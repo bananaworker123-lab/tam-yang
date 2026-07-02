@@ -28,11 +28,11 @@ export class FamilyController {
   @Roles('parent', 'admin')
   async invite(
     @Param('id') id: string,
-    @Body() body: { email: string; role: 'parent' | 'child' },
+    @Body() body: { role: 'parent' | 'child' },
     @CurrentUser() user: AuthContext,
   ) {
     await this.families.assertMember(user.userId, id);
-    return this.families.createInvite(id, body.email, body.role);
+    return this.families.createInvite(id, body.role);
   }
 
   @Post('/invites/:token/accept')
