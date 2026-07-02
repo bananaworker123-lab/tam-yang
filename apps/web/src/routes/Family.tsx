@@ -186,26 +186,6 @@ export function FamilyPage() {
         </Card>
       )}
 
-      {invites.filter((i: any) => i.status === 'pending').length > 0 && (
-        <Card>
-          <div className="font-bold text-ink mb-3">Pending invites</div>
-          <div className="flex flex-col gap-2">
-            {invites.filter((i: any) => i.status === 'pending').map((i: any) => (
-              <div key={i.id} className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-accent-soft flex items-center justify-center flex-none">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent-ink">
-                    <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <div className="text-sm text-ink capitalize">{i.role} invite</div>
-                  <div className="text-xs text-faint">Waiting for someone to scan</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
     </div>
   );
 }
