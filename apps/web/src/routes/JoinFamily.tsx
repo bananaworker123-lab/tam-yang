@@ -20,8 +20,8 @@ export function JoinFamilyPage() {
 
     // Not logged in yet → redirect to Google sign-in, come back after
     if (!user) {
-      sessionStorage.setItem('pendingInviteToken', token);
-      window.location.href = `/api/v1/auth/google?returnTo=/join?token=${token}`;
+      const returnTo = encodeURIComponent(`/join?token=${token}`);
+      window.location.href = `/api/v1/auth/google?returnTo=${returnTo}`;
       return;
     }
 
