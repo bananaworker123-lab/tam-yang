@@ -62,7 +62,7 @@ export class FamilyService {
     if (this.resend) {
       try {
         await this.resend.emails.send({
-          from: 'Homeroom <noreply@homeroom.isad1dev.com>',
+          from: 'Homeroom <onboarding@resend.dev>',
           to: email.toLowerCase().trim(),
           subject: `You're invited to join ${family?.name ?? 'a family'} on Homeroom`,
           html: `
