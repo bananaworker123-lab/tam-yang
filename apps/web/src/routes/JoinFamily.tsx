@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 
+export const PENDING_INVITE_KEY = 'pendingInviteToken';
+
 export function JoinFamilyPage() {
   const [params] = useSearchParams();
   const token = params.get('token') ?? '';
@@ -18,23 +20,20 @@ export function JoinFamilyPage() {
       return;
     }
 
-    // Not logged in yet → redirect to Google sign-in, come back after
     if (!user) {
-      const returnTo = encodeURIComponent(`/join?token=${token}`);
-      window.location.href = `/api/v1/auth/google?returnTo=${returnTo}`;
+      // Save token so we can accept it after Google sign-in redirects back
+      localStorage.setItem(PENDING_INVITE_KEY, token);
+      window.location.href = '/api/v1/auth/google';
       return;
     }
 
-    // Already logged in → accept right away
     if (status === 'idle') {
       setStatus('loading');
       api
         .post<{ familyId: string; role: string }>(`/families/invites/${token}/accept`)
+        .then(() => refetch())
         .then(() => {
           setStatus('success');
-          return refetch();
-        })
-        .then(() => {
           setTimeout(() => navigate('/dashboard', { replace: true }), 1500);
         })
         .catch((e: unknown) => {
@@ -71,10 +70,7 @@ export function JoinFamilyPage() {
             </div>
             <p className="font-bold text-ink text-lg">Invite failed</p>
             <p className="text-muted text-sm mt-1">{message}</p>
-            <button
-              onClick={() => navigate('/', { replace: true })}
-              className="mt-4 text-accent text-sm font-semibold hover:underline"
-            >
+            <button onClick={() => navigate('/', { replace: true })} className="mt-4 text-accent text-sm font-semibold hover:underline">
               Go home
             </button>
           </>

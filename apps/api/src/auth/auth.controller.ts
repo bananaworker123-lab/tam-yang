@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Req, Res, Body, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import type { Request, Response } from 'express';
-import passport from 'passport';
 import { AppError } from '@homework-tracker/shared-errors';
 import { Role, type AuthContext } from '@homework-tracker/shared-types';
 
@@ -10,16 +9,8 @@ const hasGoogle = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLI
 @Controller('auth')
 export class AuthController {
   @Get('google')
-  async googleStart(@Req() req: Request, @Res() res: Response): Promise<void> {
-    // Save returnTo in session BEFORE Passport redirects to Google,
-    // then manually invoke passport.authenticate so the save happens first.
-    const returnTo = (req.query as Record<string, string>).returnTo;
-    if (returnTo?.startsWith('/')) {
-      (req.session as unknown as { returnTo?: string }).returnTo = returnTo;
-      await new Promise<void>((resolve) => req.session.save(() => resolve()));
-    }
-    passport.authenticate('google')(req, res, () => undefined);
-  }
+  @UseGuards(AuthGuard('google'))
+  googleStart(): void { /* Passport redirects to Google */ }
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
@@ -27,11 +18,7 @@ export class AuthController {
     const user = req.user as AuthContext | undefined;
     if (user) (req.session as unknown as { user?: AuthContext }).user = user;
     const web = process.env.WEB_ORIGIN ?? 'http://localhost:5173';
-    const session = req.session as unknown as { user?: AuthContext; returnTo?: string };
-    const returnTo = session.returnTo;
-    delete session.returnTo;
-    const dest = returnTo ?? (user?.onboardingComplete ? '/dashboard' : '/onboarding');
-    res.redirect(`${web}${dest}`);
+    res.redirect(`${web}/home`);
   }
 
   @Post('logout')

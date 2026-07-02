@@ -1,11 +1,8 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { PENDING_INVITE_KEY } from './JoinFamily';
 
-/**
- * Entry point after login.
- * Routes: no user → /  |  no family → /onboarding  |  has family → /dashboard
- */
 export function HomePage() {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
@@ -13,6 +10,15 @@ export function HomePage() {
   useEffect(() => {
     if (isLoading) return;
     if (!user) { navigate('/', { replace: true }); return; }
+
+    // If user scanned a QR before logging in, resume the invite flow
+    const pendingToken = localStorage.getItem(PENDING_INVITE_KEY);
+    if (pendingToken) {
+      localStorage.removeItem(PENDING_INVITE_KEY);
+      navigate(`/join?token=${pendingToken}`, { replace: true });
+      return;
+    }
+
     if (!user.familyId && !user.roles.includes('admin') && !user.roles.includes('teacher')) {
       navigate('/onboarding', { replace: true });
     } else {
