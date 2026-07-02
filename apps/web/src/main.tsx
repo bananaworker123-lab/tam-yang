@@ -26,6 +26,7 @@ import { AdminAuditPage } from './routes/admin/Audit';
 import { AdminTeachersPage } from './routes/admin/Teachers';
 import { AdminFamiliesPage } from './routes/admin/Families';
 import { AdminSettingsPage } from './routes/admin/Settings';
+import { JoinFamilyPage } from './routes/JoinFamily';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 1000 * 30 } },
@@ -43,6 +44,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                   <Route path="/" element={<LoginPage />} />
                   <Route path="/home" element={<HomePage />} />
                   <Route path="/onboarding" element={<OnboardingPage />} />
+                  <Route path="/join" element={<JoinFamilyPage />} />
                   <Route element={<Layout />}>
                     <Route path="/dashboard" element={<DashboardPage />} />
                     <Route path="/assignment/:id" element={<AssignmentDetailPage />} />
