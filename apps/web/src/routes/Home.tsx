@@ -22,8 +22,11 @@ export function HomePage() {
     if (!user.familyId && !user.roles.includes('admin') && !user.roles.includes('teacher')) {
       navigate('/onboarding', { replace: true });
     } else {
-      const dest = user.roles.includes('admin') ? '/admin' :
-                   user.roles.includes('teacher') ? '/teacher' : '/dashboard';
+      const hasOtherRole = user.roles.some((r) => r !== 'admin');
+      // Admin-only users go to /admin; admins with another role go to their primary role first
+      const dest =
+        user.roles.includes('admin') && !hasOtherRole ? '/admin' :
+        user.roles.includes('teacher') ? '/teacher' : '/dashboard';
       navigate(dest, { replace: true });
     }
   }, [isLoading, user]);
