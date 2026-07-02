@@ -76,8 +76,6 @@ export function Layout() {
     navigate('/dashboard', { replace: true });
   }
 
-  const hasOtherRole = user?.roles.some(r => r !== 'admin') ?? false;
-
   return (
     <div className="min-h-screen bg-bg flex">
 
