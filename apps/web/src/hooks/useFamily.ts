@@ -21,6 +21,16 @@ export function useCreateFamily() {
   });
 }
 
+export function useUpdateMemberName() {
+  const qc = useQueryClient();
+  const { refetch } = useAuth();
+  return useMutation({
+    mutationFn: ({ userId, name }: { userId: string; name: string }) =>
+      api.patch(`/users/${userId}/name`, { name }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['family'] }); refetch(); },
+  });
+}
+
 export function useRemoveMember() {
   const { user } = useAuth();
   const qc = useQueryClient();

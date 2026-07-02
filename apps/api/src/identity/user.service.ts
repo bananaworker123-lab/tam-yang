@@ -28,6 +28,10 @@ export class UserService {
     return user.id;
   }
 
+  async updateName(userId: string, name: string): Promise<void> {
+    await this.prisma.user.update({ where: { id: userId }, data: { name } });
+  }
+
   /** Build the AuthContext (roles + scopes) for a user from their memberships. */
   async buildAuthContext(userId: string): Promise<AuthContext | null> {
     const user = await this.prisma.user.findUnique({

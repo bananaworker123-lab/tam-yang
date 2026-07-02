@@ -1,40 +1,37 @@
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useT } from '../i18n';
 import type { Role } from '@homework-tracker/shared-types';
 
 type AppRole = Role;
 
-const NAV: Record<AppRole, { to: string; label: string; icon: string }[]> = {
+const NAV: Record<AppRole, { to: string; labelKey: string; icon: string }[]> = {
   parent: [
-    { to: '/dashboard', label: 'Homework',    icon: 'M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 0 2-2h2a2 2 0 0 0 2 2' },
-    { to: '/family',    label: 'Family',      icon: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm4 10v-2a4 4 0 0 0-3-3.87' },
-    { to: '/requests',  label: 'Requests',    icon: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' },
-    { to: '/profile',   label: 'Profile',     icon: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z' },
+    { to: '/dashboard', labelKey: 'nav.homework',   icon: 'M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 0 2-2h2a2 2 0 0 0 2 2' },
+    { to: '/family',    labelKey: 'nav.family',     icon: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm4 10v-2a4 4 0 0 0-3-3.87' },
+    { to: '/requests',  labelKey: 'nav.myRequests', icon: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' },
+    { to: '/profile',   labelKey: 'nav.profile',   icon: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z' },
   ],
   child: [
-    { to: '/dashboard', label: 'Homework',    icon: 'M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 0 2-2h2a2 2 0 0 0 2 2' },
-    { to: '/requests',  label: 'Requests',    icon: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' },
-    { to: '/profile',   label: 'Profile',     icon: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z' },
+    { to: '/dashboard', labelKey: 'nav.homework',   icon: 'M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 0 2-2h2a2 2 0 0 0 2 2' },
+    { to: '/requests',  labelKey: 'nav.myRequests', icon: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' },
+    { to: '/profile',   labelKey: 'nav.profile',   icon: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z' },
   ],
   teacher: [
-    { to: '/teacher',   label: 'Class',       icon: 'M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z' },
-    { to: '/requests',  label: 'Requests',    icon: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' },
-    { to: '/profile',   label: 'Profile',     icon: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z' },
+    { to: '/teacher',   labelKey: 'nav.class',      icon: 'M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z' },
+    { to: '/requests',  labelKey: 'nav.myRequests', icon: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' },
+    { to: '/profile',   labelKey: 'nav.profile',   icon: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z' },
   ],
   admin: [
-    { to: '/admin',             label: 'Overview',    icon: 'M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z' },
-    { to: '/admin/assignments', label: 'Assignments', icon: 'M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 0 2-2h2a2 2 0 0 0 2 2' },
-    { to: '/admin/progress',    label: 'Progress',    icon: 'M18 20V10M12 20V4M6 20v-6' },
-    { to: '/admin/requests',    label: 'Requests',    icon: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' },
-    { to: '/admin/audit',       label: 'Audit',       icon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8' },
-    { to: '/admin/teachers',    label: 'Teachers',    icon: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm4 10v-2a4 4 0 0 0-3-3.87' },
-    { to: '/admin/families',    label: 'Families',    icon: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z' },
+    { to: '/admin',             labelKey: 'nav.overview',     icon: 'M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z' },
+    { to: '/admin/assignments', labelKey: 'nav.assignments',  icon: 'M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 0 2-2h2a2 2 0 0 0 2 2' },
+    { to: '/admin/progress',    labelKey: 'nav.progress',     icon: 'M18 20V10M12 20V4M6 20v-6' },
+    { to: '/admin/requests',    labelKey: 'nav.requests',     icon: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' },
+    { to: '/admin/audit',       labelKey: 'nav.audit',        icon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8' },
+    { to: '/admin/teachers',    labelKey: 'nav.teachers',     icon: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm4 10v-2a4 4 0 0 0-3-3.87' },
+    { to: '/admin/families',    labelKey: 'nav.families',     icon: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z' },
   ],
-};
-
-const ROLE_LABEL: Record<AppRole, string> = {
-  admin: 'Admin', parent: 'Parent', child: 'Child', teacher: 'Teacher',
 };
 
 function Icon({ d }: { d: string }) {
@@ -48,6 +45,7 @@ function Icon({ d }: { d: string }) {
 export function Layout() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useT();
 
   // Determine non-admin base role
   const baseRole: AppRole =
@@ -101,14 +99,14 @@ export function Layout() {
             )}
             <div className="flex-1 min-w-0">
               <div className="text-xs font-bold text-ink truncate">{user.name}</div>
-              <div className="text-[11px] text-faint">{ROLE_LABEL[activeRole]}</div>
+              <div className="text-[11px] text-faint">{t(`role.${activeRole}`)}</div>
             </div>
           </div>
         )}
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto px-3 pb-3">
-          <div className="text-[10px] font-extrabold tracking-widest text-faint uppercase mb-2 px-2">Menu</div>
+          <div className="text-[10px] font-extrabold tracking-widest text-faint uppercase mb-2 px-2">{t('nav.menu')}</div>
           <div className="flex flex-col gap-0.5">
             {navItems.map((n) => (
               <NavLink
@@ -124,7 +122,7 @@ export function Layout() {
                 {({ isActive }) => (
                   <>
                     <span className={isActive ? 'opacity-100' : 'opacity-60'}><Icon d={n.icon} /></span>
-                    {n.label}
+                    {t(n.labelKey)}
                   </>
                 )}
               </NavLink>
@@ -142,7 +140,7 @@ export function Layout() {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3" />
               </svg>
-              {viewingAdmin ? `Switch to ${ROLE_LABEL[baseRole]}` : 'Switch to Admin'}
+              {viewingAdmin ? `${t('nav.switchTo')} ${t(`role.${baseRole}`)}` : t('nav.switchToAdmin')}
             </button>
           </div>
         )}
@@ -164,7 +162,7 @@ export function Layout() {
                 onClick={viewingAdmin ? switchToUser : switchToAdmin}
                 className="h-7 px-2.5 rounded-lg text-[10px] font-bold border border-line text-muted hover:bg-bg transition"
               >
-                {viewingAdmin ? ROLE_LABEL[baseRole] : 'Admin'}
+                {viewingAdmin ? t(`role.${baseRole}`) : t('role.admin')}
               </button>
             )}
             {user && (
@@ -200,7 +198,7 @@ export function Layout() {
               {({ isActive }) => (
                 <>
                   <span className={isActive ? 'opacity-100' : 'opacity-50'}><Icon d={n.icon} /></span>
-                  <span>{n.label}</span>
+                  <span>{t(n.labelKey)}</span>
                 </>
               )}
             </NavLink>

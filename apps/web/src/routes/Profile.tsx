@@ -6,7 +6,6 @@ import { Card, Avatar, Button, PageHeader } from '../components/ui';
 import type { Locale } from '../i18n';
 import { useT } from '../i18n';
 
-const ROLE_LABEL: Record<string, string> = { admin: 'Admin', parent: 'Parent', child: 'Student', teacher: 'Teacher' };
 
 export function ProfilePage() {
   const { user } = useAuth();
@@ -24,7 +23,7 @@ export function ProfilePage() {
 
   return (
     <div>
-      <PageHeader title="Profile" />
+      <PageHeader title={t('profile.title')} />
 
       <Card>
         <div className="flex items-center gap-3">
@@ -39,18 +38,18 @@ export function ProfilePage() {
           </div>
         </div>
         <dl className="grid grid-cols-2 gap-y-3 text-sm mt-4">
-          <dt className="text-muted">Role</dt>
-          <dd className="text-ink font-semibold text-right">{user?.roles.map((r) => ROLE_LABEL[r] ?? r).join(', ') ?? '—'}</dd>
-          <dt className="text-muted">Family</dt>
-          <dd className="text-ink font-semibold text-right">{user?.familyId ? 'Joined' : user?.roles.includes('admin') ? 'Admin' : 'Not joined'}</dd>
+          <dt className="text-muted">{t('profile.role')}</dt>
+          <dd className="text-ink font-semibold text-right">{user?.roles.map((r) => t(`role.${r}`)).join(', ') ?? '—'}</dd>
+          <dt className="text-muted">{t('profile.family')}</dt>
+          <dd className="text-ink font-semibold text-right">{user?.familyId ? t('profile.joined') : user?.roles.includes('admin') ? t('role.admin') : t('profile.notJoined')}</dd>
         </dl>
       </Card>
 
-      <div className="text-[11px] font-extrabold tracking-widest text-faint uppercase mt-6 mb-2">Settings</div>
+      <div className="text-[11px] font-extrabold tracking-widest text-faint uppercase mt-6 mb-2">{t('profile.settings')}</div>
       <Card>
         <div className="flex items-center justify-between">
           <div>
-            <div className="font-semibold text-ink text-sm">Language</div>
+            <div className="font-semibold text-ink text-sm">{t('profile.language')}</div>
             <div className="text-xs text-faint mt-0.5">EN / TH</div>
           </div>
           <div className="flex gap-1 bg-bg rounded-xl p-1">
@@ -64,7 +63,7 @@ export function ProfilePage() {
         </div>
       </Card>
 
-      <Button variant="ghost" className="w-full mt-6" onClick={logout}>Sign out</Button>
+      <Button variant="ghost" className="w-full mt-6" onClick={logout}>{t('profile.signOut')}</Button>
     </div>
   );
 }

@@ -82,6 +82,65 @@ const DICT: Dict = {
   'profile.settings': { en: 'Settings', th: 'การตั้งค่า' },
   'profile.language': { en: 'Language', th: 'ภาษา' },
 
+  // nav extras
+  'nav.class': { en: 'Class', th: 'ชั้นเรียน' },
+  'nav.menu': { en: 'Menu', th: 'เมนู' },
+  'nav.switchTo': { en: 'Switch to', th: 'สลับเป็น' },
+  'nav.switchToAdmin': { en: 'Switch to Admin', th: 'สลับเป็น Admin' },
+
+  // login
+  'login.sub2': { en: 'One shared master list for the whole class. Each family tracks their own children.', th: 'มาสเตอร์การบ้านกลางสำหรับทั้งห้อง แต่ละครอบครัวติดตามของลูกตัวเอง' },
+
+  // dashboard extras
+  'dash.filter.todo': { en: 'To do', th: 'ต้องทำ' },
+  'dash.todo': { en: 'to do', th: 'ต้องทำ' },
+  'dash.overdueCount': { en: 'overdue', th: 'เลยกำหนด' },
+  'dash.nothingHere': { en: 'Nothing here 🎉', th: 'ไม่มีงานแล้ว 🎉' },
+  'dash.noAssignments': { en: 'No assignments for', th: 'ไม่มีงานสำหรับ' },
+  'dash.noAssignmentsHint': { en: 'Admin → Config to change active class/term', th: 'Admin → Config เพื่อเปลี่ยนชั้น/เทอม' },
+  'dash.myHomeworkLabel': { en: 'My homework', th: 'การบ้านของฉัน' },
+  'dash.homeworkOf2': { en: 'Homework ·', th: 'การบ้าน ·' },
+  'dash.submittedOf2': { en: 'Submitted', th: 'ส่งแล้ว' },
+
+  // profile extras
+  'profile.joined': { en: 'Joined', th: 'เข้าร่วมแล้ว' },
+  'profile.notJoined': { en: 'Not joined', th: 'ยังไม่เข้าร่วม' },
+  'profile.family': { en: 'Family', th: 'ครอบครัว' },
+  'profile.role': { en: 'Role', th: 'บทบาท' },
+  'profile.signOut': { en: 'Sign out', th: 'ออกจากระบบ' },
+
+  // family
+  'family.title': { en: 'Family', th: 'ครอบครัว' },
+  'family.sub': { en: 'Members & invites', th: 'สมาชิกและคำเชิญ' },
+  'family.members': { en: 'Members', th: 'สมาชิก' },
+  'family.noMembers': { en: 'No members yet', th: 'ยังไม่มีสมาชิก' },
+  'family.inviteTitle': { en: 'Invite a member', th: 'เชิญสมาชิก' },
+  'family.inviteHint': { en: 'Generate a QR code for a new member to scan', th: 'สร้าง QR code แล้วให้สมาชิกใหม่สแกน' },
+  'family.generateQr': { en: 'Generate QR code', th: 'สร้าง QR code' },
+  'family.generating': { en: 'Generating…', th: 'กำลังสร้าง…' },
+  'family.scanTitle': { en: 'Scan to join', th: 'สแกนเพื่อเข้าร่วม' },
+  'family.scanHint': { en: 'Scan QR with your phone camera\nthen Sign in with Google to join', th: 'สแกน QR ด้วยกล้องโทรศัพท์\nแล้ว Sign in with Google เพื่อเข้า family' },
+  'family.copyLink': { en: 'Copy invite link', th: 'คัดลอกลิงก์เชิญ' },
+  'family.copied': { en: 'Copied!', th: 'คัดลอกแล้ว!' },
+  'family.removeTitle': { en: 'Remove member?', th: 'ลบสมาชิก?' },
+  'family.removeHint': { en: 'Cannot be undone.', th: 'ไม่สามารถย้อนกลับได้' },
+  'family.removing': { en: 'Removing…', th: 'กำลังลบ…' },
+  'family.remove': { en: 'Remove', th: 'ลบ' },
+  'family.cancel': { en: 'Cancel', th: 'ยกเลิก' },
+  'family.save': { en: 'Save', th: 'บันทึก' },
+  'family.roleParent': { en: 'Parent', th: 'ผู้ปกครอง' },
+  'family.roleChild': { en: 'Child', th: 'เด็ก' },
+  'family.roleLabel': { en: 'Role:', th: 'บทบาท:' },
+
+  // assignment detail
+  'detail.dueOverdue': { en: 'Overdue ·', th: 'เลยกำหนด ·' },
+  'detail.dueToday': { en: 'Due today ·', th: 'ครบกำหนดวันนี้ ·' },
+  'detail.dueSoon': { en: 'Due soon ·', th: 'ใกล้กำหนด ·' },
+  'detail.dueOn': { en: 'Due', th: 'กำหนดส่ง' },
+  'detail.submittedCheck': { en: 'Submitted ✓', th: 'ส่งแล้ว ✓' },
+  'detail.notFoundFull': { en: 'Assignment not found. It may have been removed.', th: 'ไม่พบงานนี้ อาจถูกลบไปแล้ว' },
+  'detail.readonlyFull': { en: "Read-only — teachers can't change status.", th: 'อ่านอย่างเดียว — ครูเปลี่ยนสถานะไม่ได้' },
+
   // common
   'common.exampleUser': { en: 'Example user', th: 'ผู้ใช้ตัวอย่าง' },
 };

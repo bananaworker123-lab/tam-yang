@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useT } from '../i18n';
 
 export function LoginPage() {
   const apiBase = import.meta.env.VITE_API_BASE ?? '/api/v1';
   const navigate = useNavigate();
+  const { t } = useT();
 
   // If already logged in (session exists), redirect straight to app
   useEffect(() => {
@@ -23,10 +25,8 @@ export function LoginPage() {
           <span className="font-display font-bold text-3xl text-ink">Tam-Yang</span>
         </div>
         <div>
-          <h1 className="font-display font-bold text-2xl text-ink">Track homework, all in one place</h1>
-          <p className="text-muted mt-2 text-sm leading-relaxed">
-            One shared master list for the whole class. Each family tracks their own children.
-          </p>
+          <h1 className="font-display font-bold text-2xl text-ink">{t('login.headline')}</h1>
+          <p className="text-muted mt-2 text-sm leading-relaxed">{t('login.sub2')}</p>
         </div>
         <a
           href={`${apiBase}/auth/google`}
@@ -38,9 +38,9 @@ export function LoginPage() {
             <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.5-5.2l-6.2-5.3C29.2 35 26.7 36 24 36c-5.3 0-9.7-2.6-11.3-7l-6.5 5C9.5 39.6 16.2 44 24 44z" />
             <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4 5.5l6.2 5.3C41.5 35.8 44 30.4 44 24c0-1.3-.1-2.3-.4-3.5z" />
           </svg>
-          Sign in with Google
+          {t('login.google')}
         </a>
-        <p className="text-faint text-xs">Sign in with a Google account only</p>
+        <p className="text-faint text-xs">{t('login.googleOnly')}</p>
       </div>
     </div>
   );

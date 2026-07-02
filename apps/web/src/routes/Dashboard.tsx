@@ -70,10 +70,10 @@ export function DashboardPage() {
   });
 
   const chips: { key: Filter; label: string }[] = [
-    { key: 'todo',      label: 'To do' },
-    { key: 'near',      label: 'Near due' },
-    { key: 'overdue',   label: 'Overdue' },
-    { key: 'submitted', label: 'Submitted' },
+    { key: 'todo',      label: t('dash.filter.todo') },
+    { key: 'near',      label: t('dash.filter.near') },
+    { key: 'overdue',   label: t('dash.filter.overdue') },
+    { key: 'submitted', label: t('dash.filter.submitted') },
   ];
 
   if (isLoading) {
@@ -100,16 +100,16 @@ export function DashboardPage() {
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-sm opacity-90 font-semibold">
-            {isChild ? 'My homework' : `Homework · ${activeClassName} ${activeTermName}`}
+            {isChild ? t('dash.myHomeworkLabel') : `${t('dash.homeworkOf2')} ${activeClassName} ${activeTermName}`}
           </div>
-          <div className="font-display font-bold text-lg mt-0.5">Submitted {submitted}/{total}</div>
+          <div className="font-display font-bold text-lg mt-0.5">{t('dash.submittedOf2')} {submitted}/{total}</div>
           <div className="flex gap-2 mt-2.5">
             <span className="inline-flex items-center gap-1.5 bg-white/20 rounded-lg px-2.5 py-1 text-[11.5px] font-semibold">
-              <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#FFC56B' }} />{todo} to do
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#FFC56B' }} />{todo} {t('dash.todo')}
             </span>
             {overdue > 0 && (
               <span className="inline-flex items-center gap-1.5 bg-white/20 rounded-lg px-2.5 py-1 text-[11.5px] font-semibold">
-                <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#FF9A8B' }} />{overdue} overdue
+                <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#FF9A8B' }} />{overdue} {t('dash.overdueCount')}
               </span>
             )}
           </div>
@@ -130,8 +130,8 @@ export function DashboardPage() {
       {filtered.length === 0 ? (
         <div className="text-center py-10 text-faint text-sm">
           {total === 0
-            ? <><div>No assignments for <span className="font-semibold text-accent-ink">{activeClassName} · {activeTermName}</span></div><div className="mt-1 text-[11px]">Admin → Settings to change active class/term</div></>
-            : 'Nothing here 🎉'}
+            ? <><div>{t('dash.noAssignments')} <span className="font-semibold text-accent-ink">{activeClassName} · {activeTermName}</span></div><div className="mt-1 text-[11px]">{t('dash.noAssignmentsHint')}</div></>
+            : t('dash.nothingHere')}
         </div>
       ) : (
         <div className="flex flex-col gap-3">
@@ -140,7 +140,7 @@ export function DashboardPage() {
             const sh = subjectShort(p.subject);
             const dateStr = new Date(p.dueDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
             const dueChipCls = due === 'overdue' ? 'bg-status-overdue text-white' : due === 'due_today' ? 'bg-[#EBA53A] text-white' : due === 'near' ? 'bg-status-done/30 text-[#8A5D0E]' : '';
-            const dueChipLabel = due === 'overdue' ? 'Overdue' : due === 'due_today' ? 'Due today' : due === 'near' ? 'Near due' : '';
+            const dueChipLabel = due === 'overdue' ? t('due.overdue') : due === 'due_today' ? t('due.today') : due === 'near' ? t('due.near') : '';
             const STATUS_PILL: Record<ProgressStatus, { cls: string; dot: string }> = {
               not_started: { cls: 'bg-status-notstarted/30 text-ink', dot: 'bg-status-notstarted' },
               done:        { cls: 'bg-status-done/20 text-[#8A5D0E]', dot: 'bg-status-done' },
@@ -167,7 +167,7 @@ export function DashboardPage() {
                     <button onClick={(e) => { e.stopPropagation(); handleCycleStatus(p); }}
                       className={`inline-flex items-center gap-2 h-8 px-3 rounded-full text-xs font-bold transition active:scale-95 ${pill.cls}`}>
                       <span className={`w-2 h-2 rounded-full ${pill.dot}`} />
-                      {STATUS_LABEL[p.status]}
+                      {t(`status.${p.status}`)}
                     </button>
                   </div>
                 </div>
