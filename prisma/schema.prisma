@@ -1,0 +1,228 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../apps/api/prisma-client"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["identity", "family", "assignment", "progress", "requests_audit"]
+}
+
+enum FamilyRole {
+  parent
+  child
+
+  @@schema("family")
+}
+
+enum InviteStatus {
+  pending
+  accepted
+
+  @@schema("family")
+}
+
+enum ProgressStatus {
+  not_started
+  done
+  submitted
+
+  @@schema("progress")
+}
+
+enum RequestStatus {
+  pending
+  resolved
+  rejected
+
+  @@schema("requests_audit")
+}
+
+// ---------- identity ----------
+model User {
+  id         String   @id @default(uuid()) @db.Uuid
+  googleSub  String?  @unique @map("google_sub")
+  email      String   @unique
+  name       String
+  pictureUrl String?  @map("picture_url")
+  isAdmin    Boolean  @default(false) @map("is_admin")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  memberships        Membership[]
+  teacherAssignments TeacherAssignment[]
+  progress           Progress[]
+
+  @@map("users")
+  @@schema("identity")
+}
+
+// ---------- family ----------
+model Family {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  schoolId  String?  @map("school_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  members Membership[]
+  invites Invite[]
+
+  @@map("families")
+  @@schema("family")
+}
+
+model Membership {
+  id        String     @id @default(uuid()) @db.Uuid
+  familyId  String     @map("family_id") @db.Uuid
+  userId    String     @map("user_id") @db.Uuid
+  role      FamilyRole
+  createdAt DateTime   @default(now()) @map("created_at")
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([familyId, userId])
+  @@index([familyId])
+  @@index([userId])
+  @@map("memberships")
+  @@schema("family")
+}
+
+model Invite {
+  id        String       @id @default(uuid()) @db.Uuid
+  familyId  String       @map("family_id") @db.Uuid
+  email     String
+  role      FamilyRole
+  token     String       @unique
+  status    InviteStatus @default(pending)
+  createdAt DateTime     @default(now()) @map("created_at")
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  @@index([email])
+  @@map("invites")
+  @@schema("family")
+}
+
+// ---------- assignment ----------
+model ClassRoom {
+  id       String  @id @default(uuid()) @db.Uuid
+  name     String
+  schoolId String? @map("school_id") @db.Uuid
+
+  assignments        MasterAssignment[]
+  teacherAssignments TeacherAssignment[]
+
+  @@unique([name, schoolId])
+  @@map("classrooms")
+  @@schema("assignment")
+}
+
+model Term {
+  id     String  @id @default(uuid()) @db.Uuid
+  name   String
+  active Boolean @default(true)
+
+  assignments MasterAssignment[]
+
+  @@map("terms")
+  @@schema("assignment")
+}
+
+model MasterAssignment {
+  id           String   @id @default(uuid()) @db.Uuid
+  subject      String
+  teacherName  String   @map("teacher_name")
+  topic        String   @default("")
+  classId      String   @map("class_id") @db.Uuid
+  termId       String   @map("term_id") @db.Uuid
+  assignedDate DateTime @map("assigned_date") @db.Date
+  dueDate      DateTime @map("due_date") @db.Date
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  classRoom ClassRoom  @relation(fields: [classId], references: [id], onDelete: Cascade)
+  term      Term       @relation(fields: [termId], references: [id], onDelete: Cascade)
+  progress  Progress[]
+
+  @@index([classId])
+  @@index([termId])
+  @@map("master_assignments")
+  @@schema("assignment")
+}
+
+model TeacherAssignment {
+  id            String   @id @default(uuid()) @db.Uuid
+  teacherUserId String   @map("teacher_user_id") @db.Uuid
+  classId       String   @map("class_id") @db.Uuid
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  teacher   User      @relation(fields: [teacherUserId], references: [id], onDelete: Cascade)
+  classRoom ClassRoom @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([teacherUserId, classId])
+  @@index([teacherUserId])
+  @@index([classId])
+  @@map("teacher_assignments")
+  @@schema("assignment")
+}
+
+// ---------- progress ----------
+model Progress {
+  id           String         @id @default(uuid()) @db.Uuid
+  childUserId  String         @map("child_user_id") @db.Uuid
+  assignmentId String         @map("assignment_id") @db.Uuid
+  familyId     String         @map("family_id") @db.Uuid
+  schoolId     String?        @map("school_id") @db.Uuid
+  status       ProgressStatus @default(not_started)
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+
+  child      User             @relation(fields: [childUserId], references: [id], onDelete: Cascade)
+  assignment MasterAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+
+  @@unique([childUserId, assignmentId])
+  @@index([familyId])
+  @@index([childUserId])
+  @@index([assignmentId])
+  @@map("progress")
+  @@schema("progress")
+}
+
+// ---------- requests_audit ----------
+model Request {
+  id           String        @id @default(uuid()) @db.Uuid
+  createdBy    String        @map("created_by") @db.Uuid
+  role         String
+  assignmentId String?       @map("assignment_id") @db.Uuid
+  detail       String
+  status       RequestStatus @default(pending)
+  reply        String?
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  @@index([createdBy])
+  @@map("requests")
+  @@schema("requests_audit")
+}
+
+model AuditEntry {
+  id          String   @id @default(uuid()) @db.Uuid
+  eventId     String   @unique @map("event_id") @db.Uuid
+  actorUserId String   @map("actor_user_id") @db.Uuid
+  actorRole   String   @map("actor_role")
+  childUserId String   @map("child_user_id") @db.Uuid
+  assignmentId String  @map("assignment_id") @db.Uuid
+  fromStatus  String   @map("from_status")
+  toStatus    String   @map("to_status")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@index([actorUserId])
+  @@index([childUserId])
+  @@map("audit_entries")
+  @@schema("requests_audit")
+}

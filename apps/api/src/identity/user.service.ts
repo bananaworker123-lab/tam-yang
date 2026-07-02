@@ -1,0 +1,61 @@
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { Role, type AuthContext } from '@homework-tracker/shared-types';
+
+export interface GoogleProfileInput {
+  googleSub: string;
+  email: string;
+  name: string;
+  pictureUrl?: string | null;
+}
+
+@Injectable()
+export class UserService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  /** Upsert a user from a Google profile (idempotent by googleSub). */
+  async upsertFromGoogle(p: GoogleProfileInput): Promise<string> {
+    const user = await this.prisma.user.upsert({
+      where: { googleSub: p.googleSub },
+      update: { email: p.email, name: p.name, pictureUrl: p.pictureUrl ?? null },
+      create: {
+        googleSub: p.googleSub,
+        email: p.email,
+        name: p.name,
+        pictureUrl: p.pictureUrl ?? null,
+      },
+    });
+    return user.id;
+  }
+
+  /** Build the AuthContext (roles + scopes) for a user from their memberships. */
+  async buildAuthContext(userId: string): Promise<AuthContext | null> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        memberships: true,
+        teacherAssignments: true,
+      },
+    });
+    if (!user) return null;
+
+    const roles: Role[] = [];
+    if (user.isAdmin) roles.push(Role.Admin);
+    const membership = user.memberships[0];
+    if (membership) {
+      roles.push(membership.role === 'parent' ? Role.Parent : Role.Child);
+    }
+    if (user.teacherAssignments.length > 0) roles.push(Role.Teacher);
+
+    return {
+      userId: user.id,
+      email: user.email,
+      name: user.name,
+      pictureUrl: user.pictureUrl,
+      roles,
+      familyId: membership?.familyId ?? null,
+      classScopes: user.teacherAssignments.map((t: { classId: string }) => t.classId),
+      onboardingComplete: roles.length > 0,
+    };
+  }
+}

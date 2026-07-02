@@ -1,0 +1,172 @@
+version: "2.1"
+feature: "homework-tracker"
+language: "th"
+platform: "kiro"
+created: "2026-06-30T00:00:00Z"
+updated: "2026-06-30T00:00:00Z"
+state:
+  status: "active"
+  implementationMode: "autonomous"
+  sharedPhases: [context, requirements, decomposition, foundation]
+  mode: "incremental"
+  foundationSkipped: false
+artifacts:
+  context:
+    status: "approved"
+    timestamp: "2026-06-30T00:00:00Z"
+    files: [context.md]
+  requirements:
+    status: "approved"
+    timestamp: "2026-06-30T00:00:00Z"
+    files: [requirements.md, personas.md]
+  decomposition:
+    status: "approved"
+    timestamp: "2026-06-30T00:00:01Z"
+    files: [units.md]
+  foundation:
+    status: "approved"
+    timestamp: "2026-06-30T00:00:01Z"
+    files: [foundation.md]
+context-summary:
+  type: "Greenfield"
+  stack: "Pending D3 (responsive web + backend API + database; Google OAuth)"
+  architecture: "Pending D2/D3 (multi-tenant per family, RBAC, audit log)"
+  feature: "เว็บแอปติดตามการบ้านที่หลายครอบครัวใช้มาสเตอร์การบ้านกลางร่วมกัน แต่ละครอบครัวเห็นเฉพาะ progress ของตัวเอง"
+  impact: "New standalone"
+  complexity: "High"
+  recommendations: { personas: true, units: true, nfr: true }
+decisions:
+  requirements:
+    mvpScope: "ครบตาม spec — core + request + audit + teacher view (16 หน้า)"
+    inviteMechanism: "ลิงก์เชิญผูกกับอีเมลเฉพาะ (Gmail ต้องตรง)"
+    roleAssignment: "ระบุ role ตอนเชิญ"
+    familyMemberMgmt: "Parent ทุกคนในครอบครัวจัดการได้"
+    statusTransitions: "เปลี่ยนไป-กลับอิสระทุกทิศ"
+    childVisibility: "Child เห็นเฉพาะของตัวเอง"
+    notificationThresholds: "ใกล้กำหนด=ภายใน 2 วันก่อน due (เหลืองอ่อน); วัน due ยังไม่ส่ง=เหลืองเข้ม; เลย due=overdue (แดง)"
+    teacherScope: "เฉพาะชั้นที่มอบหมาย (read-only, ไม่แบ่งเทอม); เปลี่ยนครู=revoke"
+    privacyDeletion: "ลบสมาชิก/ครอบครัว → progress ถูกลบ, audit log เก็บไว้"
+    personas: "สร้าง 4 roles"
+    outOfScope: "ไม่มี noti ภายนอก/แนบไฟล์/UI multi-school; แต่ DB รองรับ multi-school"
+  decomposition:
+    decompose: "หลาย unit ตาม domain"
+    architecture: "Modular Monolith"
+    strategy: "Domain-Driven"
+    unitSet: "6 units: U1 Identity, U2 Family, U3 Assignment Master, U4 Progress, U5 Requests & Audit, U6 Oversight"
+    devSequence: "U1 → U2 → U3 → U4 → U5 → U6"
+  foundation:
+    team: "Solo"
+    repo: "Monorepo (apps/web, apps/api, packages/shared-*)"
+    architecture: "Modular Monolith"
+    auth: "OAuth2/OIDC Google + server session cookie; RBAC + scope guard"
+    errorFormat: "Custom envelope { error: { code, message, status, details?, requestId } }"
+    interModuleComms: "in-process service calls + in-process domain events (idempotent)"
+    database: "Shared DB แยก schema ตามโมดูล + scope columns family_id/school_id (เผื่อ multi-school)"
+    sharedTypes: "Shared package packages/shared-types (TS)"
+    infraUnits: "U0 Foundation (combined)"
+    language: "TypeScript (strict); framework เจาะจงใน D3"
+steering:
+  updatedBy:
+    product: [context, requirements]
+    tech: [context, foundation, design]
+    structure: [context, design]
+    resources: [context]
+units:
+  - name: "U0-foundation"
+    status: "in-progress"
+    phase: "implement"
+    completedPhases: [design, tasks]
+    implementationMode: "autonomous"
+    implementation: { totalTasks: 12, completedTasks: 11, currentTask: "7.1", currentWave: null }
+    artifacts:
+      design:
+        status: "approved"
+        timestamp: "2026-06-30T00:00:02Z"
+        files: [design.md]
+      tasks:
+        status: "approved"
+        timestamp: "2026-06-30T00:00:03Z"
+        files: [tasks.md]
+    decisions:
+      design:
+        backend: "NestJS (TypeScript)"
+        frontend: "React + Vite + TypeScript"
+        styling: "Tailwind CSS + design tokens"
+        database: "PostgreSQL"
+        orm: "Prisma (multi-schema)"
+        auth: "Passport google-oauth20 + express-session (connect-pg-simple)"
+        monorepo: "pnpm workspaces + Turborepo"
+        feState: "TanStack Query + Context"
+        testing: "Jest+Supertest (api), Vitest+RTL (web)"
+        pbt: "Yes — due-state, status transition, RBAC/isolation predicate"
+        deploy: "Docker + PaaS + managed PostgreSQL"
+        sessionStore: "PostgreSQL (connect-pg-simple)"
+      tasks:
+        breakdown: "foundation-first; test-first PBT, test-after wiring; standard granularity; sequential (solo)"
+  - name: "U1-identity-access"
+    status: "in-progress"
+    phase: "tasks"
+    completedPhases: [design, tasks]
+    implementationMode: null
+    implementation: { totalTasks: 6, completedTasks: 0, currentTask: null, currentWave: null }
+    artifacts:
+      design: { status: "approved", timestamp: "2026-06-30T00:00:04Z", files: [design.md] }
+      tasks: { status: "approved", timestamp: "2026-06-30T00:00:04Z", files: [tasks.md] }
+    decisions:
+      design: { inherits: "U0 stack (NestJS/React/Prisma/PostgreSQL); module identity" }
+  - name: "U2-family-membership"
+    status: "in-progress"
+    phase: "tasks"
+    completedPhases: [design, tasks]
+    implementationMode: null
+    implementation: { totalTasks: 7, completedTasks: 0, currentTask: null, currentWave: null }
+    artifacts:
+      design: { status: "approved", timestamp: "2026-06-30T00:00:05Z", files: [design.md] }
+      tasks: { status: "approved", timestamp: "2026-06-30T00:00:05Z", files: [tasks.md] }
+    decisions:
+      design: { inherits: "U0 stack; module family; events family.member.removed" }
+  - name: "U3-assignment-master"
+    status: "in-progress"
+    phase: "tasks"
+    completedPhases: [design, tasks]
+    implementationMode: null
+    implementation: { totalTasks: 8, completedTasks: 0, currentTask: null, currentWave: null }
+    artifacts:
+      design: { status: "approved", timestamp: "2026-06-30T00:00:06Z", files: [design.md] }
+      tasks: { status: "approved", timestamp: "2026-06-30T00:00:06Z", files: [tasks.md] }
+    decisions:
+      design: { inherits: "U0 stack; module assignment; events assignment.changed/teacher.changed" }
+  - name: "U4-progress-tracking"
+    status: "in-progress"
+    phase: "tasks"
+    completedPhases: [design, tasks]
+    implementationMode: null
+    implementation: { totalTasks: 8, completedTasks: 0, currentTask: null, currentWave: null }
+    artifacts:
+      design: { status: "approved", timestamp: "2026-06-30T00:00:07Z", files: [design.md] }
+      tasks: { status: "approved", timestamp: "2026-06-30T00:00:07Z", files: [tasks.md] }
+    decisions:
+      design: { inherits: "U0 stack; module progress; events progress.status.changed; PBT due-state/transition/isolation" }
+  - name: "U5-requests-audit"
+    status: "in-progress"
+    phase: "tasks"
+    completedPhases: [design, tasks]
+    implementationMode: null
+    implementation: { totalTasks: 7, completedTasks: 0, currentTask: null, currentWave: null }
+    artifacts:
+      design: { status: "approved", timestamp: "2026-06-30T00:00:08Z", files: [design.md] }
+      tasks: { status: "approved", timestamp: "2026-06-30T00:00:08Z", files: [tasks.md] }
+    decisions:
+      design: { inherits: "U0 stack; module requests-audit; subscribes progress.status.changed; append-only audit" }
+  - name: "U6-oversight"
+    status: "in-progress"
+    phase: "tasks"
+    completedPhases: [design, tasks]
+    implementationMode: null
+    implementation: { totalTasks: 6, completedTasks: 0, currentTask: null, currentWave: null }
+    artifacts:
+      design: { status: "approved", timestamp: "2026-06-30T00:00:09Z", files: [design.md] }
+      tasks: { status: "approved", timestamp: "2026-06-30T00:00:09Z", files: [tasks.md] }
+    decisions:
+      design: { inherits: "U0 stack; module oversight; read-only projections; teacher scope guard" }
+

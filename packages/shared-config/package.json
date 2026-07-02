@@ -1,0 +1,11 @@
+{
+  "name": "@homework-tracker/shared-config",
+  "version": "0.1.0",
+  "private": true,
+  "files": ["tsconfig.json", "eslint.cjs", "prettier.json"],
+  "scripts": {
+    "lint": "echo \"(config package)\"",
+    "test": "echo \"(no tests)\"",
+    "typecheck": "echo \"(config package)\""
+  }
+}

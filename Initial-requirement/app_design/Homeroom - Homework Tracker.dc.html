@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0}
+  body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#1B1A2A}
+  button{font-family:inherit}
+  :root{
+    --accent:#5B53E0;--accent-soft:#ECEBFD;--accent-ink:#463FBF;
+    --bg:#F4F4FB;--card:#fff;--ink:#1B1A2A;--muted:#6E6D80;--faint:#9B99AD;--line:#ECEAF3;
+  }
+  .appscroll{scrollbar-width:none}
+  .appscroll::-webkit-scrollbar{display:none}
+  .scr{animation:scrIn .32s cubic-bezier(.22,.9,.32,1)}
+  @keyframes scrIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @keyframes toastIn{from{opacity:0;transform:translate(-50%,16px)}to{opacity:1;transform:translate(-50%,0)}}
+  @keyframes ringPop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+  .pressable{transition:transform .12s ease, box-shadow .15s ease}
+  .pressable:active{transform:scale(.97)}
+  .navlist::-webkit-scrollbar{width:6px}
+  .navlist::-webkit-scrollbar-thumb{background:#d8d6e6;border-radius:3px}
+</style>
+</helmet>
+
+<div style="min-height:100vh;width:100%;background:radial-gradient(120% 90% at 80% -10%, #E9E7F6 0%, #DFDEEC 45%, #D6D5E4 100%);padding:40px 36px 60px;overflow-x:auto;font-family:'Plus Jakarta Sans',sans-serif">
+  <div style="display:flex;justify-content:center;align-items:flex-start;gap:34px;width:max-content;min-width:100%;margin:0 auto">
+
+  <!-- ====== PROTOTYPE NAVIGATOR ====== -->
+  <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+  <div style="width:236px;flex:none;position:sticky;top:40px;display:flex;flex-direction:column;gap:18px">
+    <div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:30px;height:30px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px -2px rgba(91,83,224,.5)">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        </div>
+        <span style="font-family:'Bricolage Grotesque';font-weight:700;font-size:18px;color:#26243a;letter-spacing:-.01em">Tam-Yang</span>
+      </div>
+      <div style="font-size:12px;color:#6b6a7e;margin-top:8px;line-height:1.5">Interactive prototype · front-of-house. Switch role and tap any screen to explore.</div>
+    </div>
+
+    <div>
+      <div style="font-size:10.5px;font-weight:800;letter-spacing:.13em;color:#8a89a0;text-transform:uppercase;margin-bottom:9px">Sign in as</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <sc-for list="{{ roleBtns }}" as="r" hint-placeholder-count="3">
+          <button onClick="{{ r.pick }}" class="pressable" style="{{ r.style }}">
+            <span style="display:flex;align-items:center;gap:9px">
+              <span style="{{ r.dot }}"></span>
+              <span style="font-weight:600;font-size:13.5px">{{ r.label }}</span>
+            </span>
+            <span style="font-size:11px;color:inherit;opacity:.7">{{ r.hint }}</span>
+          </button>
+        </sc-for>
+      </div>
+      <sc-if value="{{ showAdminToggle }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:10px">
+          <div style="font-size:10.5px;font-weight:800;letter-spacing:.13em;color:#8a89a0;text-transform:uppercase;margin-bottom:7px">Admin viewport</div>
+          <div style="display:flex;gap:4px;background:#E4E2F0;border-radius:11px;padding:4px">
+            <sc-for list="{{ adminViewBtns }}" as="v" hint-placeholder-count="2">
+              <button onClick="{{ v.pick }}" style="{{ v.style }}">{{ v.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+
+    <div>
+      <div style="font-size:10.5px;font-weight:800;letter-spacing:.13em;color:#8a89a0;text-transform:uppercase;margin-bottom:9px">Screens</div>
+      <div class="navlist" style="display:flex;flex-direction:column;gap:2px;max-height:340px;overflow-y:auto;padding-right:4px">
+        <sc-for list="{{ screenLinks }}" as="s" hint-placeholder-count="9">
+          <button onClick="{{ s.go }}" style="{{ s.style }}">
+            <span style="font-variant-numeric:tabular-nums;font-size:11px;font-weight:700;opacity:.55;width:16px">{{ s.num }}</span>
+            <span style="font-weight:{{ s.weight }};font-size:13px">{{ s.label }}</span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="font-size:11px;color:#7a7990;line-height:1.5;border-top:1px solid #cfcde0;padding-top:14px">
+      Tip: tap a status pill on the dashboard to cycle <b>Not started → Done → Submitted</b>. Teacher view is read-only.
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ showPhone }}" hint-placeholder-val="{{ true }}">
+  <!-- ====== PHONE ====== -->
+  <div style="width:392px;height:840px;flex:none;background:#141320;border-radius:55px;padding:11px;box-shadow:0 50px 90px -30px rgba(40,37,70,.65), 0 0 0 2px rgba(255,255,255,.05) inset;position:sticky;top:40px">
+    <div style="position:relative;width:100%;height:100%;background:var(--bg);border-radius:44px;overflow:hidden;display:flex;flex-direction:column">
+
+      <!-- dynamic island -->
+      <div style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:112px;height:31px;background:#0d0c16;border-radius:18px;z-index:40"></div>
+
+      <!-- status bar -->
+      <div style="height:52px;flex:none;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 9px;z-index:20;background:var(--statusbar)">
+        <span style="font-weight:700;font-size:14.5px;color:var(--ink)">9:41</span>
+        <div style="display:flex;align-items:center;gap:7px">
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="var(--ink)"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round"><path d="M1.5 4.4a10 10 0 0 1 13 0"/><path d="M4.3 7.2a6 6 0 0 1 7.4 0"/><circle cx="8" cy="10.2" r="1.1" fill="var(--ink)" stroke="none"/></svg>
+          <svg width="26" height="13" viewBox="0 0 26 13"><rect x="0.5" y="0.5" width="21" height="12" rx="3.4" fill="none" stroke="var(--ink)" stroke-opacity="0.35"/><rect x="2" y="2" width="15.5" height="9" rx="1.8" fill="var(--ink)"/><rect x="23" y="4.2" width="2.2" height="4.6" rx="1" fill="var(--ink)" fill-opacity="0.4"/></svg>
+        </div>
+      </div>
+
+      <!-- admin mobile header -->
+      <sc-if value="{{ isAdminMobile }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:none;padding:2px 16px 10px">
+          <div style="display:flex;align-items:center;gap:10px;min-height:40px">
+            <div style="width:32px;height:32px;flex:none;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:10px;font-weight:800;letter-spacing:.14em;color:var(--accent);text-transform:uppercase">Tam-Yang Admin</div>
+              <div style="font-family:'Bricolage Grotesque';font-weight:700;font-size:21px;line-height:1.1;color:var(--ink);letter-spacing:-.01em">{{ aTitle }}</div>
+            </div>
+            <button onClick="{{ exitAdmin }}" class="pressable" style="flex:none;height:34px;padding:0 12px;border-radius:11px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--muted);font-weight:700;font-size:12.5px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Exit</button>
+          </div>
+          <div style="display:flex;gap:7px;margin-top:12px;overflow-x:auto" class="appscroll">
+            <sc-for list="{{ aChips }}" as="c" hint-placeholder-count="7">
+              <button onClick="{{ c.go }}" class="pressable" style="{{ c.style }}">{{ c.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- header -->
+      <sc-if value="{{ showHeader }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:none;padding:2px 20px 12px">
+          <div style="display:flex;align-items:center;gap:12px;min-height:44px">
+            <sc-if value="{{ showBack }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ goBack }}" class="pressable" style="width:38px;height:38px;flex:none;border-radius:12px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+              </button>
+            </sc-if>
+            <div style="flex:1;min-width:0">
+              <sc-if value="{{ headerKicker }}" hint-placeholder-val="">
+                <div style="font-size:10.5px;font-weight:800;letter-spacing:.13em;color:var(--accent);text-transform:uppercase">{{ headerKicker }}</div>
+              </sc-if>
+              <div style="font-family:'Bricolage Grotesque';font-weight:700;font-size:23px;line-height:1.12;color:var(--ink);letter-spacing:-.01em">{{ headerTitle }}</div>
+              <sc-if value="{{ headerSub }}" hint-placeholder-val="">
+                <div style="font-size:12.5px;color:var(--muted);margin-top:2px">{{ headerSub }}</div>
+              </sc-if>
+            </div>
+            <sc-if value="{{ showBell }}" hint-placeholder-val="{{ false }}">
+              <button class="pressable" style="position:relative;width:40px;height:40px;flex:none;border-radius:13px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+                <span style="position:absolute;top:9px;right:10px;width:8px;height:8px;border-radius:50%;background:#E5484D;border:2px solid #fff"></span>
+              </button>
+            </sc-if>
+          </div>
+
+          <sc-if value="{{ showTabs }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;gap:8px;margin-top:14px">
+              <sc-for list="{{ childTabs }}" as="t" hint-placeholder-count="2">
+                <button onClick="{{ t.select }}" class="pressable" style="{{ t.style }}">
+                  <span style="{{ t.avatar }}">{{ t.initials }}</span>
+                  <span>{{ t.name }}</span>
+                  <sc-if value="{{ t.overdue }}" hint-placeholder-val="{{ false }}">
+                    <span style="{{ t.badge }}">{{ t.overdue }}</span>
+                  </sc-if>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <!-- ============ SCROLL CONTENT ============ -->
+      <div class="appscroll" style="flex:1;overflow-y:auto;overflow-x:hidden">
+
+        <!-- ========== ADMIN (mobile) ========== -->
+        <sc-if value="{{ isAdminMobile }}" hint-placeholder-val="{{ false }}">
+
+          <!-- Overview -->
+          <sc-if value="{{ aOverview }}" hint-placeholder-val="{{ true }}">
+            <div class="scr" data-screen-label="Admin Overview (mobile)" style="padding:4px 16px 24px">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+                <div style="background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px"><div style="font-size:12px;color:var(--muted);font-weight:600">Families</div><div style="font-family:'Bricolage Grotesque';font-weight:800;font-size:26px;color:var(--ink);margin-top:5px">{{ famCount }}</div></div>
+                <div style="background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px"><div style="font-size:12px;color:var(--muted);font-weight:600">Active tasks</div><div style="font-family:'Bricolage Grotesque';font-weight:800;font-size:26px;color:var(--ink);margin-top:5px">{{ activeCount }}</div></div>
+                <div style="background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px"><div style="font-size:12px;color:var(--muted);font-weight:600">Pending</div><div style="font-family:'Bricolage Grotesque';font-weight:800;font-size:26px;color:#D5403F;margin-top:5px">{{ pendingReq }}</div></div>
+                <div style="background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px"><div style="font-size:12px;color:var(--muted);font-weight:600">Completion</div><div style="font-family:'Bricolage Grotesque';font-weight:800;font-size:26px;color:var(--accent);margin-top:5px">{{ adminClassPct }}%</div></div>
+              </div>
+              <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:12px">
+                <div style="font-weight:700;font-size:14px;color:var(--ink)">Status across the class</div>
+                <div style="display:flex;height:13px;border-radius:7px;overflow:hidden;margin-top:13px;background:#F0EFF5"><div style="{{ barSubmitted }}"></div><div style="{{ barDone }}"></div><div style="{{ barNot }}"></div></div>
+                <div style="display:flex;gap:14px;margin-top:13px;flex-wrap:wrap">
+                  <div style="display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:50%;background:#27A56B"></span><span style="font-size:12px;color:var(--muted)">Submitted</span><span style="font-weight:800;font-size:12px;color:var(--ink)">{{ distSubmitted }}</span></div>
+                  <div style="display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:50%;background:#EBA53A"></span><span style="font-size:12px;color:var(--muted)">Done</span><span style="font-weight:800;font-size:12px;color:var(--ink)">{{ distDone }}</span></div>
+                  <div style="display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:50%;background:#C9C7D8"></span><span style="font-size:12px;color:var(--muted)">Not started</span><span style="font-weight:800;font-size:12px;color:var(--ink)">{{ distNot }}</span></div>
+                </div>
+              </div>
+              <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:12px">
+                <div style="font-weight:700;font-size:14px;color:var(--ink);margin-bottom:12px">Students who need a nudge</div>
+                <div style="display:flex;flex-direction:column;gap:11px">
+                  <sc-for list="{{ attentionRows }}" as="r" hint-placeholder-count="3">
+                    <div style="display:flex;align-items:center;gap:10px"><span style="{{ r.avatar }}">{{ r.initials }}</span><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:13px;color:var(--ink)">{{ r.name }}</div><div style="font-size:11px;color:var(--faint)">{{ r.fam }}</div></div><div style="display:flex;gap:5px"><sc-for list="{{ r.missing }}" as="m" hint-placeholder-count="2"><span style="background:#FCEBEB;color:#C5363B;font-size:10.5px;font-weight:700;border-radius:6px;padding:2px 7px">{{ m }}</span></sc-for></div></div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:12px">
+                <div style="font-weight:700;font-size:14px;color:var(--ink);margin-bottom:13px">Recent activity</div>
+                <div style="display:flex;flex-direction:column;gap:14px">
+                  <sc-for list="{{ recentAudit }}" as="e" hint-placeholder-count="4">
+                    <div style="display:flex;gap:10px"><span style="{{ e.avatar }}">{{ e.initials }}</span><div style="flex:1;min-width:0"><div style="font-size:12.5px;color:var(--ink);font-weight:700">{{ e.who }}</div><div style="font-size:11px;color:var(--muted);margin-top:1px">{{ e.student }} · {{ e.task }}</div><div style="display:flex;align-items:center;gap:6px;margin-top:5px"><span style="{{ e.fromStyle }}">{{ e.fromLabel }}</span><span style="color:var(--faint);font-size:11px">→</span><span style="{{ e.toStyle }}">{{ e.toLabel }}</span></div></div></div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- Tasks (assignments) -->
+          <sc-if value="{{ aAssignments }}" hint-placeholder-val="{{ false }}">
+            <div class="scr" data-screen-label="Admin Tasks (mobile)" style="padding:4px 16px 24px">
+              <button onClick="{{ openNew }}" class="pressable" style="width:100%;height:46px;border-radius:13px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 10px 22px -10px rgba(91,83,224,.7);margin-bottom:14px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>New assignment</button>
+              <div style="display:flex;flex-direction:column;gap:11px">
+                <sc-for list="{{ aRows }}" as="r" hint-placeholder-count="6">
+                  <div style="background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px">
+                    <div style="display:flex;align-items:center;justify-content:space-between">
+                      <span style="display:inline-flex;align-items:center;gap:7px"><span style="{{ r.subjDot }}"></span><span style="{{ r.subjColor }}">{{ r.subject }}</span></span>
+                      <button onClick="{{ r.toggle }}" class="pressable" style="{{ r.activeStyle }}"><span style="{{ r.activeDot }}"></span>{{ r.activeLabel }}</button>
+                    </div>
+                    <div style="font-weight:700;font-size:15px;color:var(--ink);margin-top:9px;line-height:1.25">{{ r.title }}</div>
+                    <div style="font-size:12.5px;color:var(--muted);margin-top:3px">{{ r.teacher }} · {{ r.term }} · due {{ r.dueLabel }}</div>
+                    <div style="display:flex;gap:8px;margin-top:12px">
+                      <button onClick="{{ r.edit }}" class="pressable" style="flex:1;height:38px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;font-weight:700;font-size:13px;color:var(--muted)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Edit</button>
+                      <button onClick="{{ r.del }}" class="pressable" style="width:44px;height:38px;flex:none;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D5403F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- Progress -->
+          <sc-if value="{{ aProgress }}" hint-placeholder-val="{{ false }}">
+            <div class="scr" data-screen-label="Admin Progress (mobile)" style="padding:4px 16px 24px">
+              <select value="{{ progStatus }}" onChange="{{ setProgStatus }}" style="width:100%;height:44px;border-radius:12px;border:1px solid var(--line);background:#fff;padding:0 14px;font-size:14px;font-family:inherit;color:var(--ink);outline:none;cursor:pointer;margin-bottom:14px"><option value="all">All statuses</option><option value="todo">To do</option><option value="overdue">Overdue</option><option value="submitted">Submitted</option></select>
+              <div style="display:flex;flex-direction:column;gap:11px">
+                <sc-for list="{{ progRows }}" as="s" hint-placeholder-count="6">
+                  <div onClick="{{ s.open }}" class="pressable" style="background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;cursor:pointer">
+                    <div style="display:flex;align-items:center;gap:10px"><span style="{{ s.avatar }}">{{ s.initials }}</span><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:13.5px;color:var(--ink)">{{ s.name }}</div><div style="font-size:11px;color:var(--faint)">{{ s.fam }}</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="m9 18 6-6-6-6"/></svg></div>
+                    <div style="display:flex;justify-content:space-between;margin-top:13px">
+                      <sc-for list="{{ s.cells }}" as="c" hint-placeholder-count="6">
+                        <div style="display:flex;flex-direction:column;align-items:center;gap:5px"><span style="{{ c.labelColor }}">{{ c.short }}</span><span style="{{ c.cellStyle }}">{{ c.countLabel }}</span></div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- Requests -->
+          <sc-if value="{{ aRequests }}" hint-placeholder-val="{{ false }}">
+            <div class="scr" data-screen-label="Admin Requests (mobile)" style="padding:4px 16px 24px;display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ adminReqs }}" as="q" hint-placeholder-count="3">
+                <div style="background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px">
+                  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px"><div style="font-size:12px;font-weight:700;color:var(--accent-ink)">{{ q.subjRef }}</div><span style="{{ q.badge }}">{{ q.statusLabel }}</span></div>
+                  <div style="font-size:13.5px;color:#33324a;margin-top:6px;line-height:1.5">{{ q.text }}</div>
+                  <div style="font-size:11.5px;color:var(--faint);margin-top:7px">From {{ q.by }} · {{ q.date }}</div>
+                  <sc-if value="{{ q.pending }}" hint-placeholder-val="{{ true }}">
+                    <div style="margin-top:12px"><textarea value="{{ q.replyVal }}" onInput="{{ q.setReply }}" placeholder="Write a reply…" style="width:100%;height:62px;border-radius:11px;border:1px solid var(--line);background:#FAFAFE;padding:10px 12px;font-size:13.5px;font-family:inherit;color:var(--ink);outline:none;resize:none;line-height:1.5"></textarea>
+                      <div style="display:flex;gap:8px;margin-top:9px"><button onClick="{{ q.reject }}" class="pressable" style="flex:1;height:40px;border-radius:11px;border:1px solid #F2D6D7;background:#fff;color:#D5403F;font-weight:700;font-size:13.5px;cursor:pointer">Reject</button><button onClick="{{ q.approve }}" class="pressable" style="flex:1.4;height:40px;border-radius:11px;border:none;background:#1F8A5B;color:#fff;font-weight:700;font-size:13.5px;cursor:pointer">Approve</button></div>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ q.resolved }}" hint-placeholder-val="{{ false }}">
+                    <div style="margin-top:10px;background:#F6F5FB;border-radius:11px;padding:10px 12px;border-left:3px solid var(--accent)"><div style="font-size:10px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">Your reply</div><div style="font-size:12.5px;color:#3c3b52;line-height:1.45">{{ q.reply }}</div></div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <!-- Audit -->
+          <sc-if value="{{ aAudit }}" hint-placeholder-val="{{ false }}">
+            <div class="scr" data-screen-label="Admin Audit (mobile)" style="padding:4px 16px 24px">
+              <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 13px;margin-bottom:13px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-3.5-3.5"/></svg><input value="{{ auditQ }}" onInput="{{ setAuditQ }}" placeholder="Search log…" style="border:none;outline:none;background:none;font-size:13.5px;font-family:inherit;color:var(--ink);width:100%"></div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <sc-for list="{{ auditFiltered }}" as="e" hint-placeholder-count="6">
+                  <div style="background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px">
+                    <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;font-weight:700;color:var(--ink)">{{ e.who }} <span style="font-size:11px;color:var(--faint);font-weight:600">· {{ e.role }}</span></span><span style="font-size:11px;color:var(--faint)">{{ e.when }}</span></div>
+                    <div style="font-size:12px;color:var(--muted);margin-top:3px">{{ e.student }} · {{ e.task }}</div>
+                    <div style="display:flex;align-items:center;gap:6px;margin-top:8px"><span style="{{ e.fromStyle }}">{{ e.fromLabel }}</span><span style="color:var(--faint)">→</span><span style="{{ e.toStyle }}">{{ e.toLabel }}</span></div>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ auditEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:30px;text-align:center;color:var(--faint);font-size:14px">No matching entries.</div></sc-if>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- Teachers -->
+          <sc-if value="{{ aTeachers }}" hint-placeholder-val="{{ false }}">
+            <div class="scr" data-screen-label="Admin Teachers (mobile)" style="padding:4px 16px 24px">
+              <button onClick="{{ assignTeacher }}" class="pressable" style="width:100%;height:46px;border-radius:13px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Assign teacher</button>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <sc-for list="{{ teacherRows }}" as="t" hint-placeholder-count="6">
+                  <div style="background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;align-items:center;gap:12px">
+                    <span style="{{ t.avatar }}">{{ t.initials }}</span>
+                    <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;color:var(--ink)">{{ t.name }}</div><div style="font-size:12px;color:var(--muted)">{{ t.subject }} · {{ t.cls }} · {{ t.term }}</div></div>
+                    <button onClick="{{ t.remove }}" class="pressable" style="width:34px;height:34px;flex:none;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D5403F" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- Families -->
+          <sc-if value="{{ aFamilies }}" hint-placeholder-val="{{ false }}">
+            <div class="scr" data-screen-label="Admin Families (mobile)" style="padding:4px 16px 24px;display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ famCards }}" as="f" hint-placeholder-count="4">
+                <div style="background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px">
+                  <div style="display:flex;align-items:center;justify-content:space-between"><div style="font-family:'Bricolage Grotesque';font-weight:700;font-size:16px;color:var(--ink)">{{ f.name }}</div><div style="font-size:11.5px;color:var(--faint)">{{ f.sub }}</div></div>
+                  <div style="height:1px;background:var(--line);margin:13px 0"></div>
+                  <div style="display:flex;flex-direction:column;gap:10px">
+                    <sc-for list="{{ f.members }}" as="m" hint-placeholder-count="3">
+                      <div style="display:flex;align-items:center;gap:10px"><span style="{{ m.avatar }}">{{ m.initials }}</span><span style="flex:1;font-weight:600;font-size:13.5px;color:var(--ink)">{{ m.name }}</span><span style="{{ m.badge }}">{{ m.role }}</span></div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <!-- student board (admin mobile) -->
+          <sc-if value="{{ aStudent }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;min-height:100%;padding:4px 0 8px;max-width:560px;margin:0 auto">
+            <div style="display:flex;align-items:center;gap:12px;padding:0 0 14px">
+              <button onClick="{{ board.onBack }}" class="pressable" style="width:38px;height:38px;flex:none;border-radius:12px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+              <span style="{{ board.studentAvatar }}">{{ board.studentInitials }}</span>
+              <div style="flex:1;min-width:0"><div style="font-family:'Bricolage Grotesque';font-weight:700;font-size:18px;color:var(--ink);line-height:1.1">{{ board.studentName }}</div><div style="font-size:12px;color:var(--muted)">{{ board.studentFam }} · read-only</div></div>
+            </div>
+            <div style="border-radius:18px;background:linear-gradient(140deg,#5B53E0,#7A5AF0);padding:15px 18px;color:#fff;display:flex;align-items:center;gap:16px;box-shadow:0 14px 28px -16px rgba(91,83,224,.7)">
+              <div style="position:relative;width:58px;height:58px;flex:none"><svg width="58" height="58" viewBox="0 0 58 58"><circle cx="29" cy="29" r="24" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="7"/><circle cx="29" cy="29" r="24" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-dasharray="{{ board.ringDash }}" transform="rotate(-90 29 29)"/></svg><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque';font-weight:800;font-size:15px">{{ board.pct }}%</div></div>
+              <div style="flex:1"><div style="font-size:13px;opacity:.9;font-weight:600">Homework</div><div style="font-family:'Bricolage Grotesque';font-weight:700;font-size:17px;margin-top:2px">{{ board.subLine }}</div></div>
+            </div>
+            <div style="display:flex;gap:8px;margin:14px 0 12px;overflow-x:auto"><sc-for list="{{ board.filterChips }}" as="f" hint-placeholder-count="3"><button onClick="{{ f.pick }}" style="{{ f.style }}">{{ f.label }}</button></sc-for></div>
+            <div style="display:flex;flex-direction:column;gap:11px">
+              <sc-for list="{{ board.cards }}" as="c" hint-placeholder-count="4">
+                <div onClick="{{ c.open }}" class="pressable" style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;gap:13px;align-items:flex-start;box-shadow:0 1px 2px rgba(28,27,41,.04);cursor:pointer"><div style="{{ c.subjStyle }}">{{ c.short }}</div><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:15px;color:var(--ink);line-height:1.25">{{ c.title }}</div><div style="font-size:12.5px;color:var(--muted);margin-top:3px">{{ c.subject }} · {{ c.teacher }}</div><div style="display:flex;align-items:center;gap:8px;margin-top:11px;flex-wrap:wrap"><span style="{{ c.dueStyle }}">{{ c.dueLabel }}</span><span style="flex:1"></span><span style="{{ c.statusStyle }}"><span style="{{ c.dotStyle }}"></span>{{ c.statusLabel }}</span></div></div></div>
+              </sc-for>
+              <sc-if value="{{ board.cardsEmpty }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;padding:36px 20px;color:var(--faint);font-size:14px">Nothing in this filter.</div></sc-if>
+            </div>
+          </div>
+          </sc-if>
+
+        </sc-if>
+
+        <!-- ---------- STUDENT BOARD (teacher) ---------- -->
+        <sc-if value="{{ isStudentBoard }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;min-height:100%;padding:4px 0 8px;max-width:560px;margin:0 auto">
+            <div style="display:flex;align-items:center;gap:12px;padding:0 0 14px">
+              <button onClick="{{ board.onBack }}" class="pressable" style="width:38px;height:38px;flex:none;border-radius:12px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+              <span style="{{ board.studentAvatar }}">{{ board.studentInitials }}</span>
+              <div style="flex:1;min-width:0"><div style="font-family:'Bricolage Grotesque';font-weight:700;font-size:18px;color:var(--ink);line-height:1.1">{{ board.studentName }}</div><div style="font-size:12px;color:var(--muted)">{{ board.studentFam }} · read-only</div></div>
+            </div>
+            <div style="border-radius:18px;background:linear-gradient(140deg,#5B53E0,#7A5AF0);padding:15px 18px;color:#fff;display:flex;align-items:center;gap:16px;box-shadow:0 14px 28px -16px rgba(91,83,224,.7)">
+              <div style="position:relative;width:58px;height:58px;flex:none"><svg width="58" height="58" viewBox="0 0 58 58"><circle cx="29" cy="29" r="24" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="7"/><circle cx="29" cy="29" r="24" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-dasharray="{{ board.ringDash }}" transform="rotate(-90 29 29)"/></svg><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque';font-weight:800;font-size:15px">{{ board.pct }}%</div></div>
+              <div style="flex:1"><div style="font-size:13px;opacity:.9;font-weight:600">Homework</div><div style="font-family:'Bricolage Grotesque';font-weight:700;font-size:17px;margin-top:2px">{{ board.subLine }}</div></div>
+            </div>
+            <div style="display:flex;gap:8px;margin:14px 0 12px;overflow-x:auto"><sc-for list="{{ board.filterChips }}" as="f" hint-placeholder-count="3"><button onClick="{{ f.pick }}" style="{{ f.style }}">{{ f.label }}</button></sc-for></div>
+            <div style="display:flex;flex-direction:column;gap:11px">
+              <sc-for list="{{ board.cards }}" as="c" hint-placeholder-count="4">
+                <div onClick="{{ c.open }}" class="pressable" style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;gap:13px;align-items:flex-start;box-shadow:0 1px 2px rgba(28,27,41,.04);cursor:pointer"><div style="{{ c.subjStyle }}">{{ c.short }}</div><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:15px;color:var(--ink);line-height:1.25">{{ c.title }}</div><div style="font-size:12.5px;color:var(--muted);margin-top:3px">{{ c.subject }} · {{ c.teacher }}</div><div style="display:flex;align-items:center;gap:8px;margin-top:11px;flex-wrap:wrap"><span style="{{ c.dueStyle }}">{{ c.dueLabel }}</span><span style="flex:1"></span><span style="{{ c.statusStyle }}"><span style="{{ c.dotStyle }}"></span>{{ c.statusLabel }}</span></div></div></div>
+              </sc-for>
+              <sc-if value="{{ board.cardsEmpty }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;padding:36px 20px;color:var(--faint);font-size:14px">Nothing in this filter.</div></sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ---------- LOGIN ---------- -->
+        <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+          <div class="scr" data-screen-label="Login" style="min-height:738px;display:flex;flex-direction:column;padding:0 30px 34px;background:linear-gradient(180deg,#F4F4FB 0%, #EBEAFB 100%)">
+            <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:26px">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center">
+                <div style="width:74px;height:74px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;box-shadow:0 18px 36px -10px rgba(91,83,224,.6)">
+                  <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="m9.5 11.5 1.8 1.8 3.7-3.8"/></svg>
+                </div>
+                <div>
+                  <div style="font-family:'Bricolage Grotesque';font-weight:800;font-size:34px;color:var(--ink);letter-spacing:-.02em">Tam-Yang</div>
+                  <div style="font-size:15px;color:var(--muted);margin-top:6px;max-width:240px;line-height:1.5">Homework, tracked together — for the whole family.</div>
+                </div>
+              </div>
+              <div style="border-radius:20px;height:168px;background:repeating-linear-gradient(135deg,#fff,#fff 11px,#F3F2FC 11px,#F3F2FC 22px);border:1px solid var(--line);display:flex;align-items:center;justify-content:center">
+                <span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#a6a4ba;letter-spacing:.04em">friendly hero illustration</span>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <button onClick="{{ signIn }}" class="pressable" style="height:56px;border-radius:16px;border:1px solid #E2E0EE;background:#fff;display:flex;align-items:center;justify-content:center;gap:12px;cursor:pointer;box-shadow:0 6px 16px -8px rgba(40,37,70,.25)">
+                <span style="width:26px;height:26px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque';font-weight:800;color:var(--accent-ink);font-size:15px">G</span>
+                <span style="font-weight:700;font-size:15.5px;color:var(--ink)">Continue with Google</span>
+              </button>
+              <div style="text-align:center;font-size:11.5px;color:var(--faint);line-height:1.5">Google sign-in only. We confirm your identity by the invited email.</div>
+              <div style="display:flex;align-items:center;gap:10px;margin-top:2px">
+                <div style="flex:1;height:1px;background:var(--line)"></div>
+                <span style="font-size:11px;color:var(--faint);font-weight:600">try the demo as</span>
+                <div style="flex:1;height:1px;background:var(--line)"></div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <sc-for list="{{ roleBtns }}" as="r" hint-placeholder-count="3">
+                  <button onClick="{{ r.pick }}" class="pressable" style="flex:1;height:42px;border-radius:13px;border:1px solid var(--line);background:#fff;font-weight:600;font-size:13px;color:var(--ink);cursor:pointer">{{ r.label }}</button>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ---------- ONBOARDING ---------- -->
+        <sc-if value="{{ isOnboarding }}" hint-placeholder-val="{{ false }}">
+          <div class="scr" data-screen-label="Onboarding" style="min-height:738px;display:flex;flex-direction:column;padding:18px 24px 30px">
+            <sc-if value="{{ isFamilyOnboarding }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;gap:6px;margin-bottom:26px">
+              <div style="flex:1;height:5px;border-radius:3px;background:var(--accent)"></div>
+              <div style="flex:1;height:5px;border-radius:3px;background:var(--accent)"></div>
+              <div style="flex:1;height:5px;border-radius:3px;background:var(--line)"></div>
+            </div>
+            <div style="font-family:'Bricolage Grotesque';font-weight:700;font-size:27px;line-height:1.15;color:var(--ink);letter-spacing:-.015em">Welcome, Ploy</div>
+            <div style="font-size:14.5px;color:var(--muted);margin-top:8px;line-height:1.5">Set up your family to start tracking homework together.</div>
+
+            <div style="display:flex;flex-direction:column;gap:14px;margin-top:26px">
+              <button onClick="{{ createFamily }}" class="pressable" style="text-align:left;border-radius:20px;border:1.5px solid var(--accent);background:var(--accent-soft);padding:18px;cursor:pointer;display:flex;gap:14px;align-items:flex-start">
+                <div style="width:46px;height:46px;flex:none;border-radius:14px;background:var(--accent);display:flex;align-items:center;justify-content:center">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22v-5l-1-1v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4l-1 1v5"/><circle cx="7" cy="5" r="2.4"/><path d="M14 22v-4h-1l2-6a1.6 1.6 0 0 1 1.5-1h.9a1.6 1.6 0 0 1 1.6 1l2 6h-1v4"/><circle cx="17" cy="5.5" r="2"/></svg>
+                </div>
+                <div>
+                  <div style="font-weight:700;font-size:16px;color:var(--accent-ink)">Create a new family</div>
+                  <div style="font-size:13px;color:#6660b8;margin-top:3px;line-height:1.45">Name your family — you'll be added as the owner.</div>
+                </div>
+              </button>
+
+              <button onClick="{{ inviteMember }}" class="pressable" style="text-align:left;border-radius:20px;border:1px solid var(--line);background:#fff;padding:18px;cursor:pointer;display:flex;gap:14px;align-items:center">
+                <div style="width:46px;height:46px;flex:none;border-radius:14px;background:#F0EFF7;display:flex;align-items:center;justify-content:center">
+                  <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+                </div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-weight:700;font-size:16px;color:var(--ink)">Invite Member</div>
+                  <div style="font-size:13px;color:var(--muted);margin-top:3px;line-height:1.45">Add parents or other children to your family.</div>
+                </div>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+            </div>
+            <div style="flex:1"></div>
+            <div style="text-align:center;font-size:12px;color:var(--faint);line-height:1.5">A child can belong to only one family. A family can have many parents and children.</div>
+            </sc-if>
+
+            <sc-if value="{{ isAdminOnboarding }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;gap:6px;margin-bottom:26px">
+              <div style="flex:1;height:5px;border-radius:3px;background:var(--accent)"></div>
+              <div style="flex:1;height:5px;border-radius:3px;background:var(--accent)"></div>
+              <div style="flex:1;height:5px;border-radius:3px;background:var(--line)"></div>
+            </div>
+            <div style="font-family:'Bricolage Grotesque';font-weight:700;font-size:27px;line-height:1.15;color:var(--ink);letter-spacing:-.015em">Set up your class</div>
+            <div style="font-size:14.5px;color:var(--muted);margin-top:8px;line-height:1.5">Invite the teachers who'll manage Grade 8/2 · Term 1. They sign in with Google to confirm.</div>
+            <div style="margin-top:24px">
+              <label style="display:block;font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Invite a teacher</label>
+              <div style="display:flex;gap:8px">
+                <input placeholder="teacher@school.ac.th" style="flex:1;height:48px;border-radius:13px;border:1px solid var(--line);background:#FAFAFE;padding:0 14px;font-size:14px;font-family:inherit;color:var(--ink);outline:none">
+                <button onClick="{{ sendTeacherInvite }}" class="pressable" style="height:48px;padding:0 18px;border-radius:13px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:14px;cursor:pointer">Invite</button>
+              </div>
+            </div>
+            <div style="margin-top:22px">
+              <div style="font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Teachers in this class</div>
+              <div style="display:flex;flex-direction:column;gap:9px">
+                <sc-for list="{{ onbTeachers }}" as="t" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 13px">
+                    <span style="{{ t.avatar }}">{{ t.initials }}</span>
+                    <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:13.5px;color:var(--ink)">{{ t.name }}</div><div style="font-size:12px;color:var(--muted)">{{ t.subject }}</div></div>
+                    <span style="border-radius:8px;padding:4px 9px;font-size:10.5px;font-weight:800;background:#E3F6EB;color:#1B7A50">Active</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="flex:1;min-height:20px"></div>
+            <button onClick="{{ confirmAdminOnboarding }}" class="pressable" style="width:100%;height:54px;border-radius:15px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:15.5px;cursor:pointer;box-shadow:0 12px 24px -10px rgba(91,83,224,.7)">Continue to console</button>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <!-- ---------- CREATE FAMILY ---------- -->
+        <sc-if value="{{ isCreateFamily }}" hint-placeholder-val="{{ false }}">
+          <div class="scr" data-screen-label="Create Family" style="min-height:738px;display:flex;flex-direction:column;padding:14px 24px 30px">
+            <button onClick="{{ toOnboarding }}" class="pressable" style="width:38px;height:38px;flex:none;border-radius:12px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+            <div style="font-family:'Bricolage Grotesque';font-weight:700;font-size:27px;line-height:1.15;color:var(--ink);letter-spacing:-.015em;margin-top:20px">Create your family</div>
+            <div style="font-size:14.5px;color:var(--muted);margin-top:8px;line-height:1.5">Give it a name. You'll be added as the owner right away.</div>
+
+            <div style="margin-top:26px">
+              <label style="display:block;font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Family name</label>
+              <input value="{{ familyName }}" onInput="{{ setFamilyName }}" placeholder="e.g. The Tan Family" style="width:100%;height:52px;border-radius:14px;border:1.5px solid var(--accent);background:#fff;padding:0 16px;font-size:16px;font-weight:600;font-family:inherit;color:var(--ink);outline:none">
+            </div>
+
+            <div style="margin-top:22px">
+              <div style="font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Owner</div>
+              <div style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px 14px">
+                <span style="{{ me.avatarMd }}">{{ me.initials }}</span>
+                <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14.5px;color:var(--ink)">{{ me.name }}</div><div style="font-size:12px;color:var(--muted)">{{ me.email }}</div></div>
+                <span style="border-radius:8px;padding:5px 11px;font-size:11px;font-weight:800;background:var(--accent-soft);color:var(--accent-ink)">Owner</span>
+              </div>
+              <div style="font-size:12px;color:var(--faint);margin-top:10px;line-height:1.5">You're added automatically. Invite parents and children once your family is created.</div>
+            </div>
+
+            <div style="flex:1;min-height:24px"></div>
+            <button onClick="{{ confirmCreateFamily }}" class="pressable" style="width:100%;height:54px;border-radius:15px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:15.5px;cursor:pointer;box-shadow:0 12px 24px -10px rgba(91,83,224,.7)">Create family</button>
+          </div>
+        </sc-if>
+
+        <!-- ---------- DASHBOARD ---------- -->
+        <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ false }}">
+          <div class="scr" data-screen-label="Dashboard" style="padding:4px 20px 28px">
+            <!-- summary -->
+            <div style="border-radius:22px;background:linear-gradient(140deg,#5B53E0 0%,#7A5AF0 100%);padding:18px 20px;color:#fff;box-shadow:0 18px 34px -16px rgba(91,83,224,.7);display:flex;align-items:center;gap:18px">
+              <div style="position:relative;width:70px;height:70px;flex:none;animation:ringPop .5s ease">
+                <svg width="70" height="70" viewBox="0 0 70 70"><circle cx="35" cy="35" r="29" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="8"/><circle cx="35" cy="35" r="29" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-dasharray="{{ ringDash }}" transform="rotate(-90 35 35)"/></svg>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                  <span style="font-family:'Bricolage Grotesque';font-weight:800;font-size:20px;line-height:1">{{ pct }}</span>
+                  <span style="font-size:9px;opacity:.85;margin-top:-1px">%</span>
+                </div>
+              </div>
+              <div style="flex:1">
+                <div style="font-size:13px;opacity:.9;font-weight:600">{{ summaryTitle }}</div>
+                <div style="font-family:'Bricolage Grotesque';font-weight:700;font-size:19px;margin-top:2px">{{ submittedLine }}</div>
+                <div style="display:flex;gap:7px;margin-top:9px">
+                  <span style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.18);border-radius:8px;padding:4px 9px;font-size:11.5px;font-weight:600"><span style="width:7px;height:7px;border-radius:50%;background:#FFC56B"></span>{{ todoCount }} to do</span>
+                  <span style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.18);border-radius:8px;padding:4px 9px;font-size:11.5px;font-weight:600"><span style="width:7px;height:7px;border-radius:50%;background:#FF9A8B"></span>{{ overdueCount }} overdue</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- filter chips -->
+            <div style="display:flex;gap:8px;margin:18px 0 14px;overflow-x:auto" class="appscroll">
+              <sc-for list="{{ filterChips }}" as="f" hint-placeholder-count="4">
+                <button onClick="{{ f.pick }}" class="pressable" style="{{ f.style }}">{{ f.label }}</button>
+              </sc-for>
+            </div>
+
+            <!-- list -->
+            <div style="display:flex;flex-direction:column;gap:11px">
+              <sc-for list="{{ cards }}" as="c" hint-placeholder-count="5">
+                <div onClick="{{ c.open }}" class="pressable" style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;gap:13px;align-items:flex-start;box-shadow:0 1px 2px rgba(28,27,41,.04);cursor:pointer">
+                  <div style="{{ c.subjStyle }}">{{ c.short }}</div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-weight:700;font-size:15px;color:var(--ink);line-height:1.25">{{ c.title }}</div>
+                    <div style="font-size:12.5px;color:var(--muted);margin-top:3px">{{ c.subject }} · {{ c.teacher }}</div>
+                    <div style="display:flex;align-items:center;gap:8px;margin-top:11px;flex-wrap:wrap">
+                      <span style="{{ c.dueStyle }}">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg>
+                        {{ c.dueLabel }}
+                      </span>
+                      <span style="flex:1"></span>
+                      <button onClick="{{ c.cycle }}" class="pressable" style="{{ c.statusStyle }}">
+                        <span style="{{ c.dotStyle }}"></span>{{ c.statusLabel }}
+                      </button>
+                    </div>
+                  </div>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><path d="m9 18 6-6-6-6"/></svg>
+                </div>
+              </sc-for>
+              <sc-if value="{{ cardsEmpty }}" hint-placeholder-val="{{ false }}">
+                <div style="text-align:center;padding:40px 20px;color:var(--faint);font-size:14px">Nothing here. Try another filter.</div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ---------- ASSIGNMENT DETAIL ---------- -->
+        <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+          <div class="scr" data-screen-label="Assignment Detail" style="padding:4px 20px 30px">
+            <div style="display:flex;align-items:center;gap:13px">
+              <div style="{{ detail.subjStyleLg }}">{{ detail.short }}</div>
+              <div>
+                <div style="font-weight:700;font-size:14px;color:var(--ink)">{{ detail.subject }}</div>
+                <div style="font-size:12.5px;color:var(--muted)">{{ detail.teacher }}</div>
+              </div>
+            </div>
+            <div style="font-family:'Bricolage Grotesque';font-weight:700;font-size:23px;line-height:1.18;color:var(--ink);margin-top:16px;letter-spacing:-.01em">{{ detail.title }}</div>
+            <span style="{{ detail.dueStyle }}">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg>
+              {{ detail.dueLabel }}
+            </span>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px">
+              <div style="background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px">
+                <div style="font-size:11px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.06em">Assigned</div>
+                <div style="font-weight:700;font-size:14.5px;color:var(--ink);margin-top:4px">{{ detail.assigned }}</div>
+              </div>
+              <div style="background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px">
+                <div style="font-size:11px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.06em">Due</div>
+                <div style="font-weight:700;font-size:14.5px;color:var(--ink);margin-top:4px">{{ detail.dueFull }}</div>
+              </div>
+              <div style="background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px">
+                <div style="font-size:11px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.06em">Class</div>
+                <div style="font-weight:700;font-size:14.5px;color:var(--ink);margin-top:4px">Grade 8/2</div>
+              </div>
+              <div style="background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px">
+                <div style="font-size:11px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.06em">Term</div>
+                <div style="font-weight:700;font-size:14.5px;color:var(--ink);margin-top:4px">Term 1 · 2026</div>
+              </div>
+            </div>
+
+            <div style="font-size:11px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin:20px 0 7px">Details</div>
+            <div style="font-size:14.5px;color:#42415a;line-height:1.6">{{ detail.desc }}</div>
+
+            <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:20px">
+              <div style="font-weight:700;font-size:14.5px;color:var(--ink)">{{ detail.statusHeading }}</div>
+              <sc-if value="{{ detail.readOnly }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:9px;margin-top:12px;background:#F6F5FB;border-radius:12px;padding:11px 13px">
+                  <span style="{{ detail.statusStyle }}"><span style="{{ detail.dotStyle }}"></span>{{ detail.statusLabel }}</span>
+                  <span style="font-size:12.5px;color:var(--muted)">Read-only — teachers can't change status.</span>
+                </div>
+              </sc-if>
+              <sc-if value="{{ detail.editable }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;gap:7px;margin-top:12px">
+                  <sc-for list="{{ detail.seg }}" as="s" hint-placeholder-count="3">
+                    <button onClick="{{ s.set }}" class="pressable" style="{{ s.style }}">
+                      <span style="{{ s.dot }}"></span>{{ s.label }}
+                    </button>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+
+            <button onClick="{{ detail.report }}" class="pressable" style="width:100%;margin-top:14px;height:50px;border-radius:14px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;gap:9px;cursor:pointer;color:var(--muted);font-weight:600;font-size:14px">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.2 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.2a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+              Something looks wrong? Tell the admin
+            </button>
+          </div>
+        </sc-if>
+
+        <!-- ---------- REPORT ISSUE ---------- -->
+        <sc-if value="{{ isReport }}" hint-placeholder-val="{{ false }}">
+          <div class="scr" data-screen-label="Report Issue" style="padding:4px 20px 30px">
+            <div style="background:var(--accent-soft);border-radius:16px;padding:14px 15px;display:flex;gap:11px;align-items:flex-start">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+              <div style="font-size:13px;color:#56519c;line-height:1.5">Found a wrong subject, date or detail in a task? Send it to the class admin — they'll fix the master copy for everyone.</div>
+            </div>
+
+            <div style="font-size:11px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin:20px 0 8px">Which task?</div>
+            <div style="position:relative">
+              <select value="{{ reportId }}" onChange="{{ setReportId }}" style="width:100%;height:52px;border-radius:14px;border:1px solid var(--line);background:#fff;padding:0 42px 0 15px;font-size:14.5px;font-family:inherit;color:var(--ink);appearance:none;outline:none;cursor:pointer">
+                <option value="">Select a task…</option>
+                <sc-for list="{{ reportOptions }}" as="o" hint-placeholder-count="6">
+                  <option value="{{ o.id }}">{{ o.label }}</option>
+                </sc-for>
+              </select>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:14px;top:16px;pointer-events:none"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+
+            <div style="font-size:11px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin:18px 0 8px">What's wrong?</div>
+            <textarea value="{{ reportText }}" onInput="{{ setReportText }}" placeholder="e.g. The due date should be 2 Jul, not 28 Jun." style="width:100%;height:130px;border-radius:14px;border:1px solid var(--line);background:#fff;padding:14px 15px;font-size:14.5px;font-family:inherit;color:var(--ink);outline:none;resize:none;line-height:1.5"></textarea>
+
+            <button onClick="{{ submitReport }}" class="pressable" style="width:100%;margin-top:18px;height:54px;border-radius:15px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:15.5px;cursor:pointer;box-shadow:0 12px 24px -10px rgba(91,83,224,.7)">Send request</button>
+          </div>
+        </sc-if>
+
+        <!-- ---------- MY REQUESTS ---------- -->
+        <sc-if value="{{ isRequests }}" hint-placeholder-val="{{ false }}">
+          <div class="scr" data-screen-label="My Requests" style="padding:4px 20px 28px">
+            <button onClick="{{ newRequest }}" class="pressable" style="width:100%;height:48px;border-radius:14px;border:1.5px dashed #cfc cce;border-color:#cfcce0;background:#fff;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;color:var(--accent-ink);font-weight:700;font-size:14px;margin-bottom:16px">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              New request
+            </button>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ requestList }}" as="q" hint-placeholder-count="3">
+                <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:15px;box-shadow:0 1px 2px rgba(28,27,41,.04)">
+                  <div style="display:flex;align-items:flex-start;gap:10px">
+                    <div style="flex:1">
+                      <div style="font-size:12px;font-weight:700;color:var(--accent-ink)">{{ q.subjRef }}</div>
+                      <div style="font-size:14px;color:#3c3b52;margin-top:5px;line-height:1.45">{{ q.text }}</div>
+                    </div>
+                    <span style="{{ q.badge }}">{{ q.statusLabel }}</span>
+                  </div>
+                  <sc-if value="{{ q.reply }}" hint-placeholder-val="">
+                    <div style="margin-top:11px;background:#F6F5FB;border-radius:12px;padding:11px 12px;border-left:3px solid var(--accent)">
+                      <div style="font-size:10.5px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Admin reply</div>
+                      <div style="font-size:13px;color:#3c3b52;line-height:1.45">{{ q.reply }}</div>
+                    </div>
+                  </sc-if>
+                  <div style="font-size:11.5px;color:var(--faint);margin-top:10px">Sent {{ q.date }} · by {{ q.by }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ---------- TEACHER CLASS OVERVIEW ---------- -->
+        <sc-if value="{{ isTeacher }}" hint-placeholder-val="{{ false }}">
+          <div class="scr" data-screen-label="Teacher Class Overview" style="padding:4px 20px 28px">
+            <select value="{{ progStatus }}" onChange="{{ setProgStatus }}" style="width:100%;height:44px;border-radius:12px;border:1px solid var(--line);background:#fff;padding:0 14px;font-size:14px;font-family:inherit;color:var(--ink);outline:none;cursor:pointer;margin-bottom:12px"><option value="all">All statuses</option><option value="todo">To do</option><option value="overdue">Overdue</option><option value="submitted">Submitted</option></select>
+            <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px">
+              <span style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted)"><span style="width:11px;height:11px;border-radius:3px;background:#E3F6EB;border:1.5px solid #27A56B"></span>All in</span>
+              <span style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted)"><span style="width:11px;height:11px;border-radius:3px;background:#FBF1DA;border:1.5px solid #EBA53A"></span>Partial</span>
+              <span style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted)"><span style="width:11px;height:11px;border-radius:3px;background:#F0EFF5;border:1.5px solid #B9B7C8"></span>Not started</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:11px">
+              <sc-for list="{{ progRows }}" as="s" hint-placeholder-count="6">
+                <div onClick="{{ s.open }}" class="pressable" style="background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;cursor:pointer">
+                  <div style="display:flex;align-items:center;gap:10px"><span style="{{ s.avatar }}">{{ s.initials }}</span><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:13.5px;color:var(--ink)">{{ s.name }}</div><div style="font-size:11px;color:var(--faint)">{{ s.fam }}</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="m9 18 6-6-6-6"/></svg></div>
+                  <div style="display:flex;justify-content:space-between;margin-top:13px">
+                    <sc-for list="{{ s.cells }}" as="c" hint-placeholder-count="6">
+                      <div style="display:flex;flex-direction:column;align-items:center;gap:5px"><span style="{{ c.labelColor }}">{{ c.short }}</span><span style="{{ c.cellStyle }}">{{ c.countLabel }}</span></div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ---------- FAMILY MANAGEMENT ---------- -->
+        <sc-if value="{{ isFamily }}" hint-placeholder-val="{{ false }}">
+          <div class="scr" data-screen-label="Family Management" style="padding:4px 20px 28px">
+            <div style="border-radius:20px;background:linear-gradient(140deg,#26243a,#3a3658);padding:18px 20px;color:#fff">
+              <div style="font-size:12px;opacity:.7;font-weight:600;letter-spacing:.04em">FAMILY</div>
+              <div style="font-family:'Bricolage Grotesque';font-weight:700;font-size:22px;margin-top:3px">{{ familyName }}</div>
+              <div style="font-size:13px;opacity:.8;margin-top:4px">4 members · Grade 8/2 · Term 1</div>
+            </div>
+
+            <div style="font-size:11px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin:20px 0 10px">Members</div>
+            <div style="display:flex;flex-direction:column;gap:9px">
+              <sc-for list="{{ members }}" as="m" hint-placeholder-count="4">
+                <div style="background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px 14px;display:flex;align-items:center;gap:12px">
+                  <span style="{{ m.avatar }}">{{ m.initials }}</span>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-weight:700;font-size:14.5px;color:var(--ink)">{{ m.name }}</div>
+                    <div style="font-size:12px;color:var(--muted)">{{ m.role }} · {{ m.sub }}</div>
+                  </div>
+                  <span style="{{ m.badge }}">{{ m.statusLabel }}</span>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="font-size:11px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin:22px 0 10px">Invite</div>
+            <div style="display:flex;gap:10px">
+              <button onClick="{{ invite }}" class="pressable" style="flex:1;height:54px;border-radius:15px;border:1px solid var(--line);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer">
+                <span style="font-weight:700;font-size:13.5px;color:var(--ink)">Invite a parent</span>
+                <span style="font-size:11px;color:var(--faint)">share by email</span>
+              </button>
+              <button onClick="{{ invite }}" class="pressable" style="flex:1;height:54px;border-radius:15px;border:1px solid var(--line);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer">
+                <span style="font-weight:700;font-size:13.5px;color:var(--ink)">Invite a child</span>
+                <span style="font-size:11px;color:var(--faint)">into this family</span>
+              </button>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ---------- PROFILE ---------- -->
+        <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+          <div class="scr" data-screen-label="Profile" style="padding:8px 20px 28px">
+            <div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px">
+              <span style="{{ me.avatarLg }}">{{ me.initials }}</span>
+              <div>
+                <div style="font-family:'Bricolage Grotesque';font-weight:700;font-size:22px;color:var(--ink)">{{ me.name }}</div>
+                <div style="font-size:13px;color:var(--muted);margin-top:2px">{{ me.email }}</div>
+              </div>
+              <span style="{{ me.roleBadge }}">{{ me.roleLabel }}</span>
+            </div>
+
+            <div style="background:#fff;border:1px solid var(--line);border-radius:18px;margin-top:22px;overflow:hidden">
+              <div style="display:flex;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)">
+                <span style="font-size:13.5px;color:var(--muted)">Role</span><span style="font-weight:700;font-size:13.5px;color:var(--ink)">{{ me.roleLabel }}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)">
+                <span style="font-size:13.5px;color:var(--muted)">Class</span><span style="font-weight:700;font-size:13.5px;color:var(--ink)">Grade 8/2 · Term 1</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:14px 16px">
+                <span style="font-size:13.5px;color:var(--muted)">Family</span><span style="font-weight:700;font-size:13.5px;color:var(--ink)">{{ me.family }}</span>
+              </div>
+            </div>
+
+            <div style="font-size:11px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin:20px 0 10px">Settings</div>
+            <div style="background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)">
+                <span style="font-size:14px;color:var(--ink);font-weight:500">In-app reminders</span>
+                <span style="width:44px;height:26px;border-radius:14px;background:var(--accent);position:relative;flex:none"><span style="position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:#fff"></span></span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)">
+                <span style="font-size:14px;color:var(--ink);font-weight:500">Language</span>
+                <span style="font-size:13.5px;color:var(--muted);font-weight:600">English ›</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px">
+                <span style="font-size:14px;color:var(--ink);font-weight:500">Help &amp; feedback</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              </div>
+            </div>
+
+            <sc-if value="{{ alsoAdmin }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ enterAdmin }}" class="pressable" style="width:100%;margin-top:18px;border-radius:16px;border:1px solid var(--accent);background:var(--accent-soft);padding:15px 16px;display:flex;align-items:center;gap:13px;cursor:pointer;text-align:left">
+                <div style="width:42px;height:42px;flex:none;border-radius:12px;background:var(--accent);display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+                <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:15px;color:var(--accent-ink)">Admin console</div><div style="font-size:12.5px;color:#6660b8;margin-top:2px">You also manage this class — open the back office</div></div>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+            </sc-if>
+
+            <button onClick="{{ signOut }}" class="pressable" style="width:100%;margin-top:12px;height:52px;border-radius:15px;border:1px solid #F2D6D7;background:#fff;color:#D5403F;font-weight:700;font-size:14.5px;cursor:pointer">Sign out</button>
+          </div>
+        </sc-if>
+
+      </div>
+
+      <!-- ============ BOTTOM NAV ============ -->
+      <sc-if value="{{ showChrome }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:none;background:#fff;border-top:1px solid var(--line);padding:9px 12px 4px">
+          <div style="display:flex;justify-content:space-around;align-items:center">
+            <sc-if value="{{ teacherNav }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ nav.goClass }}" class="pressable" style="background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 16px;{{ nav.classColor }}">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="16" rx="2.5"/><path d="M9 5V3h6v2M8 11h8M8 15h5"/></svg>
+                <span style="font-size:10.5px;font-weight:700">Class</span>
+              </button>
+            </sc-if>
+            <sc-if value="{{ familyNav }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ nav.goHome }}" class="pressable" style="background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 16px;{{ nav.homeColor }}">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
+                <span style="font-size:10.5px;font-weight:700">Home</span>
+              </button>
+              <button onClick="{{ nav.goFamily }}" class="pressable" style="background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 16px;{{ nav.familyColor }}">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span style="font-size:10.5px;font-weight:700">Family</span>
+              </button>
+            </sc-if>
+            <button onClick="{{ nav.goRequests }}" class="pressable" style="position:relative;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 16px;{{ nav.requestsColor }}">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.7 1.1z"/></svg>
+              <span style="font-size:10.5px;font-weight:700">Requests</span>
+              <sc-if value="{{ pendingDot }}" hint-placeholder-val="{{ false }}">
+                <span style="position:absolute;top:5px;right:13px;min-width:16px;height:16px;border-radius:8px;background:#E5484D;color:#fff;font-size:9.5px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px">{{ pendingDot }}</span>
+              </sc-if>
+            </button>
+            <button onClick="{{ nav.goProfile }}" class="pressable" style="background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 16px;{{ nav.profileColor }}">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M5.5 21a8 8 0 0 1 13 0"/></svg>
+              <span style="font-size:10.5px;font-weight:700">Profile</span>
+            </button>
+          </div>
+          <div style="width:128px;height:5px;border-radius:3px;background:#1B1A2A;opacity:.85;margin:6px auto 2px"></div>
+        </div>
+      </sc-if>
+
+      <!-- home indicator for login/onboarding -->
+      <sc-if value="{{ showHandle }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:none;height:22px;display:flex;align-items:center;justify-content:center"><div style="width:128px;height:5px;border-radius:3px;background:#1B1A2A;opacity:.85"></div></div>
+      </sc-if>
+
+      <!-- admin mobile modal -->
+      <sc-if value="{{ adminModalMobile }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ adminModal.close }}" style="position:absolute;inset:0;background:rgba(20,19,31,.5);display:flex;align-items:flex-end;z-index:60">
+          <div onClick="{{ adminModal.stop }}" style="width:100%;background:#fff;border-radius:24px 24px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));max-height:92%;overflow-y:auto" class="appscroll">
+            <div style="width:40px;height:5px;border-radius:3px;background:#E0DEEC;margin:0 auto 16px"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+              <div style="font-family:'Bricolage Grotesque';font-weight:700;font-size:19px;color:var(--ink)">{{ adminModal.heading }}</div>
+              <button onClick="{{ adminModal.close }}" class="pressable" style="width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div><label style="display:block;font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Title</label><input value="{{ adminModal.title }}" onInput="{{ adminModal.setTitle }}" placeholder="Assignment title" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:#FAFAFE;padding:0 14px;font-size:15px;font-family:inherit;color:var(--ink);outline:none"></div>
+              <div><label style="display:block;font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Subject</label><select value="{{ adminModal.subject }}" onChange="{{ adminModal.setSubject }}" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:#FAFAFE;padding:0 12px;font-size:15px;font-family:inherit;color:var(--ink);outline:none;cursor:pointer"><sc-for list="{{ subjectOptions }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for></select></div>
+              <div><label style="display:block;font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Teacher <span style="color:var(--accent);font-weight:700">· from master</span></label><input value="{{ adminModal.teacher }}" onInput="{{ adminModal.setTeacher }}" placeholder="Teacher name" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:#FAFAFE;padding:0 14px;font-size:15px;font-family:inherit;color:var(--ink);outline:none"></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div><label style="display:block;font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Assigned</label><input type="date" value="{{ adminModal.assigned }}" onChange="{{ adminModal.setAssigned }}" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:#FAFAFE;padding:0 12px;font-size:14px;font-family:inherit;color:var(--ink);outline:none"></div>
+                <div><label style="display:block;font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Due</label><input type="date" value="{{ adminModal.due }}" onChange="{{ adminModal.setDue }}" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:#FAFAFE;padding:0 12px;font-size:14px;font-family:inherit;color:var(--ink);outline:none"></div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;background:#F7F7FB;border-radius:12px;padding:13px 14px">
+                <div><div style="font-weight:700;font-size:13.5px;color:var(--ink)">Active</div><div style="font-size:11.5px;color:var(--muted)">Visible to families</div></div>
+                <button onClick="{{ adminModal.toggleActive }}" class="pressable" style="{{ adminModal.activeStyle }}"><span style="{{ adminModal.activeDot }}"></span>{{ adminModal.activeLabel }}</button>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:20px">
+              <button onClick="{{ adminModal.close }}" class="pressable" style="flex:1;height:48px;border-radius:13px;border:1px solid var(--line);background:#fff;font-weight:700;font-size:14.5px;color:var(--muted);cursor:pointer">Cancel</button>
+              <button onClick="{{ adminModal.save }}" class="pressable" style="flex:1.4;height:48px;border-radius:13px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:14.5px;cursor:pointer">Save</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- toast -->
+      <sc-if value="{{ toast }}" hint-placeholder-val="">
+        <div style="position:absolute;bottom:96px;left:50%;transform:translateX(-50%);background:#1B1A2A;color:#fff;padding:12px 18px;border-radius:14px;font-size:13.5px;font-weight:600;box-shadow:0 14px 30px -10px rgba(0,0,0,.5);z-index:50;animation:toastIn .3s ease;display:flex;align-items:center;gap:9px;white-space:nowrap">
+          <span style="width:8px;height:8px;border-radius:50%;background:#5EE0A0"></span>{{ toast }}
+        </div>
+      </sc-if>
+
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ====== ADMIN CONSOLE (desktop) ====== -->
+  <sc-if value="{{ showConsole }}" hint-placeholder-val="{{ false }}">
+  <div style="position:sticky;top:40px;width:1010px;height:824px;flex:none;background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 50px 90px -34px rgba(40,37,70,.55),0 0 0 1px rgba(40,37,70,.06);display:flex">
+
+    <!-- SIDEBAR -->
+    <div style="width:228px;flex:none;background:#15141F;display:flex;flex-direction:column;padding:20px 14px">
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 8px 20px">
+        <div style="width:32px;height:32px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+        <div><div style="font-family:'Bricolage Grotesque';font-weight:700;font-size:16px;color:#fff;line-height:1">Tam-Yang</div><div style="font-size:10px;color:#7E7BA4;font-weight:800;letter-spacing:.14em;margin-top:3px">ADMIN</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <button onClick="{{ aGo.overview }}" class="pressable" style="{{ aNav.overview }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Overview</button>
+        <button onClick="{{ aGo.assignments }}" class="pressable" style="{{ aNav.assignments }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="16" rx="2.5"/><path d="M9 5V3h6v2M8 11h8M8 15h5"/></svg>Assignments</button>
+        <button onClick="{{ aGo.progress }}" class="pressable" style="{{ aNav.progress }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M6 21V11M12 21V4M18 21v-7"/></svg>Class Overview</button>
+        <button onClick="{{ aGo.requests }}" class="pressable" style="{{ aNav.requests }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.7 1.1z"/></svg>Requests</button>
+        <button onClick="{{ aGo.audit }}" class="pressable" style="{{ aNav.audit }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Audit log</button>
+        <button onClick="{{ aGo.teachers }}" class="pressable" style="{{ aNav.teachers }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M22 9 12 5 2 9l10 4 10-4zM6 11v5a6 3 0 0 0 12 0v-5"/></svg>Teachers</button>
+        <button onClick="{{ aGo.families }}" class="pressable" style="{{ aNav.families }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Families</button>
+      </div>
+      <div style="flex:1"></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:14px 8px 12px;border-top:1px solid rgba(255,255,255,.08)">
+        <span style="width:34px;height:34px;flex:none;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px">AD</span>
+        <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:#fff">Admin</div><div style="font-size:11px;color:#7E7BA4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">admin@school.ac.th</div></div>
+      </div>
+      <button onClick="{{ exitAdmin }}" class="pressable" style="width:100%;height:42px;border-radius:11px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;color:#E7E6F4;font-weight:700;font-size:13px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Back to family app</button>
+    </div>
+
+    <!-- MAIN -->
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;background:#F7F7FB">
+      <div style="flex:none;display:flex;align-items:center;justify-content:space-between;padding:19px 26px;border-bottom:1px solid var(--line);background:#fff">
+        <div><div style="font-family:'Bricolage Grotesque';font-weight:700;font-size:21px;color:var(--ink);letter-spacing:-.01em">{{ aTitle }}</div><div style="font-size:12.5px;color:var(--muted);margin-top:2px">{{ aSub }}</div></div>
+        <div style="display:flex;align-items:center;gap:8px;background:#F4F4FB;border:1px solid var(--line);border-radius:11px;padding:9px 13px;width:210px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-3.5-3.5"/></svg>
+          <span style="font-size:13px;color:var(--faint)">Search…</span>
+        </div>
+      </div>
+
+      <div class="navlist" style="flex:1;overflow-y:auto;padding:24px 26px">
+
+        <!-- OVERVIEW -->
+        <sc-if value="{{ aOverview }}" hint-placeholder-val="{{ true }}">
+          <div class="scr" data-screen-label="Admin Overview">
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+              <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:17px">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start"><span style="font-size:12.5px;color:var(--muted);font-weight:600">Families</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9C7D8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+                <div style="font-family:'Bricolage Grotesque';font-weight:800;font-size:30px;color:var(--ink);margin-top:8px">{{ famCount }}</div>
+              </div>
+              <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:17px">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start"><span style="font-size:12.5px;color:var(--muted);font-weight:600">Active tasks</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9C7D8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="16" rx="2.5"/><path d="M9 5V3h6v2"/></svg></div>
+                <div style="font-family:'Bricolage Grotesque';font-weight:800;font-size:30px;color:var(--ink);margin-top:8px">{{ activeCount }}</div>
+              </div>
+              <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:17px">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start"><span style="font-size:12.5px;color:var(--muted);font-weight:600">Pending requests</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9C7D8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+                <div style="font-family:'Bricolage Grotesque';font-weight:800;font-size:30px;color:#D5403F;margin-top:8px">{{ pendingReq }}</div>
+              </div>
+              <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:17px">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start"><span style="font-size:12.5px;color:var(--muted);font-weight:600">Completion</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9C7D8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12a10 10 0 1 1-10-10"/><path d="M22 4 12 14.01l-3-3"/></svg></div>
+                <div style="font-family:'Bricolage Grotesque';font-weight:800;font-size:30px;color:var(--accent);margin-top:8px">{{ adminClassPct }}%</div>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1.35fr 1fr;gap:14px;margin-top:14px">
+              <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px">
+                <div style="font-weight:700;font-size:14.5px;color:var(--ink)">Status across the class</div>
+                <div style="font-size:12.5px;color:var(--muted);margin-top:2px">All students × all tasks</div>
+                <div style="display:flex;height:14px;border-radius:7px;overflow:hidden;margin-top:16px;background:#F0EFF5">
+                  <div style="{{ barSubmitted }}"></div><div style="{{ barDone }}"></div><div style="{{ barNot }}"></div>
+                </div>
+                <div style="display:flex;gap:18px;margin-top:14px">
+                  <div style="display:flex;align-items:center;gap:7px"><span style="width:9px;height:9px;border-radius:50%;background:#27A56B"></span><span style="font-size:12.5px;color:var(--muted)">Submitted</span><span style="font-weight:800;font-size:12.5px;color:var(--ink)">{{ distSubmitted }}</span></div>
+                  <div style="display:flex;align-items:center;gap:7px"><span style="width:9px;height:9px;border-radius:50%;background:#EBA53A"></span><span style="font-size:12.5px;color:var(--muted)">Done</span><span style="font-weight:800;font-size:12.5px;color:var(--ink)">{{ distDone }}</span></div>
+                  <div style="display:flex;align-items:center;gap:7px"><span style="width:9px;height:9px;border-radius:50%;background:#C9C7D8"></span><span style="font-size:12.5px;color:var(--muted)">Not started</span><span style="font-weight:800;font-size:12.5px;color:var(--ink)">{{ distNot }}</span></div>
+                </div>
+                <div style="height:1px;background:var(--line);margin:18px 0"></div>
+                <div style="font-weight:700;font-size:13.5px;color:var(--ink);margin-bottom:12px">Students who need a nudge</div>
+                <div style="display:flex;flex-direction:column;gap:11px">
+                  <sc-for list="{{ attentionRows }}" as="r" hint-placeholder-count="3">
+                    <div style="display:flex;align-items:center;gap:10px">
+                      <span style="{{ r.avatar }}">{{ r.initials }}</span>
+                      <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:13px;color:var(--ink)">{{ r.name }}</div><div style="font-size:11px;color:var(--faint)">{{ r.fam }}</div></div>
+                      <div style="display:flex;gap:5px"><sc-for list="{{ r.missing }}" as="m" hint-placeholder-count="2"><span style="background:#FCEBEB;color:#C5363B;font-size:10.5px;font-weight:700;border-radius:6px;padding:2px 7px">{{ m }}</span></sc-for></div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px">
+                <div style="font-weight:700;font-size:14.5px;color:var(--ink);margin-bottom:15px">Recent activity</div>
+                <div style="display:flex;flex-direction:column;gap:15px">
+                  <sc-for list="{{ recentAudit }}" as="e" hint-placeholder-count="5">
+                    <div style="display:flex;gap:10px">
+                      <span style="{{ e.avatar }}">{{ e.initials }}</span>
+                      <div style="flex:1;min-width:0">
+                        <div style="font-size:12.5px;color:var(--ink);font-weight:700">{{ e.who }}</div>
+                        <div style="font-size:11.5px;color:var(--muted);margin-top:1px">{{ e.student }} · {{ e.task }}</div>
+                        <div style="display:flex;align-items:center;gap:6px;margin-top:6px"><span style="{{ e.fromStyle }}">{{ e.fromLabel }}</span><span style="color:var(--faint);font-size:11px">→</span><span style="{{ e.toStyle }}">{{ e.toLabel }}</span></div>
+                      </div>
+                      <span style="font-size:10.5px;color:var(--faint);white-space:nowrap">{{ e.when }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ASSIGNMENTS -->
+        <sc-if value="{{ aAssignments }}" hint-placeholder-val="{{ false }}">
+          <div class="scr" data-screen-label="Admin Assignments">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+              <div style="font-size:13px;color:var(--muted)"><b style="color:var(--ink)">{{ activeCount }}</b> active · shared master list</div>
+              <button onClick="{{ openNew }}" class="pressable" style="display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 18px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:13.5px;cursor:pointer;box-shadow:0 10px 22px -10px rgba(91,83,224,.7)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>New assignment</button>
+            </div>
+            <div style="background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden">
+              <div style="display:grid;grid-template-columns:1fr 2.2fr 1.3fr .8fr .9fr 1fr .8fr;gap:10px;padding:13px 18px;background:#FAFAFD;border-bottom:1px solid var(--line);font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em"><span>Subject</span><span>Title</span><span>Teacher</span><span>Term</span><span>Due</span><span>Active</span><span style="text-align:right">Edit</span></div>
+              <sc-for list="{{ aRows }}" as="r" hint-placeholder-count="6">
+                <div style="display:grid;grid-template-columns:1fr 2.2fr 1.3fr .8fr .9fr 1fr .8fr;gap:10px;padding:13px 18px;align-items:center;border-bottom:1px solid var(--line)">
+                  <span style="display:inline-flex;align-items:center;gap:7px"><span style="{{ r.subjDot }}"></span><span style="{{ r.subjColor }}">{{ r.subject }}</span></span>
+                  <span style="font-weight:700;font-size:13.5px;color:var(--ink)">{{ r.title }}</span>
+                  <span style="font-size:13px;color:var(--muted)">{{ r.teacher }}</span>
+                  <span style="font-size:13px;color:var(--muted)">{{ r.term }}</span>
+                  <span style="font-size:13px;color:var(--muted)">{{ r.dueLabel }}</span>
+                  <span><button onClick="{{ r.toggle }}" class="pressable" style="{{ r.activeStyle }}"><span style="{{ r.activeDot }}"></span>{{ r.activeLabel }}</button></span>
+                  <span style="display:flex;gap:6px;justify-content:flex-end">
+                    <button onClick="{{ r.edit }}" class="pressable" style="width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+                    <button onClick="{{ r.del }}" class="pressable" style="width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D5403F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+                  </span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- PROGRESS -->
+        <sc-if value="{{ aProgress }}" hint-placeholder-val="{{ false }}">
+          <div class="scr" data-screen-label="Admin Progress">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+              <div style="display:flex;align-items:center;gap:8px"><span style="font-size:12px;color:var(--faint);font-weight:700">Class</span><div style="height:40px;display:flex;align-items:center;border-radius:11px;border:1px solid var(--line);background:#fff;padding:0 14px;font-size:13.5px;font-weight:600;color:var(--ink)">Grade 8/2 · Term 1</div></div>
+              <div style="display:flex;align-items:center;gap:8px"><span style="font-size:12px;color:var(--faint);font-weight:700">Status</span>
+                <select value="{{ progStatus }}" onChange="{{ setProgStatus }}" style="height:40px;border-radius:11px;border:1px solid var(--line);background:#fff;padding:0 12px;font-size:13.5px;font-family:inherit;color:var(--ink);cursor:pointer;outline:none"><option value="all">All statuses</option><option value="todo">To do</option><option value="overdue">Overdue</option><option value="submitted">Submitted</option></select>
+              </div>
+              <span style="flex:1"></span>
+              <div style="display:flex;gap:14px">
+                <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><span style="width:11px;height:11px;border-radius:3px;background:#E3F6EB;border:1.5px solid #27A56B"></span>All in</span>
+                <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><span style="width:11px;height:11px;border-radius:3px;background:#FBF1DA;border:1.5px solid #EBA53A"></span>Partial</span>
+                <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><span style="width:11px;height:11px;border-radius:3px;background:#F0EFF5;border:1.5px solid #B9B7C8"></span>Not started</span>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden">
+              <div style="display:flex;align-items:center;padding:12px 18px;background:#FAFAFD;border-bottom:1px solid var(--line)">
+                <div style="width:210px;flex:none;font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em">Student</div>
+                <div style="flex:1;display:flex;justify-content:space-around"><sc-for list="{{ progCols }}" as="c" hint-placeholder-count="6"><span style="{{ c.color }}">{{ c.short }}</span></sc-for></div>
+              </div>
+              <sc-for list="{{ progRows }}" as="s" hint-placeholder-count="6">
+                <div onClick="{{ s.open }}" class="pressable" style="display:flex;align-items:center;padding:11px 18px;border-bottom:1px solid var(--line);cursor:pointer">
+                  <div style="width:210px;flex:none;display:flex;align-items:center;gap:10px"><span style="{{ s.avatar }}">{{ s.initials }}</span><div style="min-width:0"><div style="font-weight:700;font-size:13px;color:var(--ink)">{{ s.name }}</div><div style="font-size:11px;color:var(--faint)">{{ s.fam }}</div></div></div>
+                  <div style="flex:1;display:flex;justify-content:space-around"><sc-for list="{{ s.cells }}" as="c" hint-placeholder-count="6"><span style="{{ c.cellStyle }}">{{ c.countLabel }}</span></sc-for></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- REQUESTS -->
+        <sc-if value="{{ aRequests }}" hint-placeholder-val="{{ false }}">
+          <div class="scr" data-screen-label="Admin Requests" style="display:flex;flex-direction:column;gap:13px;max-width:760px">
+            <sc-for list="{{ adminReqs }}" as="q" hint-placeholder-count="3">
+              <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px">
+                <div style="display:flex;align-items:flex-start;gap:12px">
+                  <span style="{{ q.avatar }}">{{ q.initials }}</span>
+                  <div style="flex:1;min-width:0">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div style="font-size:12px;font-weight:700;color:var(--accent-ink)">{{ q.subjRef }}</div><span style="{{ q.badge }}">{{ q.statusLabel }}</span></div>
+                    <div style="font-size:14px;color:#33324a;margin-top:6px;line-height:1.5">{{ q.text }}</div>
+                    <div style="font-size:11.5px;color:var(--faint);margin-top:7px">From {{ q.by }} · {{ q.date }}</div>
+                    <sc-if value="{{ q.pending }}" hint-placeholder-val="{{ true }}">
+                      <div style="margin-top:13px">
+                        <textarea value="{{ q.replyVal }}" onInput="{{ q.setReply }}" placeholder="Write a reply to the requester…" style="width:100%;height:68px;border-radius:12px;border:1px solid var(--line);background:#FAFAFE;padding:11px 13px;font-size:13.5px;font-family:inherit;color:var(--ink);outline:none;resize:none;line-height:1.5"></textarea>
+                        <div style="display:flex;gap:9px;margin-top:10px"><button onClick="{{ q.reject }}" class="pressable" style="height:40px;padding:0 18px;border-radius:11px;border:1px solid #F2D6D7;background:#fff;color:#D5403F;font-weight:700;font-size:13.5px;cursor:pointer">Reject</button><button onClick="{{ q.approve }}" class="pressable" style="height:40px;padding:0 20px;border-radius:11px;border:none;background:#1F8A5B;color:#fff;font-weight:700;font-size:13.5px;cursor:pointer">Approve &amp; reply</button></div>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ q.resolved }}" hint-placeholder-val="{{ false }}">
+                      <div style="margin-top:11px;background:#F6F5FB;border-radius:12px;padding:11px 13px;border-left:3px solid var(--accent)"><div style="font-size:10.5px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">Your reply</div><div style="font-size:13px;color:#3c3b52;line-height:1.45">{{ q.reply }}</div></div>
+                    </sc-if>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <!-- AUDIT -->
+        <sc-if value="{{ aAudit }}" hint-placeholder-val="{{ false }}">
+          <div class="scr" data-screen-label="Admin Audit">
+            <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;width:320px;margin-bottom:16px">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-3.5-3.5"/></svg>
+              <input value="{{ auditQ }}" onInput="{{ setAuditQ }}" placeholder="Search student, task or person…" style="border:none;outline:none;background:none;font-size:13.5px;font-family:inherit;color:var(--ink);width:100%">
+            </div>
+            <div style="background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden">
+              <div style="display:grid;grid-template-columns:1.1fr 1.2fr 1.1fr 1.8fr 1.6fr;gap:10px;padding:12px 18px;background:#FAFAFD;border-bottom:1px solid var(--line);font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em"><span>When</span><span>Who</span><span>Student</span><span>Assignment</span><span>Change</span></div>
+              <sc-for list="{{ auditFiltered }}" as="e" hint-placeholder-count="6">
+                <div style="display:grid;grid-template-columns:1.1fr 1.2fr 1.1fr 1.8fr 1.6fr;gap:10px;padding:13px 18px;align-items:center;border-bottom:1px solid var(--line)">
+                  <span style="font-size:12.5px;color:var(--muted)">{{ e.when }}</span>
+                  <span style="font-size:13px;font-weight:600;color:var(--ink)">{{ e.who }} <span style="font-size:11px;color:var(--faint);font-weight:600">· {{ e.role }}</span></span>
+                  <span style="font-size:13px;color:var(--ink)">{{ e.student }}</span>
+                  <span style="font-size:12.5px;color:var(--muted)">{{ e.task }}</span>
+                  <span style="display:flex;align-items:center;gap:6px"><span style="{{ e.fromStyle }}">{{ e.fromLabel }}</span><span style="color:var(--faint)">→</span><span style="{{ e.toStyle }}">{{ e.toLabel }}</span></span>
+                </div>
+              </sc-for>
+              <sc-if value="{{ auditEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:34px;text-align:center;color:var(--faint);font-size:14px">No matching log entries.</div></sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- TEACHERS -->
+        <sc-if value="{{ aTeachers }}" hint-placeholder-val="{{ false }}">
+          <div class="scr" data-screen-label="Admin Teachers">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:16px"><button onClick="{{ assignTeacher }}" class="pressable" style="display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 18px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:13.5px;cursor:pointer"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Assign teacher</button></div>
+            <div style="background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden">
+              <div style="display:grid;grid-template-columns:1.6fr 1.2fr 1.8fr 1fr .8fr .6fr;gap:10px;padding:12px 18px;background:#FAFAFD;border-bottom:1px solid var(--line);font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em"><span>Teacher</span><span>Subject</span><span>Email</span><span>Class</span><span>Term</span><span></span></div>
+              <sc-for list="{{ teacherRows }}" as="t" hint-placeholder-count="6">
+                <div style="display:grid;grid-template-columns:1.6fr 1.2fr 1.8fr 1fr .8fr .6fr;gap:10px;padding:12px 18px;align-items:center;border-bottom:1px solid var(--line)">
+                  <span style="display:flex;align-items:center;gap:10px"><span style="{{ t.avatar }}">{{ t.initials }}</span><span style="font-weight:700;font-size:13.5px;color:var(--ink)">{{ t.name }}</span></span>
+                  <span style="font-size:13px;color:var(--muted)">{{ t.subject }}</span>
+                  <span style="font-size:12.5px;color:var(--muted)">{{ t.email }}</span>
+                  <span style="font-size:13px;color:var(--muted)">{{ t.cls }}</span>
+                  <span style="font-size:13px;color:var(--muted)">{{ t.term }}</span>
+                  <span style="text-align:right"><button onClick="{{ t.remove }}" class="pressable" style="width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D5403F" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg></button></span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- FAMILIES -->
+        <sc-if value="{{ aFamilies }}" hint-placeholder-val="{{ false }}">
+          <div class="scr" data-screen-label="Admin Families" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <sc-for list="{{ famCards }}" as="f" hint-placeholder-count="4">
+              <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px">
+                <div style="display:flex;align-items:center;justify-content:space-between"><div style="font-family:'Bricolage Grotesque';font-weight:700;font-size:17px;color:var(--ink)">{{ f.name }}</div><div style="font-size:12px;color:var(--faint)">{{ f.sub }}</div></div>
+                <div style="height:1px;background:var(--line);margin:14px 0"></div>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <sc-for list="{{ f.members }}" as="m" hint-placeholder-count="3">
+                    <div style="display:flex;align-items:center;gap:10px"><span style="{{ m.avatar }}">{{ m.initials }}</span><span style="flex:1;font-weight:600;font-size:13.5px;color:var(--ink)">{{ m.name }}</span><span style="{{ m.badge }}">{{ m.role }}</span></div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <!-- STUDENT BOARD (admin desktop) -->
+        <sc-if value="{{ aStudent }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;min-height:100%;padding:4px 0 8px;max-width:560px;margin:0 auto">
+            <div style="display:flex;align-items:center;gap:12px;padding:0 0 14px">
+              <button onClick="{{ board.onBack }}" class="pressable" style="width:38px;height:38px;flex:none;border-radius:12px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+              <span style="{{ board.studentAvatar }}">{{ board.studentInitials }}</span>
+              <div style="flex:1;min-width:0"><div style="font-family:'Bricolage Grotesque';font-weight:700;font-size:18px;color:var(--ink);line-height:1.1">{{ board.studentName }}</div><div style="font-size:12px;color:var(--muted)">{{ board.studentFam }} · read-only</div></div>
+            </div>
+            <div style="border-radius:18px;background:linear-gradient(140deg,#5B53E0,#7A5AF0);padding:15px 18px;color:#fff;display:flex;align-items:center;gap:16px;box-shadow:0 14px 28px -16px rgba(91,83,224,.7)">
+              <div style="position:relative;width:58px;height:58px;flex:none"><svg width="58" height="58" viewBox="0 0 58 58"><circle cx="29" cy="29" r="24" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="7"/><circle cx="29" cy="29" r="24" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-dasharray="{{ board.ringDash }}" transform="rotate(-90 29 29)"/></svg><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque';font-weight:800;font-size:15px">{{ board.pct }}%</div></div>
+              <div style="flex:1"><div style="font-size:13px;opacity:.9;font-weight:600">Homework</div><div style="font-family:'Bricolage Grotesque';font-weight:700;font-size:17px;margin-top:2px">{{ board.subLine }}</div></div>
+            </div>
+            <div style="display:flex;gap:8px;margin:14px 0 12px;overflow-x:auto"><sc-for list="{{ board.filterChips }}" as="f" hint-placeholder-count="3"><button onClick="{{ f.pick }}" style="{{ f.style }}">{{ f.label }}</button></sc-for></div>
+            <div style="display:flex;flex-direction:column;gap:11px">
+              <sc-for list="{{ board.cards }}" as="c" hint-placeholder-count="4">
+                <div onClick="{{ c.open }}" class="pressable" style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;gap:13px;align-items:flex-start;box-shadow:0 1px 2px rgba(28,27,41,.04);cursor:pointer"><div style="{{ c.subjStyle }}">{{ c.short }}</div><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:15px;color:var(--ink);line-height:1.25">{{ c.title }}</div><div style="font-size:12.5px;color:var(--muted);margin-top:3px">{{ c.subject }} · {{ c.teacher }}</div><div style="display:flex;align-items:center;gap:8px;margin-top:11px;flex-wrap:wrap"><span style="{{ c.dueStyle }}">{{ c.dueLabel }}</span><span style="flex:1"></span><span style="{{ c.statusStyle }}"><span style="{{ c.dotStyle }}"></span>{{ c.statusLabel }}</span></div></div></div>
+              </sc-for>
+              <sc-if value="{{ board.cardsEmpty }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;padding:36px 20px;color:var(--faint);font-size:14px">Nothing in this filter.</div></sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+      </div>
+    </div>
+
+    <!-- MODAL -->
+    <sc-if value="{{ adminModal }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ adminModal.close }}" style="position:absolute;inset:0;background:rgba(20,19,31,.5);display:flex;align-items:center;justify-content:center;z-index:60">
+        <div onClick="{{ adminModal.stop }}" style="width:466px;background:#fff;border-radius:20px;padding:24px;box-shadow:0 30px 70px -20px rgba(0,0,0,.5)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+            <div style="font-family:'Bricolage Grotesque';font-weight:700;font-size:19px;color:var(--ink)">{{ adminModal.heading }}</div>
+            <button onClick="{{ adminModal.close }}" class="pressable" style="width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:13px">
+            <div><label style="display:block;font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Title</label><input value="{{ adminModal.title }}" onInput="{{ adminModal.setTitle }}" placeholder="Assignment title" style="width:100%;height:44px;border-radius:11px;border:1px solid var(--line);background:#FAFAFE;padding:0 13px;font-size:14px;font-family:inherit;color:var(--ink);outline:none"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px">
+              <div><label style="display:block;font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Subject</label><select value="{{ adminModal.subject }}" onChange="{{ adminModal.setSubject }}" style="width:100%;height:44px;border-radius:11px;border:1px solid var(--line);background:#FAFAFE;padding:0 11px;font-size:14px;font-family:inherit;color:var(--ink);outline:none;cursor:pointer"><sc-for list="{{ subjectOptions }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for></select></div>
+              <div><label style="display:block;font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Teacher <span style="color:var(--accent);font-weight:700">· from master</span></label><input value="{{ adminModal.teacher }}" onInput="{{ adminModal.setTeacher }}" placeholder="Teacher name" style="width:100%;height:44px;border-radius:11px;border:1px solid var(--line);background:#FAFAFE;padding:0 13px;font-size:14px;font-family:inherit;color:var(--ink);outline:none"></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px">
+              <div><label style="display:block;font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Class</label><div style="height:44px;display:flex;align-items:center;border-radius:11px;border:1px solid var(--line);background:#F0EFF5;padding:0 13px;font-size:14px;color:var(--muted)">Grade 8/2</div></div>
+              <div><label style="display:block;font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Term</label><select value="{{ adminModal.term }}" onChange="{{ adminModal.setTerm }}" style="width:100%;height:44px;border-radius:11px;border:1px solid var(--line);background:#FAFAFE;padding:0 11px;font-size:14px;font-family:inherit;color:var(--ink);outline:none;cursor:pointer"><option value="Term 1">Term 1</option><option value="Term 2">Term 2</option></select></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px">
+              <div><label style="display:block;font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Assigned</label><input type="date" value="{{ adminModal.assigned }}" onChange="{{ adminModal.setAssigned }}" style="width:100%;height:44px;border-radius:11px;border:1px solid var(--line);background:#FAFAFE;padding:0 13px;font-size:14px;font-family:inherit;color:var(--ink);outline:none"></div>
+              <div><label style="display:block;font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Due</label><input type="date" value="{{ adminModal.due }}" onChange="{{ adminModal.setDue }}" style="width:100%;height:44px;border-radius:11px;border:1px solid var(--line);background:#FAFAFE;padding:0 13px;font-size:14px;font-family:inherit;color:var(--ink);outline:none"></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;background:#F7F7FB;border-radius:12px;padding:12px 14px">
+              <div><div style="font-weight:700;font-size:13.5px;color:var(--ink)">Active</div><div style="font-size:11.5px;color:var(--muted)">Visible to families in this class</div></div>
+              <button onClick="{{ adminModal.toggleActive }}" class="pressable" style="{{ adminModal.activeStyle }}"><span style="{{ adminModal.activeDot }}"></span>{{ adminModal.activeLabel }}</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:22px">
+            <button onClick="{{ adminModal.close }}" class="pressable" style="flex:1;height:46px;border-radius:12px;border:1px solid var(--line);background:#fff;font-weight:700;font-size:14px;color:var(--muted);cursor:pointer">Cancel</button>
+            <button onClick="{{ adminModal.save }}" class="pressable" style="flex:1.4;height:46px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:14px;cursor:pointer">Save assignment</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- admin toast -->
+    <sc-if value="{{ toast }}" hint-placeholder-val="">
+      <div style="position:absolute;bottom:28px;left:50%;transform:translateX(-50%);background:#1B1A2A;color:#fff;padding:12px 18px;border-radius:14px;font-size:13.5px;font-weight:600;box-shadow:0 14px 30px -10px rgba(0,0,0,.5);z-index:70;animation:toastIn .3s ease;display:flex;align-items:center;gap:9px;white-space:nowrap"><span style="width:8px;height:8px;border-radius:50%;background:#5EE0A0"></span>{{ toast }}</div>
+    </sc-if>
+
+  </div>
+  </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1360,&quot;height&quot;:960},&quot;defaultRole&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;parent&quot;,&quot;child&quot;,&quot;teacher&quot;,&quot;admin&quot;],&quot;default&quot;:&quot;parent&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Prototype&quot;},&quot;showNavigator&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Prototype&quot;}}">
+class Component extends DCLogic {
+  MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  TODAY = new Date(2026, 5, 30);
+  C = 2 * Math.PI * 29;
+
+  STATUS = {
+    not_done:  { label:'Not started', fg:'#6E6D80', bg:'#F0EFF5', dot:'#A9A7BC' },
+    done:      { label:'Done',        fg:'#9A6A12', bg:'#FBF1DA', dot:'#EBA53A' },
+    submitted: { label:'Submitted',   fg:'#1B7A50', bg:'#E3F6EB', dot:'#27A56B' },
+  };
+  SUBJ = {
+    'Mathematics':   { c:'#5B53E0', t:'#ECEBFC' },
+    'English':       { c:'#0E9BA6', t:'#E1F4F5' },
+    'Science':       { c:'#1F8A5B', t:'#E3F5EB' },
+    'Thai':          { c:'#D6477E', t:'#FCE9F0' },
+    'Social Studies':{ c:'#D38216', t:'#FBF0DC' },
+    'Art':           { c:'#7A5AF0', t:'#EFEBFD' },
+  };
+
+  assignments = [
+    { id:'a1', subject:'Mathematics',    short:'Ma', title:'Algebra Worksheet — Ch.4', teacher:'Ms. Wanida', assigned:'2026-06-24', due:'2026-06-28', desc:'Complete problems 1–20 in the Chapter 4 worksheet. Show all working steps; answers without working will not be marked.' },
+    { id:'a2', subject:'English',        short:'En', title:'Essay: My Summer Plan',   teacher:'Mr. James',   assigned:'2026-06-25', due:'2026-07-01', desc:'Write a one-page essay (around 250 words) describing your plan for the summer break. Hand in a printed copy.' },
+    { id:'a3', subject:'Science',        short:'Sc', title:'Lab Report: Photosynthesis', teacher:'Ms. Pranee', assigned:'2026-06-26', due:'2026-07-03', desc:'Write up the photosynthesis experiment from Tuesday\u2019s lab. Include your hypothesis, method, results table and a short conclusion.' },
+    { id:'a4', subject:'Thai',           short:'Th', title:'Reading Ch.5 + Summary',  teacher:'Ms. Suda',    assigned:'2026-06-22', due:'2026-07-02', desc:'Read Chapter 5 and write a half-page summary in your own words. Note any vocabulary you did not know.' },
+    { id:'a5', subject:'Social Studies', short:'So', title:'Map Activity: Southeast Asia', teacher:'Mr. Kittisak', assigned:'2026-06-29', due:'2026-07-08', desc:'Label all Southeast Asian countries and their capitals on the blank map provided. Colour each country differently.' },
+    { id:'a6', subject:'Art',            short:'Ar', title:'Color Wheel Poster',      teacher:'Ms. Mali',    assigned:'2026-06-20', due:'2026-06-27', desc:'Create an A3 colour wheel poster showing primary, secondary and tertiary colours. Bring it to class for display.' },
+    { id:'a7', subject:'Mathematics',    short:'Ma', title:'Geometry Quiz — Prep',  teacher:'Ms. Wanida', assigned:'2026-06-27', due:'2026-07-04', desc:'Revise chapters 4–5 and complete the practice set before the in-class quiz.' },
+    { id:'a8', subject:'Science',        short:'Sc', title:'Worksheet: Cell Structure', teacher:'Ms. Pranee', assigned:'2026-06-28', due:'2026-07-01', desc:'Label the plant and animal cell diagrams and answer the short questions on the back.' },
+  ];
+
+  members = [
+    { id:'p1', name:'Ploy Tan', role:'Parent', sub:'Mom · Owner', email:'ploy.tan@gmail.com', color:'#5B53E0', status:'active' },
+    { id:'p2', name:'Anan Tan', role:'Parent', sub:'Dad',         email:'anan.t@gmail.com',   color:'#0E9BA6', status:'pending' },
+    { id:'c1', name:'Nina Tan', role:'Child',  sub:'Grade 8/2',   email:'nina.tan@gmail.com', color:'#D6477E', status:'active' },
+    { id:'c2', name:'Leo Tan',  role:'Child',  sub:'Grade 8/2',   email:'leo.tan@gmail.com',  color:'#D38216', status:'active' },
+  ];
+
+  roster = [
+    { id:'c1', live:true,  name:'Nina Tan', fam:'Tan Family',     color:'#D6477E' },
+    { id:'c2', live:true,  name:'Leo Tan',  fam:'Tan Family',     color:'#D38216' },
+    { name:'Mook Saetang', fam:'Saetang Family', color:'#0E9BA6', map:{a1:'submitted',a2:'submitted',a3:'done',a4:'submitted',a5:'not_done',a6:'submitted',a7:'submitted',a8:'done'} },
+    { name:'Tar Phongam',  fam:'Phongam Family', color:'#7A5AF0', map:{a1:'submitted',a2:'not_done',a3:'not_done',a4:'done',a5:'not_done',a6:'submitted',a7:'submitted',a8:'not_done'} },
+    { name:'Beam Rojana',  fam:'Rojana Family',  color:'#1F8A5B', map:{a1:'done',a2:'submitted',a3:'submitted',a4:'submitted',a5:'submitted',a6:'not_done',a7:'done',a8:'submitted'} },
+    { name:'Fah Klinkaew', fam:'Klin Family',    color:'#D38216', map:{a1:'not_done',a2:'not_done',a3:'not_done',a4:'not_done',a5:'not_done',a6:'done',a7:'not_done',a8:'not_done'} },
+  ];
+
+  adminTeachers = [
+    { name:'Ms. Wanida',   subject:'Mathematics',    email:'wanida.k@school.ac.th',   cls:'Grade 8/2', term:'Term 1', color:'#5B53E0' },
+    { name:'Mr. James',    subject:'English',        email:'james.c@school.ac.th',    cls:'Grade 8/2', term:'Term 1', color:'#0E9BA6' },
+    { name:'Ms. Pranee',   subject:'Science',        email:'pranee.s@school.ac.th',   cls:'Grade 8/2', term:'Term 1', color:'#1F8A5B' },
+    { name:'Ms. Suda',     subject:'Thai',           email:'suda.p@school.ac.th',     cls:'Grade 8/2', term:'Term 1', color:'#D6477E' },
+    { name:'Mr. Kittisak', subject:'Social Studies', email:'kittisak.r@school.ac.th', cls:'Grade 8/2', term:'Term 1', color:'#D38216' },
+    { name:'Ms. Mali',     subject:'Art',            email:'mali.t@school.ac.th',     cls:'Grade 8/2', term:'Term 1', color:'#7A5AF0' },
+  ];
+  adminFamilies = [
+    { name:'Tan Family',     members:[['Ploy Tan','Parent','#5B53E0'],['Anan Tan','Parent','#0E9BA6'],['Nina Tan','Child','#D6477E'],['Leo Tan','Child','#D38216']] },
+    { name:'Saetang Family', members:[['Som Saetang','Parent','#7A5AF0'],['Mook Saetang','Child','#0E9BA6']] },
+    { name:'Phongam Family', members:[['Nok Phongam','Parent','#1F8A5B'],['Tar Phongam','Child','#7A5AF0']] },
+    { name:'Rojana Family',  members:[['Ben Rojana','Parent','#D38216'],['Beam Rojana','Child','#1F8A5B']] },
+    { name:'Klin Family',    members:[['Aoi Klinkaew','Parent','#D6477E'],['Fah Klinkaew','Child','#D38216']] },
+  ];
+  adminAudit = [
+    { when:'30 Jun · 09:12', who:'Ploy Tan',    role:'Parent', student:'Nina Tan',     task:'Algebra Worksheet — Ch.4',      from:'done',      to:'submitted' },
+    { when:'30 Jun · 08:40', who:'Nina Tan',    role:'Child',  student:'Nina Tan',     task:'Reading Ch.5 + Summary',        from:'not_done',  to:'submitted' },
+    { when:'29 Jun · 20:05', who:'Leo Tan',     role:'Child',  student:'Leo Tan',      task:'Reading Ch.5 + Summary',        from:'not_done',  to:'done' },
+    { when:'29 Jun · 18:22', who:'Ploy Tan',    role:'Parent', student:'Leo Tan',      task:'Color Wheel Poster',            from:'submitted', to:'not_done' },
+    { when:'28 Jun · 15:10', who:'Som Saetang', role:'Parent', student:'Mook Saetang', task:'Lab Report: Photosynthesis',    from:'not_done',  to:'done' },
+    { when:'27 Jun · 11:48', who:'Nina Tan',    role:'Child',  student:'Nina Tan',     task:'Color Wheel Poster',            from:'done',      to:'submitted' },
+    { when:'27 Jun · 09:03', who:'Ben Rojana',  role:'Parent', student:'Beam Rojana',  task:'Map Activity: Southeast Asia',  from:'not_done',  to:'submitted' },
+    { when:'26 Jun · 19:30', who:'Tar Phongam', role:'Child',  student:'Tar Phongam',  task:'Reading Ch.5 + Summary',        from:'not_done',  to:'done' },
+  ];
+
+  state = {
+    screen: 'login',
+    role: (this.props && this.props.defaultRole) || 'parent',
+    childId: 'c1',
+    detailId: null,
+    backTo: 'dashboard',
+    navTab: 'home',
+    filter: 'todo',
+    reportId: '',
+    reportText: '',
+    familyName: 'Tan Family',
+    viewStudent: null,
+    prevRole: null,
+    adminScreen: 'overview',
+    adminView: 'desktop',
+    adminModal: null,
+    adminReplies: {},
+    progStatus: 'all',
+    auditQ: '',
+    adminAssignments: [
+      { id:'a1', subject:'Mathematics',    title:'Algebra Worksheet — Ch.4',       teacher:'Ms. Wanida',   cls:'Grade 8/2', term:'Term 1', assigned:'2026-06-24', due:'2026-06-28', active:true },
+      { id:'a2', subject:'English',        title:'Essay: My Summer Plan',          teacher:'Mr. James',    cls:'Grade 8/2', term:'Term 1', assigned:'2026-06-25', due:'2026-07-01', active:true },
+      { id:'a3', subject:'Science',        title:'Lab Report: Photosynthesis',     teacher:'Ms. Pranee',   cls:'Grade 8/2', term:'Term 1', assigned:'2026-06-26', due:'2026-07-03', active:true },
+      { id:'a4', subject:'Thai',           title:'Reading Ch.5 + Summary',         teacher:'Ms. Suda',     cls:'Grade 8/2', term:'Term 1', assigned:'2026-06-22', due:'2026-07-02', active:true },
+      { id:'a5', subject:'Social Studies', title:'Map Activity: Southeast Asia',   teacher:'Mr. Kittisak', cls:'Grade 8/2', term:'Term 1', assigned:'2026-06-29', due:'2026-07-08', active:true },
+      { id:'a6', subject:'Art',            title:'Color Wheel Poster',             teacher:'Ms. Mali',     cls:'Grade 8/2', term:'Term 1', assigned:'2026-06-20', due:'2026-06-27', active:false },
+      { id:'a0', subject:'Science',        title:'Term 1 Science Project (brief)', teacher:'Ms. Pranee',   cls:'Grade 8/2', term:'Term 1', assigned:'2026-06-15', due:'2026-07-25', active:true },
+    ],
+    toast: null,
+    progress: {
+      'c1|a1':'submitted','c1|a2':'done','c1|a3':'not_done','c1|a4':'submitted','c1|a5':'not_done','c1|a6':'submitted','c1|a7':'not_done','c1|a8':'submitted',
+      'c2|a1':'not_done','c2|a2':'not_done','c2|a3':'not_done','c2|a4':'done','c2|a5':'not_done','c2|a6':'not_done','c2|a7':'not_done','c2|a8':'not_done',
+    },
+    requests: [
+      { id:'r1', subjRef:'Mathematics · Algebra Worksheet', text:'The due date shows 28 Jun, but the teacher said 2 Jul in class. Please check.', status:'resolved', reply:'Good catch — the master copy is now 2 Jul. Thanks!', date:'27 Jun', by:'Ploy' },
+      { id:'r2', subjRef:'English · Essay: My Summer Plan', text:'Is the essay one page or two pages? The brief is a bit unclear.', status:'pending', reply:'', date:'29 Jun', by:'Nina' },
+      { id:'r3', subjRef:'Art · Color Wheel Poster', text:'Nina handed this in last week — can the deadline be removed for her?', status:'rejected', reply:'Submissions go in the class tray; please confirm directly with Ms. Mali.', date:'26 Jun', by:'Ploy' },
+      { id:'r4', subjRef:'Science · Lab Report: Photosynthesis', text:'Could the due date move to 4 Jul? Several students were absent for the lab on Tuesday.', status:'pending', reply:'', date:'30 Jun', by:'Ploy' },
+    ],
+  };
+
+  // ---------- helpers ----------
+  parse(s){ const p = s.split('-'); return new Date(+p[0], +p[1]-1, +p[2]); }
+  fmt(d){ return d.getDate() + ' ' + this.MON[d.getMonth()]; }
+  initials(name){ const p = name.trim().split(' '); return (p[0][0] + (p[1] ? p[1][0] : '')).toUpperCase(); }
+
+  dueMeta(dueStr){
+    const due = this.parse(dueStr);
+    const days = Math.round((due - this.TODAY) / 86400000);
+    let fg='#6E6D80', bg='#F0EFF5', label='Due ' + this.fmt(due), urgency='normal';
+    if (days < 0)      { urgency='overdue'; fg='#D5403F'; bg='#FCEBEB'; label='Overdue · ' + this.fmt(due); }
+    else if (days===0) { urgency='soon'; fg='#C96A1E'; bg='#FBEFE2'; label='Due today'; }
+    else if (days<=2)  { urgency='soon'; fg='#C96A1E'; bg='#FBEFE2'; label='Due in ' + days + 'd · ' + this.fmt(due); }
+    return { fg, bg, label, urgency, days, full:this.fmt(due) };
+  }
+  statusOf(childId, aid){ return this.state.progress[childId + '|' + aid] || 'not_done'; }
+
+  pill(sm){ return 'display:inline-flex;align-items:center;gap:6px;border:none;cursor:pointer;border-radius:9px;padding:6px 11px;font-size:12px;font-weight:700;font-family:inherit;background:' + sm.bg + ';color:' + sm.fg; }
+  dot(sm){ return 'width:7px;height:7px;border-radius:50%;background:' + sm.dot; }
+  duePill(dm){ return 'display:inline-flex;align-items:center;gap:5px;border-radius:8px;padding:5px 9px;font-size:11.5px;font-weight:700;background:' + dm.bg + ';color:' + dm.fg; }
+  subjChip(sub, big){ const s=this.SUBJ[sub]; const d = big?48:42; const f = big?15:13; return 'width:'+d+'px;height:'+d+'px;flex:none;border-radius:13px;display:flex;align-items:center;justify-content:center;font-family:\'Bricolage Grotesque\';font-weight:800;font-size:'+f+'px;background:'+s.t+';color:'+s.c; }
+  avatarStyle(color, d, f){ return 'width:'+d+'px;height:'+d+'px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:'+f+'px;color:#fff;background:'+color; }
+
+  // ---------- actions ----------
+  toast(msg){ this.setState({ toast: msg }); clearTimeout(this._t); this._t = setTimeout(()=>this.setState({ toast:null }), 1900); }
+
+  pickRole(role){
+    if(role==='admin'){ this.setState({ role:'admin', adminScreen:'overview', adminModal:null, screen:'onboarding' }); return; }
+    const screen = role==='teacher' ? 'teacher' : 'dashboard';
+    const navTab = role==='teacher' ? 'class' : 'home';
+    const childId = role==='child' ? 'c1' : this.state.childId;
+    this.setState({ role, screen, navTab, childId, detailId:null, filter:'todo' });
+  }
+  adminGo(s){ this.setState({ adminScreen:s, adminModal:null, screen:'adminhome' }); }
+  confirmAdminOnboarding(){ this.setState({ screen:'adminhome', adminScreen:'overview' }); }
+  sendTeacherInvite(){ this.toast('Teacher invite sent'); }
+  openStudent(s){ if(this.state.role==='teacher'){ this.setState({ viewStudent:s, screen:'studentboard', filter:'todo' }); } else { this.setState({ viewStudent:s, adminScreen:'student', filter:'todo' }); } }
+  backStudent(){ if(this.state.role==='teacher'){ this.setState({ viewStudent:null, screen:'teacher' }); } else { this.setState({ viewStudent:null, adminScreen:'progress', screen:'adminhome' }); } }
+  openBoardDetail(aid){ this.setState({ screen:'detail', detailId:aid, backTo: this.state.role==='teacher' ? 'studentboard' : 'adminhome' }); }
+  enterAdmin(){ this.setState({ prevRole:this.state.role, role:'admin', screen:'adminhome', adminScreen:'overview', viewStudent:null, adminModal:null }); }
+  exitAdmin(){ this.setState({ role:this.state.prevRole||'parent', viewStudent:null, screen:'profile', navTab:'profile' }); }
+  teacherFor(subject){ return (this.adminTeachers.find(x=>x.subject===subject)||{}).name || ''; }
+  openAModal(id){ if(id){ const a=this.state.adminAssignments.find(x=>x.id===id); this.setState({ adminModal:{ mode:'edit', ...a } }); } else { const subject='Mathematics'; this.setState({ adminModal:{ mode:'new', id:'na'+Date.now(), subject, title:'', teacher:this.teacherFor(subject), cls:'Grade 8/2', term:'Term 1', assigned:'2026-07-01', due:'2026-07-08', active:true } }); } }
+  closeAModal(){ this.setState({ adminModal:null }); }
+  setModalField(k,v){ this.setState({ adminModal:{ ...this.state.adminModal, [k]:v } }); }
+  saveAssignment(){ const m=this.state.adminModal; if(!m.title.trim()||!m.teacher.trim()){ this.toast('Add a title and teacher'); return; } const list=this.state.adminAssignments.slice(); const i=list.findIndex(x=>x.id===m.id); const row={ id:m.id, subject:m.subject, title:m.title.trim(), teacher:m.teacher.trim(), cls:m.cls, term:m.term, assigned:m.assigned, due:m.due, active:m.active }; if(i>=0)list[i]=row; else list.unshift(row); this.setState({ adminAssignments:list, adminModal:null }); this.toast(m.mode==='new'?'Assignment created':'Changes saved'); }
+  deleteAssignment(id){ this.setState({ adminAssignments:this.state.adminAssignments.filter(x=>x.id!==id) }); this.toast('Assignment deleted'); }
+  toggleActive(id){ this.setState({ adminAssignments:this.state.adminAssignments.map(x=>x.id===id?{...x,active:!x.active}:x) }); }
+  setReply(id,v){ this.setState({ adminReplies:{...this.state.adminReplies,[id]:v} }); }
+  resolveReq(id,status){ const reply=(this.state.adminReplies[id]||'').trim(); if(!reply){ this.toast('Add a reply first'); return; } this.setState({ requests:this.state.requests.map(q=>q.id===id?{...q,status,reply}:q) }); this.toast(status==='resolved'?'Request approved':'Request rejected'); }
+  signIn(){ if(this.state.role==='teacher'){ this.setState({ screen:'teacher', navTab:'class' }); } else { this.setState({ screen:'onboarding' }); } }
+  createFamily(){ this.setState({ screen:'createfamily' }); }
+  confirmCreateFamily(){ this.setState({ screen:'dashboard', navTab:'home' }); this.toast((this.state.familyName||'Family').trim()+' created'); }
+  inviteMember(){ this.setState({ screen:'family', navTab:'family' }); }
+  setFamilyName(e){ this.setState({ familyName:e.target.value }); }
+  toOnboarding(){ this.setState({ screen:'onboarding' }); }
+  signOut(){ this.setState({ screen:'login' }); }
+  go(screen){
+    const map = { dashboard:'home', family:'family', requests:'requests', profile:'profile', teacher:'class' };
+    this.setState({ screen, navTab: map[screen] || this.state.navTab, detailId:null });
+  }
+  goBack(){ this.setState({ screen: this.state.backTo }); }
+  openDetail(id){ this.setState({ screen:'detail', detailId:id, backTo:'dashboard' }); }
+  goReport(prefill){ this.setState({ screen:'report', backTo: this.state.screen, reportId: prefill || '', reportText:'' }); }
+
+  setStatus(childId, aid, status){
+    if (this.state.role==='teacher') { this.toast('Read-only — teachers can\u2019t edit'); return; }
+    if (this.state.role==='child' && childId!=='c1') return;
+    this.setState({ progress: { ...this.state.progress, [childId+'|'+aid]: status } });
+    this.toast('Marked as ' + this.STATUS[status].label);
+  }
+  cycle(childId, aid){
+    const order = ['not_done','done','submitted'];
+    const next = order[(order.indexOf(this.statusOf(childId, aid)) + 1) % 3];
+    this.setStatus(childId, aid, next);
+  }
+  submitReport(){
+    if (!this.state.reportId || !this.state.reportText.trim()) { this.toast('Pick a task and add details'); return; }
+    const a = this.assignments.find(x=>x.id===this.state.reportId);
+    const who = this.state.role==='child' ? 'Nina' : (this.state.role==='teacher' ? 'Teacher' : 'Ploy');
+    const req = { id:'r'+Date.now(), subjRef:a.subject+' · '+a.title.split(' — ')[0].split(':')[0], text:this.state.reportText.trim(), status:'pending', reply:'', date:'Today', by:who };
+    this.setState({ requests:[req, ...this.state.requests], reportId:'', reportText:'', screen:'requests', navTab:'requests' });
+    this.toast('Request sent');
+  }
+
+  // ---------- render ----------
+  renderVals(){
+    const st = this.state, role = st.role;
+    const screen = st.screen;
+    const isLogin = screen==='login', isOnboarding = screen==='onboarding', isCreateFamily = screen==='createfamily';
+    const familyName = (st.familyName || 'Tan Family');
+    const isAdmin = role==='admin', aScreen = st.adminScreen;
+    const adminView = st.adminView || 'desktop';
+    const isAdminOnboarding = isAdmin && isOnboarding;
+    const detailFromBoard = screen==='detail' && !!st.viewStudent;
+    const adminMobileActive = isAdmin && !isOnboarding && adminView==='mobile';
+    const isAdminMobile = adminMobileActive && !detailFromBoard;
+    const showConsole = isAdmin && !isOnboarding && adminView==='desktop' && !detailFromBoard;
+    const showPhone = isOnboarding || !isAdmin || adminMobileActive || detailFromBoard;
+    const showChrome = !isLogin && !isOnboarding && !isCreateFamily && !isAdmin;
+    const currentChild = role==='child' ? 'c1' : st.childId;
+    const childName = (this.members.find(m=>m.id===currentChild)||{}).name.split(' ')[0];
+
+    // header
+    const H = { headerKicker:'', headerTitle:'', headerSub:'', showBack:false, showBell:false, showTabs:false };
+    if (screen==='dashboard') { H.headerKicker=familyName; H.headerTitle='Homework'; H.headerSub='Grade 8/2 · Term 1 / 2026'; H.showBell=true; H.showTabs = role==='parent'; }
+    else if (screen==='detail') { H.showBack=true; H.headerTitle='Assignment'; }
+    else if (screen==='report') { H.showBack=true; H.headerTitle='Report an issue'; }
+    else if (screen==='requests') { H.headerTitle='My Requests'; H.headerSub='Edit requests you\u2019ve sent to the admin'; }
+    else if (screen==='teacher') { H.headerTitle='Class Overview'; H.headerSub='Grade 8/2 · Term 1 · read-only'; }
+    else if (screen==='family') { H.headerTitle='Family'; }
+    else if (screen==='profile') { H.headerTitle='Profile'; }
+
+    // child tabs
+    const childTabs = this.members.filter(m=>m.role==='Child').map(m=>{
+      const active = m.id===currentChild;
+      const od = this.assignments.filter(a=>{ const dm=this.dueMeta(a.due); return dm.urgency==='overdue' && this.statusOf(m.id,a.id)!=='submitted'; }).length;
+      return {
+        name:m.name.split(' ')[0], initials:this.initials(m.name), overdue: od||'',
+        select:()=>this.setState({ childId:m.id }),
+        style:'display:inline-flex;align-items:center;gap:7px;border:1px solid '+(active?'transparent':'var(--line)')+';cursor:pointer;border-radius:13px;padding:7px 12px 7px 7px;font-weight:700;font-size:13px;background:'+(active?'var(--ink)':'#fff')+';color:'+(active?'#fff':'var(--ink)'),
+        avatar:this.avatarStyle(m.color,24,11),
+        badge:'background:#E5484D;color:#fff;font-size:10px;font-weight:800;border-radius:7px;padding:1px 6px',
+      };
+    });
+
+    // dashboard cards
+    const buildCard = (a) => {
+      const status = this.statusOf(currentChild, a.id);
+      const sm = this.STATUS[status], dm = this.dueMeta(a.due);
+      return {
+        id:a.id, title:a.title, subject:a.subject, teacher:a.teacher, short:a.short,
+        subjStyle:this.subjChip(a.subject,false),
+        statusLabel:sm.label, statusStyle:this.pill(sm), dotStyle:this.dot(sm),
+        dueLabel:dm.label, dueStyle:this.duePill(dm), status, urgency:dm.urgency,
+        open:()=>this.openDetail(a.id),
+        cycle:(e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.cycle(currentChild, a.id); },
+      };
+    };
+    let cards = this.assignments.map(buildCard);
+    if (st.filter==='todo')     cards = cards.filter(c=>c.status!=='submitted');
+    else if (st.filter==='overdue') cards = cards.filter(c=>c.urgency==='overdue' && c.status!=='submitted');
+    else if (st.filter==='done') cards = cards.filter(c=>c.status==='submitted');
+
+    const allCards = this.assignments.map(buildCard);
+    const submitted = allCards.filter(c=>c.status==='submitted').length;
+    const total = allCards.length;
+    const pct = Math.round(submitted/total*100);
+    const todoCount = allCards.filter(c=>c.status!=='submitted').length;
+    const overdueCount = allCards.filter(c=>c.urgency==='overdue' && c.status!=='submitted').length;
+
+    const filterDefs = [['todo','To do'],['overdue','Overdue'],['done','Submitted']];
+    const filterChips = filterDefs.map(([k,label])=>{
+      const active = st.filter===k;
+      return { label, pick:()=>this.setState({ filter:k }),
+        style:'white-space:nowrap;border:1px solid '+(active?'transparent':'var(--line)')+';cursor:pointer;border-radius:11px;padding:8px 15px;font-weight:700;font-size:13px;background:'+(active?'var(--accent)':'#fff')+';color:'+(active?'#fff':'var(--muted)') };
+    });
+
+    // detail
+    let detail = null;
+    if (screen==='detail') {
+      const a = this.assignments.find(x=>x.id===st.detailId) || this.assignments[0];
+      const vsd = st.viewStudent;
+      const status = vsd ? (vsd.live ? this.statusOf(vsd.id,a.id) : vsd.map[a.id]) : this.statusOf(currentChild, a.id);
+      const sm = this.STATUS[status], dm = this.dueMeta(a.due);
+      const ro = role==='teacher' || !!vsd;
+      const seg = ['not_done','done','submitted'].map(k=>{
+        const m = this.STATUS[k], active = status===k;
+        return { label:m.label, set:()=>this.setStatus(currentChild, a.id, k),
+          dot:'width:7px;height:7px;border-radius:50%;background:'+(active?m.dot:'#C7C5D6'),
+          style:'flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;border-radius:11px;padding:11px 4px;font-size:12px;font-weight:700;font-family:inherit;border:1.5px solid '+(active?m.dot:'var(--line)')+';background:'+(active?m.bg:'#fff')+';color:'+(active?m.fg:'var(--muted)') };
+      });
+      detail = {
+        short:a.short, subject:a.subject, teacher:a.teacher, title:a.title, desc:a.desc,
+        subjStyleLg:this.subjChip(a.subject,true),
+        assigned:this.fmt(this.parse(a.assigned)), dueFull:dm.full,
+        dueLabel:dm.label, dueStyle:'display:inline-flex;align-items:center;gap:5px;margin-top:12px;border-radius:9px;padding:7px 12px;font-size:12.5px;font-weight:700;background:'+dm.bg+';color:'+dm.fg,
+        statusHeading: vsd ? (vsd.name.split(' ')[0]+'\u2019s status') : (role==='parent' ? childName+'\u2019s status' : (role==='teacher' ? 'Status' : 'Your status')),
+        readOnly:ro, editable:!ro, seg,
+        statusLabel:sm.label, statusStyle:this.pill(sm).replace('cursor:pointer','cursor:default'), dotStyle:this.dot(sm),
+        report:()=>this.goReport(a.id),
+      };
+    }
+
+    // requests
+    const reqMeta = { pending:{l:'Pending',bg:'#FBEFE2',fg:'#C96A1E'}, resolved:{l:'Resolved',bg:'#E3F6EB',fg:'#1B7A50'}, rejected:{l:'Rejected',bg:'#F0EFF5',fg:'#6E6D80'} };
+    const requestList = st.requests.map(q=>{ const m=reqMeta[q.status]; return { ...q, statusLabel:m.l, badge:'flex:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:800;background:'+m.bg+';color:'+m.fg }; });
+    const pendingCount = st.requests.filter(q=>q.status==='pending').length;
+
+    const reportOptions = this.assignments.map(a=>({ id:a.id, label:a.subject+' · '+a.title }));
+
+    // teacher roster
+    const rosterRows = this.roster.map(s=>{
+      const statusFor = (aid)=> s.live ? this.statusOf(s.id, aid) : s.map[aid];
+      let sub=0; const missing=[];
+      this.assignments.forEach(a=>{ const st2=statusFor(a.id); if(st2==='submitted')sub++; const dm=this.dueMeta(a.due); if(dm.urgency==='overdue'&&st2!=='submitted')missing.push(a.short); });
+      const p = Math.round(sub/this.assignments.length*100);
+      const col = p>=80?'#1B7A50':(p>=50?'#C96A1E':'#D5403F');
+      return { name:s.name, fam:s.fam, initials:this.initials(s.name), avatar:this.avatarStyle(s.color,42,14),
+        pct:p, pctColor:col, subLine:sub+'/'+this.assignments.length+' in',
+        barStyle:'height:100%;width:'+p+'%;border-radius:4px;background:'+col,
+        missing, hasMissing:missing.length>0, allDone:missing.length===0 };
+    });
+    const classSub = this.roster.reduce((n,s)=>{ const f=(aid)=> s.live?this.statusOf(s.id,aid):s.map[aid]; return n + this.assignments.filter(a=>f(a.id)==='submitted').length; },0);
+    const classTot = this.roster.length * this.assignments.length;
+    const classPct = Math.round(classSub/classTot*100);
+    const classAttention = rosterRows.filter(r=>r.hasMissing).length;
+
+    // members
+    const members = this.members.map(m=>({ name:m.name, role:m.role, sub:m.sub, initials:this.initials(m.name), avatar:this.avatarStyle(m.color,42,14),
+      statusLabel: m.status==='pending'?'Pending':'Active',
+      badge: m.status==='pending' ? 'flex:none;border-radius:8px;padding:4px 9px;font-size:10.5px;font-weight:800;background:#FBEFE2;color:#C96A1E' : 'flex:none;border-radius:8px;padding:4px 9px;font-size:10.5px;font-weight:800;background:#E3F6EB;color:#1B7A50' }));
+
+    // me (profile)
+    const meMember = role==='teacher' ? { name:'Ms. Wanida', email:'wanida.k@gmail.com', color:'#0E9BA6' } : (role==='child' ? this.members[2] : this.members[0]);
+    const roleLabelMap = { parent:'Parent', child:'Child', teacher:'Teacher' };
+    const me = {
+      name:meMember.name, email:meMember.email, initials:this.initials(meMember.name),
+      avatarLg:this.avatarStyle(meMember.color,84,30),
+      avatarMd:this.avatarStyle(meMember.color,44,15),
+      roleLabel:roleLabelMap[role], family: role==='teacher'?'—':familyName,
+      roleBadge:'display:inline-flex;border-radius:10px;padding:6px 14px;font-size:12.5px;font-weight:800;background:var(--accent-soft);color:var(--accent-ink)',
+    };
+
+    // nav colors
+    const navColor = (on)=> on ? 'color:var(--accent)' : 'color:var(--faint)';
+    const nav = {
+      goHome:()=>this.go('dashboard'), goFamily:()=>this.go('family'), goRequests:()=>this.go('requests'), goProfile:()=>this.go('profile'), goClass:()=>this.go('teacher'),
+      homeColor:navColor(screen==='dashboard'||screen==='detail'),
+      familyColor:navColor(screen==='family'),
+      requestsColor:navColor(screen==='requests'||screen==='report'),
+      profileColor:navColor(screen==='profile'),
+      classColor:navColor(screen==='teacher'),
+    };
+
+    // navigator (left)
+    const roleHints = { parent:'edits all kids', child:'edits self only', teacher:'read-only', admin:'full control' };
+    const roleBtns = ['parent','child','teacher','admin'].map(r=>{
+      const active = role===r;
+      return { label:r.charAt(0).toUpperCase()+r.slice(1), hint:roleHints[r], pick:()=>this.pickRole(r),
+        dot:'width:9px;height:9px;border-radius:50%;background:'+(active?'var(--accent)':'#c7c5d6'),
+        style:'display:flex;align-items:center;justify-content:space-between;cursor:pointer;border-radius:12px;padding:11px 13px;text-align:left;border:1.5px solid '+(active?'var(--accent)':'#dad8e6')+';background:'+(active?'#fff':'rgba(255,255,255,.45)')+';color:'+(active?'var(--ink)':'#52516a') };
+    });
+    let screenLinks;
+    if (isAdmin) {
+      const adminDefs = [['onboarding','Onboarding · invite teachers'],['overview','Overview'],['assignments','Assignment master'],['progress','Class Overview'],['requests','Request management'],['audit','Audit log'],['teachers','Teacher assignment'],['families','All families']];
+      screenLinks = adminDefs.map(([k,label],i)=>{
+        const active = k==='onboarding' ? isOnboarding : (!isOnboarding && aScreen===k);
+        return { num:String(i+9).padStart(2,'0'), label, weight: active?'800':'600',
+          go: k==='onboarding' ? (()=>this.setState({screen:'onboarding'})) : (()=>this.adminGo(k)),
+          style:'display:flex;align-items:center;gap:9px;cursor:pointer;border:none;text-align:left;border-radius:9px;padding:9px 10px;background:'+(active?'#fff':'transparent')+';color:'+(active?'var(--accent-ink)':'#56546c')+';box-shadow:'+(active?'0 1px 3px rgba(40,37,70,.12)':'none') };
+      });
+    } else {
+      const screenDefs = role==='teacher'
+        ? [['login','Login'],['teacher','Class overview'],['requests','My Requests'],['profile','Profile']]
+        : [['login','Login'],['onboarding','Onboarding'],['createfamily','Create family'],['family','Family management'],['dashboard','Dashboard'],['detail','Assignment detail'],['report','Report an issue'],['requests','My Requests'],['profile','Profile']];
+      screenLinks = screenDefs.map(([k,label],i)=>{
+        const active = screen===k;
+        return { num:String(i+1).padStart(2,'0'), label, weight: active?'800':'600',
+          go:()=>{ if(k==='detail'){ this.setState({screen:'detail',detailId:'a1',backTo:'dashboard'}); } else if(k==='teacher'){ this.setState({screen:'teacher',role:'teacher',navTab:'class'}); } else { this.setState({screen:k}); } },
+          style:'display:flex;align-items:center;gap:9px;cursor:pointer;border:none;text-align:left;border-radius:9px;padding:9px 10px;background:'+(active?'#fff':'transparent')+';color:'+(active?'var(--accent-ink)':'#56546c')+';box-shadow:'+(active?'0 1px 3px rgba(40,37,70,.12)':'none') };
+      });
+    }
+
+    // ===== ADMIN CONSOLE =====
+    const aScreenTitles = {
+      overview:['Overview','Everything across the classroom at a glance'],
+      assignments:['Assignment master','Add, edit and archive the shared homework list'],
+      progress:['Class Overview','Every family, every task — read-only'],
+      requests:['Requests','Approve or reject edit requests from users'],
+      audit:['Audit log','Every status change — who, when and what'],
+      teachers:['Teachers','Assign teachers to classes and terms'],
+      families:['Families','All families in the system and their members'],
+    };
+    const _at = aScreenTitles[aScreen] || ['Student','One student\u2019s homework board'];
+    const aTitle = _at[0], aSub = _at[1];
+    const aItems = ['overview','assignments','progress','requests','audit','teachers','families'];
+    const aNav = {}, aGo = {};
+    aItems.forEach(k=>{ const on = aScreen===k; aGo[k]=()=>this.adminGo(k);
+      aNav[k]='display:flex;align-items:center;gap:11px;width:100%;cursor:pointer;border:none;text-align:left;border-radius:11px;padding:10px 13px;font-weight:600;font-size:13.5px;font-family:inherit;background:'+(on?'#332D63':'#15141F')+';color:'+(on?'#FFFFFF':'#9D9BBA'); });
+    const aChipDefs=[['overview','Overview'],['assignments','Tasks'],['progress','Class'],['requests','Requests'],['audit','Audit'],['teachers','Teachers'],['families','Families']];
+    const aChips=aChipDefs.map(([k,label])=>{ const on=aScreen===k; return { label, go:()=>this.adminGo(k), style:'white-space:nowrap;border:1px solid '+(on?'transparent':'var(--line)')+';cursor:pointer;border-radius:11px;padding:7px 13px;font-weight:700;font-size:13px;font-family:inherit;background:'+(on?'var(--accent)':'#fff')+';color:'+(on?'#fff':'var(--muted)') }; });
+    const adminViewBtns=['desktop','mobile'].map(v=>{ const on=adminView===v; return { label:v==='desktop'?'Desktop':'Mobile', pick:()=>this.setState({adminView:v}), style:'flex:1;cursor:pointer;border:none;border-radius:9px;padding:8px;font-weight:700;font-size:12.5px;font-family:inherit;background:'+(on?'#fff':'transparent')+';color:'+(on?'var(--accent-ink)':'#6b6a7e')+';box-shadow:'+(on?'0 1px 2px rgba(40,37,70,.15)':'none') }; });
+
+    const famCount = this.adminFamilies.length;
+    const activeCount = st.adminAssignments.filter(a=>a.active).length;
+    const pendingReq = st.requests.filter(q=>q.status==='pending').length;
+
+    let cs=0,cd=0,cn=0;
+    this.roster.forEach(s=>{ this.assignments.forEach(a=>{ const v=s.live?this.statusOf(s.id,a.id):s.map[a.id]; if(v==='submitted')cs++; else if(v==='done')cd++; else cn++; }); });
+    const cTot=cs+cd+cn||1;
+    const barSubmitted='width:'+(cs/cTot*100)+'%;background:#27A56B';
+    const barDone='width:'+(cd/cTot*100)+'%;background:#EBA53A';
+    const barNot='width:'+(cn/cTot*100)+'%;background:#D5D3E0';
+
+    const auditMap=(e)=>{ const f=this.STATUS[e.from], t=this.STATUS[e.to]; return { when:e.when, who:e.who, role:e.role, student:e.student, task:e.task, initials:this.initials(e.who), avatar:this.avatarStyle('#5B53E0',30,11),
+      fromLabel:f.label, toLabel:t.label, fromStyle:'display:inline-flex;border-radius:7px;padding:3px 8px;font-size:11px;font-weight:700;background:'+f.bg+';color:'+f.fg, toStyle:'display:inline-flex;border-radius:7px;padding:3px 8px;font-size:11px;font-weight:700;background:'+t.bg+';color:'+t.fg }; };
+    const auditAll=this.adminAudit.map(auditMap);
+    const auditFiltered = st.auditQ ? auditAll.filter(e=>(e.who+' '+e.student+' '+e.task).toLowerCase().includes(st.auditQ.toLowerCase())) : auditAll;
+    const recentAudit=auditAll.slice(0,6);
+
+    const attentionRows = rosterRows.filter(r=>r.hasMissing).map(r=>({ name:r.name, fam:r.fam, initials:r.initials, avatar:r.avatar, missing:r.missing }));
+
+    const aRows = st.adminAssignments.map(a=>{ const sc=this.SUBJ[a.subject];
+      return { id:a.id, subject:a.subject, title:a.title, teacher:a.teacher, cls:a.cls, term:a.term,
+        subjDot:'width:9px;height:9px;border-radius:3px;flex:none;background:'+sc.c, subjColor:'font-weight:700;font-size:13px;color:'+sc.c,
+        assignedLabel:this.fmt(this.parse(a.assigned)), dueLabel:this.fmt(this.parse(a.due)),
+        active:a.active, activeLabel:a.active?'Active':'Off',
+        activeStyle:'cursor:pointer;border:none;border-radius:20px;padding:5px 11px 5px 9px;font-size:11.5px;font-weight:700;font-family:inherit;display:inline-flex;align-items:center;gap:6px;background:'+(a.active?'#E3F6EB':'#F0EFF5')+';color:'+(a.active?'#1B7A50':'#8A899C'),
+        activeDot:'width:8px;height:8px;border-radius:50%;background:'+(a.active?'#27A56B':'#B9B7C8'),
+        toggle:()=>this.toggleActive(a.id), edit:()=>this.openAModal(a.id), del:()=>this.deleteAssignment(a.id) };
+    });
+
+    const subjectOptions = Object.keys(this.SUBJ);
+    const mo = st.adminModal;
+    let adminModal = null;
+    if (mo) {
+      adminModal = { heading: mo.mode==='new'?'New assignment':'Edit assignment',
+        subject:mo.subject, title:mo.title, teacher:mo.teacher, term:mo.term, cls:mo.cls, assigned:mo.assigned, due:mo.due, active:mo.active,
+        activeLabel:mo.active?'Active':'Off',
+        activeStyle:'cursor:pointer;border:none;border-radius:20px;padding:6px 13px 6px 10px;font-size:12.5px;font-weight:700;font-family:inherit;display:inline-flex;align-items:center;gap:7px;background:'+(mo.active?'#E3F6EB':'#F0EFF5')+';color:'+(mo.active?'#1B7A50':'#8A899C'),
+        activeDot:'width:9px;height:9px;border-radius:50%;background:'+(mo.active?'#27A56B':'#B9B7C8'),
+        setSubject:(e)=>{ const subject=e.target.value; this.setState({ adminModal:{ ...this.state.adminModal, subject, teacher:this.teacherFor(subject) } }); }, setTitle:(e)=>this.setModalField('title',e.target.value),
+        setTeacher:(e)=>this.setModalField('teacher',e.target.value), setTerm:(e)=>this.setModalField('term',e.target.value),
+        setAssigned:(e)=>this.setModalField('assigned',e.target.value), setDue:(e)=>this.setModalField('due',e.target.value),
+        toggleActive:()=>this.setModalField('active',!mo.active),
+        save:()=>this.saveAssignment(), close:()=>this.closeAModal(), stop:(e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); } };
+    }
+
+    const SHORTBY={Mathematics:'Ma',English:'En',Science:'Sc',Thai:'Th','Social Studies':'So',Art:'Ar'};
+    const SUBJ_ORDER=['Mathematics','English','Science','Thai','Social Studies','Art'];
+    const subjGroups=SUBJ_ORDER.map(su=>({ subject:su, short:SHORTBY[su], color:this.SUBJ[su].c, as:this.assignments.filter(a=>a.subject===su) }));
+    const TONE={green:{bg:'#E3F6EB',fg:'#1B7A50'},amber:{bg:'#FBF1DA',fg:'#9A6A12'},red:{bg:'#FCEBEB',fg:'#C5363B'},none:{bg:'#F4F3F8',fg:'#BBB9C9'}};
+    const progCols = subjGroups.map(g=>({ short:g.short, color:'font-weight:800;font-size:11px;color:'+g.color }));
+    const progRows = this.roster.map(s=>{ const sget=(aid)=> s.live?this.statusOf(s.id,aid):s.map[aid]; const pf=st.progStatus;
+        const cells=subjGroups.map(g=>{ const sts=g.as.map(a=>sget(a.id)); const total=sts.length;
+          const overP=g.as.filter(a=>this.dueMeta(a.due).urgency==='overdue'&&sget(a.id)!=='submitted').length;
+          let label, tone;
+          if(pf==='submitted'){ const n=sts.filter(x=>x==='submitted').length; label=String(n); tone=n>0?'green':'none'; }
+          else if(pf==='todo'){ const n=sts.filter(x=>x!=='submitted').length; label=String(n); tone=n>0?'amber':'none'; }
+          else if(pf==='overdue'){ label=String(overP); tone=overP>0?'red':'none'; }
+          else { const sub=sts.filter(x=>x==='submitted').length; label=sub+'/'+total; tone= sub===total?'green':(overP>0?'red':((sub>0||sts.some(x=>x==='done'))?'amber':'none')); }
+          const t=TONE[tone];
+          return { short:g.short, labelColor:'font-size:10px;font-weight:800;color:'+g.color, countLabel:label,
+            cellStyle:'min-width:40px;height:30px;padding:0 6px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;background:'+t.bg+';color:'+t.fg, dot:'display:none' }; });
+      return { name:s.name, fam:s.fam, initials:this.initials(s.name), avatar:this.avatarStyle(s.color,30,11), cells, open:()=>this.openStudent(s) }; });
+    const setProgStatus=(e)=>this.setState({progStatus:e.target.value});
+
+    const adminReqs = st.requests.map(q=>{ const m=reqMeta[q.status]; const rv = st.adminReplies[q.id]!==undefined?st.adminReplies[q.id]:'';
+      return { id:q.id, subjRef:q.subjRef, text:q.text, by:q.by, date:q.date, reply:q.reply, pending:q.status==='pending', resolved:q.status!=='pending',
+        statusLabel:m.l, initials:this.initials(q.by), avatar:this.avatarStyle('#5B53E0',34,13),
+        badge:'flex:none;border-radius:8px;padding:5px 11px;font-size:11.5px;font-weight:800;background:'+m.bg+';color:'+m.fg,
+        replyVal:rv, setReply:(e)=>this.setReply(q.id,e.target.value), approve:()=>this.resolveReq(q.id,'resolved'), reject:()=>this.resolveReq(q.id,'rejected') }; });
+
+    const teacherRows = this.adminTeachers.map(t=>({ name:t.name, subject:t.subject, email:t.email, cls:t.cls, term:t.term, initials:this.initials(t.name), avatar:this.avatarStyle(t.color,34,13), remove:()=>this.toast('Teacher removed from class') }));
+
+    const famCards = this.adminFamilies.map(f=>({ name:f.name,
+      sub: f.members.filter(m=>m[1]==='Parent').length+' parents · '+f.members.filter(m=>m[1]==='Child').length+' children',
+      members: f.members.map(m=>({ name:m[0], role:m[1], initials:this.initials(m[0]), avatar:this.avatarStyle(m[2],32,12),
+        badge:'border-radius:7px;padding:2px 8px;font-size:10.5px;font-weight:800;'+(m[1]==='Child'?'background:#ECEBFC;color:#5B53E0':'background:#E3F6EB;color:#1B7A50') })) }));
+
+    const C24 = 2*Math.PI*24;
+    const vs = st.viewStudent;
+    let board = null;
+    if (vs) {
+      const sget=(aid)=> vs.live ? this.statusOf(vs.id,aid) : vs.map[aid];
+      let bcards = this.assignments.map(a=>{ const status=sget(a.id); const sm=this.STATUS[status]; const dm=this.dueMeta(a.due);
+        return { subjStyle:this.subjChip(a.subject,false), short:a.short, title:a.title, subject:a.subject, teacher:a.teacher,
+          dueStyle:this.duePill(dm), dueLabel:dm.label, statusStyle:this.pill(sm).replace('cursor:pointer','cursor:default'), dotStyle:this.dot(sm), statusLabel:sm.label, status, urgency:dm.urgency, open:()=>this.openBoardDetail(a.id) }; });
+      if(st.filter==='todo') bcards=bcards.filter(c=>c.status!=='submitted');
+      else if(st.filter==='overdue') bcards=bcards.filter(c=>c.urgency==='overdue'&&c.status!=='submitted');
+      else if(st.filter==='done') bcards=bcards.filter(c=>c.status==='submitted');
+      const subN=this.assignments.filter(a=>sget(a.id)==='submitted').length;
+      const bp=Math.round(subN/this.assignments.length*100);
+      const bfdefs=[['todo','To do'],['overdue','Overdue'],['done','Submitted']];
+      const bchips=bfdefs.map(([k,label])=>{ const ac=st.filter===k; return { label, pick:()=>this.setState({filter:k}), style:'white-space:nowrap;border:1px solid '+(ac?'transparent':'var(--line)')+';cursor:pointer;border-radius:11px;padding:8px 15px;font-weight:700;font-size:13px;font-family:inherit;background:'+(ac?'var(--accent)':'#fff')+';color:'+(ac?'#fff':'var(--muted)') }; });
+      board={ studentName:vs.name, studentFam:vs.fam, studentInitials:this.initials(vs.name), studentAvatar:this.avatarStyle(vs.color,42,15), ringDash:(bp/100*C24).toFixed(1)+' '+C24.toFixed(1), pct:bp, subLine:subN+' of '+this.assignments.length+' submitted', filterChips:bchips, cards:bcards, cardsEmpty:bcards.length===0, onBack:()=>this.backStudent() };
+    }
+    const isStudentBoard = role==='teacher' && screen==='studentboard';
+    const aStudent = isAdmin && aScreen==='student';
+    const showHeader = (showChrome && !isStudentBoard) || detailFromBoard;
+
+    return {
+      ...H,
+      isLogin, isOnboarding, showChrome,
+      isDashboard:screen==='dashboard', isDetail:screen==='detail', isReport:screen==='report',
+      isRequests:screen==='requests', isTeacher:screen==='teacher', isFamily:screen==='family', isProfile:screen==='profile', isCreateFamily,
+      board, isStudentBoard, aStudent, showHeader,
+      alsoAdmin: role==='parent'||role==='teacher', enterAdmin:()=>this.enterAdmin(), exitAdmin:()=>this.exitAdmin(),
+      isAdminOnboarding, isFamilyOnboarding: isOnboarding && !isAdmin && role!=='teacher', confirmAdminOnboarding:()=>this.confirmAdminOnboarding(), sendTeacherInvite:()=>this.sendTeacherInvite(), onbTeachers: teacherRows.slice(0,4),
+      familyName, setFamilyName:(e)=>this.setFamilyName(e), confirmCreateFamily:()=>this.confirmCreateFamily(), inviteMember:()=>this.inviteMember(), toOnboarding:()=>this.toOnboarding(),
+      showHandle:isLogin||isOnboarding||isCreateFamily||isAdminMobile||detailFromBoard,
+      isAdminMobile, showConsole, aChips, adminViewBtns, showAdminToggle:isAdmin,
+      goBack:()=>this.goBack(), signIn:()=>this.signIn(), createFamily:()=>this.createFamily(), signOut:()=>this.signOut(),
+      childTabs, cards, cardsEmpty:cards.length===0, filterChips,
+      ringDash:(pct/100*this.C).toFixed(1)+' '+this.C.toFixed(1), pct, summaryTitle:childName+'\u2019s week',
+      submittedLine: submitted+' of '+total+' submitted', todoCount, overdueCount,
+      detail,
+      reportId:st.reportId, reportText:st.reportText, reportOptions,
+      setReportId:(e)=>this.setState({reportId:e.target.value}), setReportText:(e)=>this.setState({reportText:e.target.value}),
+      submitReport:()=>this.submitReport(), newRequest:()=>this.goReport(''),
+      requestList, pendingDot: pendingCount||'',
+      roster:rosterRows, classPct, classCount:this.roster.length, classAttention,
+      members, me,
+      nav, teacherNav: role==='teacher', familyNav: role!=='teacher', pendingDot2:pendingCount,
+      roleBtns, screenLinks,
+      showNav: this.props.showNavigator !== false,
+      isAdmin, showPhone,
+      aTitle, aSub, aNav, aGo,
+      aOverview:aScreen==='overview', aAssignments:aScreen==='assignments', aProgress:aScreen==='progress',
+      aRequests:aScreen==='requests', aAudit:aScreen==='audit', aTeachers:aScreen==='teachers', aFamilies:aScreen==='families',
+      famCount, activeCount, pendingReq, adminClassPct:classPct,
+      barSubmitted, barDone, barNot, distSubmitted:cs, distDone:cd, distNot:cn,
+      recentAudit, attentionRows,
+      aRows, openNew:()=>this.openAModal(''), adminModal, adminModalMobile: isAdminMobile ? adminModal : null, subjectOptions,
+      progCols, progRows, progStatus:st.progStatus, setProgStatus,
+      adminReqs,
+      teacherRows, assignTeacher:()=>this.toast('Invite sent to teacher'),
+      famCards,
+      auditFiltered, auditEmpty:auditFiltered.length===0, auditQ:st.auditQ, setAuditQ:(e)=>this.setState({auditQ:e.target.value}),
+      toast:st.toast,
+    };
+  }
+}
+</script>
+</body>
+</html>
