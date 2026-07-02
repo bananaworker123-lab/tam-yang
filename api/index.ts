@@ -1,8 +1,7 @@
 /**
- * Vercel serverless entry — wraps the NestJS app as a single function.
- * All /api/* requests are routed here via vercel.json rewrites.
+ * Vercel serverless entry — imports NestJS from pre-compiled dist/
+ * so Vercel's bundler never sees TypeScript decorators.
  */
-import '../apps/api/src/load-env';
 import 'reflect-metadata';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
@@ -11,8 +10,12 @@ import session from 'express-session';
 import connectPg from 'connect-pg-simple';
 import passport from 'passport';
 import type { IncomingMessage, ServerResponse } from 'http';
-import { AppModule } from '../apps/api/src/app.module';
-import { AllExceptionsFilter } from '../apps/api/src/common/all-exceptions.filter';
+
+// Import from pre-compiled JS output (nest build produces apps/api/dist/)
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { AppModule } = require('../apps/api/dist/app.module');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { AllExceptionsFilter } = require('../apps/api/dist/common/all-exceptions.filter');
 
 const expressApp = express();
 let nestReady = false;
