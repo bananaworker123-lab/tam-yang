@@ -35,7 +35,7 @@ export function useActiveClassTerm() {
   );
 
   useEffect(() => {
-    if (!activeClassId && classes.length > 0) {
+    if (classes.length > 0 && (!activeClassId || !classes.find((c) => c.id === activeClassId))) {
       const id = classes[0]!.id;
       setActiveClassIdState(id);
       localStorage.setItem('activeClassId', id);
@@ -43,7 +43,7 @@ export function useActiveClassTerm() {
   }, [classes, activeClassId]);
 
   useEffect(() => {
-    if (!activeTermId && terms.length > 0) {
+    if (terms.length > 0 && (!activeTermId || !terms.find((t) => t.id === activeTermId))) {
       const id = terms[0]!.id;
       setActiveTermIdState(id);
       localStorage.setItem('activeTermId', id);
