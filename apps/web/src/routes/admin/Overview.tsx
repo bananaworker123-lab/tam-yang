@@ -75,11 +75,11 @@ export function AdminOverviewPage() {
     setTeacherErr('');
   }
 
-  if (isLoading) {
+  if (!data) {
     return <div className="flex items-center justify-center py-20"><div className="w-8 h-8 rounded-full border-2 border-accent border-t-transparent animate-spin" /></div>;
   }
 
-  const d = data!;
+  const d = data;
   type StatCard = { label: string; value: number; icon: string; color?: string };
   const stats: StatCard[] = [
     { label: 'Families',         value: d.familyCount,           icon: '🏠' },

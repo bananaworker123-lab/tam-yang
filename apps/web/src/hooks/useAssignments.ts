@@ -12,6 +12,7 @@ export function useActiveAssignments(className: string, termName: string) {
     queryKey: ['assignments', 'active', className, termName],
     queryFn: () => api.get(`/assignments?className=${encodeURIComponent(className)}&termName=${encodeURIComponent(termName)}`),
     enabled: !!className && !!termName,
+    staleTime: 1000 * 60 * 2,
   });
 }
 
@@ -19,6 +20,7 @@ export function useAllAssignments() {
   return useQuery<AssignmentRow[]>({
     queryKey: ['assignments', 'all'],
     queryFn: () => api.get('/assignments?all=1'),
+    staleTime: 1000 * 60 * 2,
   });
 }
 

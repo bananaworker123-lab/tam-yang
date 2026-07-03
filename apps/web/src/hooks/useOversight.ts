@@ -110,6 +110,7 @@ export function useAdminOverview() {
   return useQuery<AdminOverviewData>({
     queryKey: ['oversight', 'admin', 'overview'],
     queryFn: () => api.get('/oversight/admin/overview'),
+    staleTime: 1000 * 60 * 2,
   });
 }
 
@@ -117,6 +118,7 @@ export function useAdminFamilies() {
   return useQuery<AdminFamily[]>({
     queryKey: ['oversight', 'admin', 'families'],
     queryFn: () => api.get('/oversight/admin/families'),
+    staleTime: 1000 * 60 * 2,
   });
 }
 
@@ -132,6 +134,7 @@ export function useAdminAllProgress(className?: string, termName?: string) {
     queryKey: ['oversight', 'admin', 'progress', className, termName],
     queryFn: () => api.get(`/oversight/admin/progress?${params}`),
     enabled: !!className && !!termName,
+    staleTime: 1000 * 60 * 2,
   });
 }
 
@@ -144,6 +147,7 @@ export function useAdminTeachers() {
   return useQuery<AdminTeacherRow[]>({
     queryKey: ['oversight', 'admin', 'teachers'],
     queryFn: () => api.get('/oversight/admin/teachers'),
+    staleTime: 1000 * 60 * 2,
   });
 }
 

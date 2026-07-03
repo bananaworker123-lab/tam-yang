@@ -17,6 +17,7 @@ export function useMyRequests() {
   return useQuery<RequestRow[]>({
     queryKey: ['requests', 'mine'],
     queryFn: () => api.get('/requests/mine'),
+    staleTime: 1000 * 60 * 2,
   });
 }
 
@@ -24,6 +25,7 @@ export function useAllRequests() {
   return useQuery<RequestRow[]>({
     queryKey: ['requests', 'all'],
     queryFn: () => api.get('/requests'),
+    staleTime: 1000 * 60 * 2,
   });
 }
 

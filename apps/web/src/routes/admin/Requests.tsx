@@ -8,7 +8,7 @@ export function AdminRequestsPage() {
   const rejectRequest  = useRejectRequest();
   const [replies, setReplies] = useState<Record<string, string>>({});
 
-  if (isLoading) {
+  if (isLoading && !requests.length) {
     return <div className="flex items-center justify-center py-20"><div className="w-8 h-8 rounded-full border-2 border-accent border-t-transparent animate-spin" /></div>;
   }
 
