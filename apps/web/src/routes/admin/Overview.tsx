@@ -47,7 +47,7 @@ export function AdminOverviewPage() {
   const [subjectErr, setSubjectErr] = useState('');
   const [editingTeacher, setEditingTeacher] = useState<TeacherRecord | null>(null);
   const [teacherErr, setTeacherErr] = useState('');
-  const [showConfig, setShowConfig] = useState(false);
+  const [editingClassTerm, setEditingClassTerm] = useState(false);
 
   function saveSubject() {
     if (!editingSubject) return;
@@ -117,41 +117,57 @@ export function AdminOverviewPage() {
       <Card className="mb-4">
         <div className="flex items-center justify-between mb-3">
           <div className="text-xs font-bold text-muted uppercase tracking-wide">Active class &amp; term</div>
+          {!editingClassTerm && (
+            <button onClick={() => setEditingClassTerm(true)}
+              className="h-7 px-3 rounded-lg border border-line text-xs text-muted hover:bg-bg transition">
+              Edit
+            </button>
+          )}
         </div>
-        {classes.length > 0 && (
+
+        {editingClassTerm ? (
           <>
-            <div className="text-xs text-muted mb-1">Class</div>
-            <div className="grid grid-cols-3 gap-1.5 mb-3">
-              {classes.map((c) => (
-                <button key={c.id} onClick={() => setActiveClassId(c.id)}
-                  className={`h-10 rounded-xl text-xs font-bold transition ${c.id === activeClassId ? 'bg-accent text-white' : 'bg-bg text-muted border border-line hover:text-ink'}`}>
-                  {c.name}
-                </button>
-              ))}
-            </div>
+            {classes.length > 0 && (
+              <>
+                <div className="text-xs text-muted mb-1">Class</div>
+                <div className="grid grid-cols-3 gap-1.5 mb-3">
+                  {classes.map((c) => (
+                    <button key={c.id} onClick={() => setActiveClassId(c.id)}
+                      className={`h-10 rounded-xl text-xs font-bold transition ${c.id === activeClassId ? 'bg-accent text-white' : 'bg-bg text-muted border border-line hover:text-ink'}`}>
+                      {c.name}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+            {terms.length > 0 && (
+              <>
+                <div className="text-xs text-muted mb-1">Term</div>
+                <div className="grid grid-cols-2 gap-1.5 mb-3">
+                  {terms.map((t) => (
+                    <button key={t.id} onClick={() => setActiveTermId(t.id)}
+                      className={`h-10 rounded-xl text-xs font-bold transition ${t.id === activeTermId ? 'bg-accent text-white' : 'bg-bg text-muted border border-line hover:text-ink'}`}>
+                      {t.name}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+            {classes.length === 0 && <div className="text-faint text-xs mb-3">No classes yet — add assignments first</div>}
+            <Button className="w-full h-9 text-sm" onClick={() => setEditingClassTerm(false)}>Done</Button>
           </>
-        )}
-        {terms.length > 0 && (
-          <>
-            <div className="text-xs text-muted mb-1">Term</div>
-            <div className="grid grid-cols-2 gap-1.5 mb-3">
-              {terms.map((t) => (
-                <button key={t.id} onClick={() => setActiveTermId(t.id)}
-                  className={`h-10 rounded-xl text-xs font-bold transition ${t.id === activeTermId ? 'bg-accent text-white' : 'bg-bg text-muted border border-line hover:text-ink'}`}>
-                  {t.name}
-                </button>
-              ))}
+        ) : (
+          <div className="flex items-center gap-3">
+            <div className="flex-1 bg-accent-soft rounded-xl px-4 py-3">
+              <div className="text-[10px] text-accent-ink font-bold uppercase tracking-wide mb-0.5">Class</div>
+              <div className="font-bold text-accent-ink text-sm">{activeClassName || '—'}</div>
             </div>
-          </>
-        )}
-        {(activeClassName || activeTermName) && (
-          <div className="flex items-center gap-2 bg-accent-soft rounded-xl px-3 py-2">
-            <span className="text-xs text-accent-ink font-semibold">Active:</span>
-            <span className="font-bold text-accent-ink text-xs">{activeClassName}</span>
-            {activeTermName && <><span className="text-faint">·</span><span className="font-bold text-accent-ink text-xs">{activeTermName}</span></>}
+            <div className="flex-1 bg-accent-soft rounded-xl px-4 py-3">
+              <div className="text-[10px] text-accent-ink font-bold uppercase tracking-wide mb-0.5">Term</div>
+              <div className="font-bold text-accent-ink text-sm">{activeTermName || '—'}</div>
+            </div>
           </div>
         )}
-        {classes.length === 0 && <div className="text-faint text-xs">No classes yet — add assignments first</div>}
       </Card>
 
       {/* Families */}
