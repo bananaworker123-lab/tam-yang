@@ -14,8 +14,22 @@ export interface AssignmentInput {
 export class AssignmentService {
   constructor(private readonly prisma: PrismaService, private readonly events: EventBus) {}
 
+  private mapRow(a: { id: string; subject: string; topic: string; teacherName: string; active: boolean; assignedDate: Date; dueDate: Date; classRoom: { name: string }; term: { name: string } }) {
+    return {
+      id: a.id,
+      subject: a.subject,
+      topic: a.topic,
+      teacherName: a.teacherName,
+      className: a.classRoom.name,
+      term: a.term.name,
+      assignedDate: a.assignedDate.toISOString().slice(0, 10),
+      dueDate: a.dueDate.toISOString().slice(0, 10),
+      active: a.active,
+    };
+  }
+
   async listActive(className?: string, termName?: string) {
-    return this.prisma.masterAssignment.findMany({
+    const rows = await this.prisma.masterAssignment.findMany({
       where: {
         active: true,
         ...(className ? { classRoom: { name: className } } : {}),
@@ -24,13 +38,15 @@ export class AssignmentService {
       include: { classRoom: true, term: true },
       orderBy: { dueDate: 'asc' },
     });
+    return rows.map((r) => this.mapRow(r));
   }
 
   async listAll() {
-    return this.prisma.masterAssignment.findMany({
+    const rows = await this.prisma.masterAssignment.findMany({
       include: { classRoom: true, term: true },
       orderBy: { createdAt: 'desc' },
     });
+    return rows.map((r) => this.mapRow(r));
   }
 
   async create(input: AssignmentInput) {
@@ -50,7 +66,7 @@ export class AssignmentService {
       include: { classRoom: true, term: true },
     });
     await this.events.publish({ eventId: `asgn-${a.id}`, eventType: EventType.AssignmentChanged, timestamp: new Date().toISOString(), source: 'assignment', data: { assignmentId: a.id, action: 'created' } });
-    return a;
+    return this.mapRow(a);
   }
 
   async update(id: string, input: Partial<AssignmentInput> & { active?: boolean }) {
@@ -70,7 +86,7 @@ export class AssignmentService {
       include: { classRoom: true, term: true },
     });
     await this.events.publish({ eventId: `asgn-upd-${a.id}-${Date.now()}`, eventType: EventType.AssignmentChanged, timestamp: new Date().toISOString(), source: 'assignment', data: { assignmentId: a.id, action: 'updated' } });
-    return a;
+    return this.mapRow(a);
   }
 
   async delete(id: string) {
