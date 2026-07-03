@@ -7,7 +7,7 @@ export function useFamily() {
   const familyId = user?.familyId;
   return useQuery({
     queryKey: ['family', familyId],
-    queryFn: () => api.get<{ members: unknown[]; invites: unknown[] }>(`/families/${familyId}/members`),
+    queryFn: () => api.get<{ familyName: string; members: unknown[]; invites: unknown[] }>(`/families/${familyId}/members`),
     enabled: !!familyId,
   });
 }

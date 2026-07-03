@@ -28,12 +28,13 @@ export class FamilyService {
   }
 
   async listMembers(familyId: string) {
-    const members = await this.prisma.membership.findMany({
-      where: { familyId },
-      include: { user: true },
-    });
-    const invites = await this.prisma.invite.findMany({ where: { familyId } });
+    const [family, members, invites] = await Promise.all([
+      this.prisma.family.findUnique({ where: { id: familyId }, select: { name: true } }),
+      this.prisma.membership.findMany({ where: { familyId }, include: { user: true } }),
+      this.prisma.invite.findMany({ where: { familyId } }),
+    ]);
     return {
+      familyName: family?.name ?? '',
       members: members.map((m) => ({
         userId: m.userId, name: m.user.name, email: m.user.email,
         pictureUrl: m.user.pictureUrl, role: m.role,

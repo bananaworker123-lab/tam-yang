@@ -84,7 +84,6 @@ const DICT: Dict = {
 
   // nav extras
   'nav.class': { en: 'Class', th: 'ชั้นเรียน' },
-  'nav.menu': { en: 'Menu', th: 'เมนู' },
   'nav.switchTo': { en: 'Switch to', th: 'สลับเป็น' },
   'nav.switchToAdmin': { en: 'Switch to Admin', th: 'สลับเป็น Admin' },
 
@@ -106,7 +105,6 @@ const DICT: Dict = {
   'profile.joined': { en: 'Joined', th: 'เข้าร่วมแล้ว' },
   'profile.notJoined': { en: 'Not joined', th: 'ยังไม่เข้าร่วม' },
   'profile.family': { en: 'Family', th: 'ครอบครัว' },
-  'profile.role': { en: 'Role', th: 'บทบาท' },
   'profile.signOut': { en: 'Sign out', th: 'ออกจากระบบ' },
 
   // family

@@ -165,15 +165,17 @@ export function FamilyPage() {
             {members.map((m: any) => (
               <div key={m.userId} className="flex items-center gap-3">
                 <Avatar initials={(m.name?.slice(0, 2) ?? '??').toUpperCase()} />
-                {editingMember?.userId === m.userId ? (
+                {editingMember?.userId === m.userId ? (() => {
+                  const em = editingMember!;
+                  return (
                   <div className="flex-1 flex items-center gap-2 min-w-0">
                     <input
                       autoFocus
-                      value={editingMember.name}
-                      onChange={(e) => setEditingMember({ ...editingMember, name: e.target.value })}
+                      value={em.name}
+                      onChange={(e) => setEditingMember({ userId: em.userId, name: e.target.value })}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
-                          updateMemberName.mutate({ userId: m.userId, name: editingMember.name }, { onSuccess: () => setEditingMember(null) });
+                          updateMemberName.mutate({ userId: m.userId, name: em.name }, { onSuccess: () => setEditingMember(null) });
                         } else if (e.key === 'Escape') {
                           setEditingMember(null);
                         }
@@ -181,7 +183,7 @@ export function FamilyPage() {
                       className="flex-1 min-w-0 h-8 px-2 text-sm rounded-lg border border-accent focus:outline-none"
                     />
                     <button
-                      onClick={() => updateMemberName.mutate({ userId: m.userId, name: editingMember.name }, { onSuccess: () => setEditingMember(null) })}
+                      onClick={() => updateMemberName.mutate({ userId: m.userId, name: em.name }, { onSuccess: () => setEditingMember(null) })}
                       disabled={updateMemberName.isPending}
                       className="h-8 px-3 rounded-lg bg-accent text-white text-xs font-semibold disabled:opacity-60 flex-none"
                     >
@@ -194,7 +196,8 @@ export function FamilyPage() {
                       {t('family.cancel')}
                     </button>
                   </div>
-                ) : (
+                  );
+                })() : (
                   <>
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold text-ink text-sm truncate">{m.name}</div>

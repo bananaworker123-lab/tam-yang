@@ -29,8 +29,6 @@ const NAV: Record<AppRole, { to: string; labelKey: string; icon: string }[]> = {
     { to: '/admin/progress',    labelKey: 'nav.progress',     icon: 'M18 20V10M12 20V4M6 20v-6' },
     { to: '/admin/requests',    labelKey: 'nav.requests',     icon: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' },
     { to: '/admin/audit',       labelKey: 'nav.audit',        icon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8' },
-    { to: '/admin/teachers',    labelKey: 'nav.teachers',     icon: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm4 10v-2a4 4 0 0 0-3-3.87' },
-    { to: '/admin/families',    labelKey: 'nav.families',     icon: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z' },
   ],
 };
 

@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Card, Avatar, Button, PageHeader } from '../components/ui';
 import type { Locale } from '../i18n';
 import { useT } from '../i18n';
+import { useFamily } from '../hooks/useFamily';
 
 
 export function ProfilePage() {
@@ -12,6 +13,7 @@ export function ProfilePage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { t, locale, setLocale } = useT();
+  const { data: familyData } = useFamily();
 
   const initials = user ? (user.name?.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase() ?? '??') : '??';
 
@@ -41,7 +43,11 @@ export function ProfilePage() {
           <dt className="text-muted">{t('profile.role')}</dt>
           <dd className="text-ink font-semibold text-right">{user?.roles.map((r) => t(`role.${r}`)).join(', ') ?? '—'}</dd>
           <dt className="text-muted">{t('profile.family')}</dt>
-          <dd className="text-ink font-semibold text-right">{user?.familyId ? t('profile.joined') : user?.roles.includes('admin') ? t('role.admin') : t('profile.notJoined')}</dd>
+          <dd className="text-ink font-semibold text-right">
+            {user?.familyId
+              ? ((familyData as any)?.familyName || t('profile.joined'))
+              : user?.roles.includes('admin') ? t('role.admin') : t('profile.notJoined')}
+          </dd>
         </dl>
       </Card>
 

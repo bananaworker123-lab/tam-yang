@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { useActiveClassTerm } from '../../hooks/useOversight';
 import { useAllAssignments, useCreateAssignment, useUpdateAssignment, useDeleteAssignment } from '../../hooks/useAssignments';
 import type { AssignmentRow } from '../../hooks/useAssignments';
+import { useStore } from '../../mock/store';
 import { Card, Button, PageHeader } from '../../components/ui';
 
 const TOPIC_MAX = 120;
 
 export function AdminAssignmentsPage() {
-  const { classes, terms, activeClassName, activeTermName } = useActiveClassTerm();
+  const { activeClassName, activeTermName } = useActiveClassTerm();
+  const { teachers } = useStore();
   const [editing, setEditing] = useState<Partial<AssignmentRow> & { id?: string } | null>(null);
   const [filterClass, setFilterClass] = useState('');
   const [filterTerm, setFilterTerm]   = useState('');
@@ -28,8 +30,8 @@ export function AdminAssignmentsPage() {
   function openNew() {
     setEditing({
       subject: '', topic: '', teacherName: '',
-      className: activeClassName || classes[0]?.name || '',
-      term: activeTermName || terms[0]?.name || '',
+      className: activeClassName,
+      term: activeTermName,
       assignedDate: new Date().toISOString().slice(0, 10),
       dueDate: new Date().toISOString().slice(0, 10),
       active: true,
@@ -42,9 +44,20 @@ export function AdminAssignmentsPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  function handleTeacherSelect(teacherId: string) {
+    const t = teachers.find((x) => x.id === teacherId);
+    if (!t) return;
+    setEditing((prev) => prev ? { ...prev, teacherName: t.name, subject: t.subject } : prev);
+  }
+
   async function save() {
     if (!editing || !editing.topic?.trim() || !editing.teacherName?.trim() || !editing.subject?.trim()) return;
-    const payload = { ...editing, topic: editing.topic.slice(0, TOPIC_MAX) } as AssignmentRow;
+    const payload = {
+      ...editing,
+      topic: editing.topic.slice(0, TOPIC_MAX),
+      className: activeClassName || editing.className || '',
+      term: activeTermName || editing.term || '',
+    } as AssignmentRow;
     if (editing.id) {
       const { id: _id, ...rest } = payload;
       await updateAssignment.mutateAsync({ id: editing.id, ...rest });
@@ -64,15 +77,41 @@ export function AdminAssignmentsPage() {
         <Card className="mb-4">
           <div className="font-bold text-ink mb-3">{editing.id ? 'Edit' : 'New'} assignment</div>
 
-          <label className="text-xs text-muted">Teacher name</label>
-          <input value={editing.teacherName ?? ''} onChange={(e) => setEditing({ ...editing, teacherName: e.target.value })}
-            placeholder="e.g. Ms. Smith"
-            className="w-full h-11 rounded-xl border border-line px-3 text-sm mt-0.5 mb-3 outline-none focus:border-accent" />
+          {/* Active class & term display */}
+          <div className="flex gap-2 mb-3">
+            <div className="flex-1 bg-accent-soft rounded-xl px-3 py-2">
+              <div className="text-[10px] text-accent-ink font-bold uppercase tracking-wide">Class</div>
+              <div className="font-bold text-accent-ink text-sm">{activeClassName || editing.className || '—'}</div>
+            </div>
+            <div className="flex-1 bg-accent-soft rounded-xl px-3 py-2">
+              <div className="text-[10px] text-accent-ink font-bold uppercase tracking-wide">Term</div>
+              <div className="font-bold text-accent-ink text-sm">{activeTermName || editing.term || '—'}</div>
+            </div>
+          </div>
 
+          {/* Teacher selector */}
+          <label className="text-xs text-muted">Teacher</label>
+          {teachers.length > 0 ? (
+            <select
+              onChange={(e) => handleTeacherSelect(e.target.value)}
+              defaultValue=""
+              className="w-full h-11 rounded-xl border border-line px-3 text-sm mt-0.5 mb-3 outline-none focus:border-accent">
+              <option value="" disabled>— select teacher —</option>
+              {teachers.map((t) => (
+                <option key={t.id} value={t.id}>{t.name} · {t.subject}</option>
+              ))}
+            </select>
+          ) : (
+            <input value={editing.teacherName ?? ''} onChange={(e) => setEditing({ ...editing, teacherName: e.target.value })}
+              placeholder="e.g. Ms. Smith"
+              className="w-full h-11 rounded-xl border border-line px-3 text-sm mt-0.5 mb-3 outline-none focus:border-accent" />
+          )}
+
+          {/* Subject (auto-filled or manual) */}
           <label className="text-xs text-muted">Subject</label>
           <input value={editing.subject ?? ''} onChange={(e) => setEditing({ ...editing, subject: e.target.value })}
-            placeholder="e.g. Mathematics"
-            className="w-full h-11 rounded-xl border border-line px-3 text-sm mt-0.5 mb-3 outline-none focus:border-accent" />
+            placeholder={teachers.length > 0 ? 'Auto-filled from teacher' : 'e.g. Mathematics'}
+            className="w-full h-11 rounded-xl border border-line px-3 text-sm mt-0.5 mb-3 outline-none focus:border-accent bg-bg" />
 
           <label className="text-xs text-muted">Topic</label>
           <input value={editing.topic ?? ''} onChange={(e) => setEditing({ ...editing, topic: e.target.value.slice(0, TOPIC_MAX) })}
@@ -80,27 +119,6 @@ export function AdminAssignmentsPage() {
             className={`w-full h-11 rounded-xl border px-3 text-sm mt-0.5 outline-none focus:border-accent ${(editing.topic?.length ?? 0) >= TOPIC_MAX ? 'border-status-overdue' : 'border-line'}`} />
           <div className={`text-right text-[11px] mt-0.5 mb-3 ${(editing.topic?.length ?? 0) >= TOPIC_MAX ? 'text-status-overdue font-bold' : 'text-faint'}`}>
             {editing.topic?.length ?? 0} / {TOPIC_MAX}
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 mb-3">
-            <div>
-              <label className="text-xs text-muted">Class</label>
-              <input value={editing.className ?? ''} onChange={(e) => setEditing({ ...editing, className: e.target.value })}
-                placeholder="e.g. M.1" list="class-options"
-                className="w-full h-11 rounded-xl border border-line px-3 text-sm mt-0.5 outline-none focus:border-accent" />
-              <datalist id="class-options">
-                {classes.map((c) => <option key={c.id} value={c.name} />)}
-              </datalist>
-            </div>
-            <div>
-              <label className="text-xs text-muted">Term</label>
-              <input value={editing.term ?? ''} onChange={(e) => setEditing({ ...editing, term: e.target.value })}
-                placeholder="e.g. Term 1" list="term-options"
-                className="w-full h-11 rounded-xl border border-line px-3 text-sm mt-0.5 outline-none focus:border-accent" />
-              <datalist id="term-options">
-                {terms.map((t) => <option key={t.id} value={t.name} />)}
-              </datalist>
-            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-2 mb-4">
