@@ -32,6 +32,10 @@ export class UserService {
     await this.prisma.user.update({ where: { id: userId }, data: { name } });
   }
 
+  async updateShortName(userId: string, shortName: string): Promise<void> {
+    await this.prisma.user.update({ where: { id: userId }, data: { shortName: shortName.slice(0, 4) || null } });
+  }
+
   /** Build the AuthContext (roles + scopes) for a user from their memberships. */
   async buildAuthContext(userId: string): Promise<AuthContext | null> {
     const user = await this.prisma.user.findUnique({
@@ -55,6 +59,7 @@ export class UserService {
       userId: user.id,
       email: user.email,
       name: user.name,
+      shortName: user.shortName,
       pictureUrl: user.pictureUrl,
       roles,
       familyId: membership?.familyId ?? null,

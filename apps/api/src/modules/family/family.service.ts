@@ -36,7 +36,7 @@ export class FamilyService {
     return {
       familyName: family?.name ?? '',
       members: members.map((m) => ({
-        userId: m.userId, name: m.user.name, email: m.user.email,
+        userId: m.userId, name: m.user.name, shortName: m.user.shortName, email: m.user.email,
         pictureUrl: m.user.pictureUrl, role: m.role,
       })),
       invites: invites.map((i) => ({

@@ -14,7 +14,7 @@ export function AdminProgressPage() {
   const assignments = data?.assignments ?? [];
   const rows        = data?.rows ?? [];
 
-  const initials = (name: string) => name.split(' ').filter(Boolean).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+  const initials = (name: string, short?: string | null) => short?.toUpperCase() || name.split(' ').filter(Boolean).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
 
   return (
     <div>
@@ -72,7 +72,7 @@ export function AdminProgressPage() {
             return (
               <Card key={r.childId}>
                 <div className="flex items-center gap-3 mb-2">
-                  <Avatar initials={initials(r.childName)} />
+                  <Avatar initials={initials(r.childName, r.childShort)} />
                   <div>
                     <div className="font-bold text-ink text-sm">{r.childName}</div>
                     <div className="text-xs text-faint">{r.familyName}</div>

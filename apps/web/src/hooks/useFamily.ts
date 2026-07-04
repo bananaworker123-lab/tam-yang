@@ -31,6 +31,16 @@ export function useUpdateMemberName() {
   });
 }
 
+export function useUpdateMemberShort() {
+  const qc = useQueryClient();
+  const { refetch } = useAuth();
+  return useMutation({
+    mutationFn: ({ userId, shortName }: { userId: string; shortName: string }) =>
+      api.patch(`/users/${userId}/short-name`, { shortName }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['family'] }); refetch(); },
+  });
+}
+
 export function useRemoveMember() {
   const { user } = useAuth();
   const qc = useQueryClient();

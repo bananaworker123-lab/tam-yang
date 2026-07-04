@@ -21,7 +21,7 @@ export function TeacherPage() {
     return 'bg-bg text-faint';
   }
 
-  const initials = (name: string) => name.split(' ').filter(Boolean).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+  const initials = (name: string, short?: string | null) => short?.toUpperCase() || name.split(' ').filter(Boolean).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
 
   if (isLoading) {
     return <div className="flex items-center justify-center py-20"><div className="w-8 h-8 rounded-full border-2 border-accent border-t-transparent animate-spin" /></div>;
@@ -82,7 +82,7 @@ export function TeacherPage() {
             return (
               <Card key={r.childId}>
                 <div className="flex items-center gap-3 mb-3">
-                  <Avatar initials={initials(r.childName)} />
+                  <Avatar initials={initials(r.childName, r.childShort)} />
                   <div className="font-bold text-ink text-sm">{r.childName}</div>
                 </div>
                 {cells.length === 0 ? (

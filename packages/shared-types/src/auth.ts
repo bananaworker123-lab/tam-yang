@@ -5,6 +5,7 @@ export interface AuthContext {
   userId: string;
   email: string;
   name: string;
+  shortName?: string | null;
   pictureUrl?: string | null;
   roles: Role[];
   /** Set when the user belongs to a family (parent/child). */

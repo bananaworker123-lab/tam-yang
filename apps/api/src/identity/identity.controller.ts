@@ -34,4 +34,20 @@ export class IdentityController {
     }
     return { ok: true };
   }
+
+  @Patch('users/:id/short-name')
+  async updateShortName(
+    @Req() req: Request,
+    @Param('id') targetId: string,
+    @Body() body: { shortName: string },
+  ): Promise<{ ok: boolean }> {
+    const session = req.session as unknown as { user?: AuthContext };
+    if (!session.user) throw AppError.unauthorized();
+    await this.users.updateShortName(targetId, (body.shortName ?? '').trim());
+    if (session.user.userId === targetId) {
+      const updated = await this.users.buildAuthContext(targetId);
+      if (updated) session.user = updated;
+    }
+    return { ok: true };
+  }
 }

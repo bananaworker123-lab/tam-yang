@@ -46,6 +46,7 @@ model User {
   googleSub  String?  @unique @map("google_sub")
   email      String   @unique
   name       String
+  shortName  String?  @map("short_name") @db.VarChar(4)
   pictureUrl String?  @map("picture_url")
   isAdmin    Boolean  @default(false) @map("is_admin")
   createdAt  DateTime @default(now()) @map("created_at")

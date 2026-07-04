@@ -38,14 +38,15 @@ export class OversightService {
 
     const progress = await this.prisma.progress.findMany({
       where: { assignmentId: { in: assignments.map((a) => a.id) } },
-      include: { child: true },
+      include: { child: { select: { id: true, name: true, shortName: true, pictureUrl: true } } },
     });
 
-    const childMap = new Map<string, { id: string; name: string; pictureUrl: string | null }>();
+    const childMap = new Map<string, { id: string; name: string; shortName: string | null; pictureUrl: string | null }>();
     for (const p of progress) {
       childMap.set(p.childUserId, {
         id: p.childUserId,
         name: p.child.name,
+        shortName: p.child.shortName ?? null,
         pictureUrl: p.child.pictureUrl,
       });
     }
@@ -53,6 +54,7 @@ export class OversightService {
     const rows = [...childMap.values()].map((c) => ({
       childId: c.id,
       childName: c.name,
+      childShort: c.shortName ?? null,
       pictureUrl: c.pictureUrl,
       cells: assignments.map((a) => {
         const p = progress.find((x) => x.childUserId === c.id && x.assignmentId === a.id);
@@ -178,6 +180,7 @@ export class OversightService {
     const rows = memberships.map((m) => ({
       childId: m.userId,
       childName: m.user.name,
+      childShort: m.user.shortName ?? null,
       familyName: m.family.name,
       cells: assignments.map((a) => {
         const p = progress.find((x) => x.childUserId === m.userId && x.assignmentId === a.id);

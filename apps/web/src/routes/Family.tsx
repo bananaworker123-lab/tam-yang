@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useAuth } from '../context/AuthContext';
-import { useFamily, useInviteMember, useRemoveMember, useUpdateMemberName } from '../hooks/useFamily';
+import { useFamily, useInviteMember, useRemoveMember, useUpdateMemberName, useUpdateMemberShort } from '../hooks/useFamily';
 import { Card, Avatar, Button, PageHeader, EmptyState, SkeletonLine } from '../components/ui';
 import { useT } from '../i18n';
 
@@ -106,11 +106,12 @@ export function FamilyPage() {
   const inviteMember = useInviteMember();
   const removeMember = useRemoveMember();
   const updateMemberName = useUpdateMemberName();
+  const updateMemberShort = useUpdateMemberShort();
   const [inviteRole, setInviteRole] = useState<'parent' | 'child'>('child');
   const [err, setErr] = useState('');
   const [qrToken, setQrToken] = useState<string | null>(null);
   const [confirmRemove, setConfirmRemove] = useState<{ userId: string; name: string } | null>(null);
-  const [editingMember, setEditingMember] = useState<{ userId: string; name: string } | null>(null);
+  const [editingMember, setEditingMember] = useState<{ userId: string; name: string; shortName: string } | null>(null);
 
   const { t } = useT();
   const isParent = user?.roles.includes('parent');
@@ -167,37 +168,51 @@ export function FamilyPage() {
           <div className="flex flex-col gap-3">
             {members.map((m: any) => (
               <div key={m.userId} className="flex items-center gap-3">
-                <Avatar initials={(m.name?.slice(0, 2) ?? '??').toUpperCase()} />
+                <Avatar initials={m.shortName?.toUpperCase() || (m.name?.slice(0, 2) ?? '??').toUpperCase()} />
                 {editingMember?.userId === m.userId ? (() => {
                   const em = editingMember!;
+                  const isSaving = updateMemberName.isPending || updateMemberShort.isPending;
+                  function saveAll() {
+                    let done = 0;
+                    const tryClose = () => { if (++done === 2) setEditingMember(null); };
+                    updateMemberName.mutate({ userId: m.userId, name: em.name }, { onSuccess: tryClose, onError: tryClose });
+                    updateMemberShort.mutate({ userId: m.userId, shortName: em.shortName }, { onSuccess: tryClose, onError: tryClose });
+                  }
                   return (
-                  <div className="flex-1 flex items-center gap-2 min-w-0">
-                    <input
-                      autoFocus
-                      value={em.name}
-                      onChange={(e) => setEditingMember({ userId: em.userId, name: e.target.value })}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          updateMemberName.mutate({ userId: m.userId, name: em.name }, { onSuccess: () => setEditingMember(null) });
-                        } else if (e.key === 'Escape') {
-                          setEditingMember(null);
-                        }
-                      }}
-                      className="flex-1 min-w-0 h-8 px-2 text-sm rounded-lg border border-accent focus:outline-none"
-                    />
-                    <button
-                      onClick={() => updateMemberName.mutate({ userId: m.userId, name: em.name }, { onSuccess: () => setEditingMember(null) })}
-                      disabled={updateMemberName.isPending}
-                      className="h-8 px-3 rounded-lg bg-accent text-white text-xs font-semibold disabled:opacity-60 flex-none"
-                    >
-                      {t('family.save')}
-                    </button>
-                    <button
-                      onClick={() => setEditingMember(null)}
-                      className="h-8 px-3 rounded-lg border border-line text-xs text-muted flex-none"
-                    >
-                      {t('family.cancel')}
-                    </button>
+                  <div className="flex-1 flex flex-col gap-1.5 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <input
+                        autoFocus
+                        value={em.name}
+                        onChange={(e) => setEditingMember({ ...em, name: e.target.value })}
+                        onKeyDown={(e) => { if (e.key === 'Enter') saveAll(); else if (e.key === 'Escape') setEditingMember(null); }}
+                        placeholder="ชื่อ"
+                        className="flex-1 min-w-0 h-8 px-2 text-sm rounded-lg border border-accent focus:outline-none"
+                      />
+                      <input
+                        value={em.shortName}
+                        onChange={(e) => setEditingMember({ ...em, shortName: e.target.value.slice(0, 4) })}
+                        onKeyDown={(e) => { if (e.key === 'Enter') saveAll(); else if (e.key === 'Escape') setEditingMember(null); }}
+                        placeholder="ย่อ"
+                        maxLength={4}
+                        className="w-16 h-8 px-2 text-sm rounded-lg border border-accent focus:outline-none text-center font-bold"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={saveAll}
+                        disabled={isSaving}
+                        className="h-8 px-3 rounded-lg bg-accent text-white text-xs font-semibold disabled:opacity-60 flex-none"
+                      >
+                        {isSaving ? 'Saving…' : t('family.save')}
+                      </button>
+                      <button
+                        onClick={() => setEditingMember(null)}
+                        className="h-8 px-3 rounded-lg border border-line text-xs text-muted flex-none"
+                      >
+                        {t('family.cancel')}
+                      </button>
+                    </div>
                   </div>
                   );
                 })() : (
@@ -209,7 +224,7 @@ export function FamilyPage() {
                     {isParent && (
                       <div className="flex items-center gap-1 flex-none">
                         <button
-                          onClick={() => setEditingMember({ userId: m.userId, name: m.name })}
+                          onClick={() => setEditingMember({ userId: m.userId, name: m.name, shortName: m.shortName ?? '' })}
                           className="w-8 h-8 rounded-lg flex items-center justify-center text-faint hover:text-accent hover:bg-accent/10 transition"
                           title="Edit name"
                         >
