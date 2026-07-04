@@ -27,6 +27,7 @@ export class IdentityController {
     const session = req.session as unknown as { user?: AuthContext };
     if (!session.user) throw AppError.unauthorized();
     if (!body.name?.trim()) throw AppError.validation('Name is required');
+    await this.users.assertSameFamilyOrSelf(session.user, targetId);
     await this.users.updateName(targetId, body.name.trim());
     if (session.user.userId === targetId) {
       const updated = await this.users.buildAuthContext(targetId);
@@ -43,6 +44,7 @@ export class IdentityController {
   ): Promise<{ ok: boolean }> {
     const session = req.session as unknown as { user?: AuthContext };
     if (!session.user) throw AppError.unauthorized();
+    await this.users.assertSameFamilyOrSelf(session.user, targetId);
     await this.users.updateShortName(targetId, (body.shortName ?? '').trim());
     if (session.user.userId === targetId) {
       const updated = await this.users.buildAuthContext(targetId);

@@ -212,20 +212,18 @@ export function ProfilePage() {
                         <div className="font-semibold text-ink text-sm truncate">{m.name}</div>
                         <div className="text-xs text-faint capitalize">{m.role} · {m.email}</div>
                       </div>
-                      {isParent && (
-                        <div className="flex items-center gap-1 flex-none">
-                          <button onClick={() => setEditingMember({ userId: m.userId, name: m.name, shortName: m.shortName ?? '' })}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center text-faint hover:text-accent hover:bg-accent/10 transition">
-                            <PencilIcon />
+                      <div className="flex items-center gap-1 flex-none">
+                        <button onClick={() => setEditingMember({ userId: m.userId, name: m.name, shortName: m.shortName ?? '' })}
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-faint hover:text-accent hover:bg-accent/10 transition">
+                          <PencilIcon />
+                        </button>
+                        {isParent && m.userId !== user?.userId && (
+                          <button onClick={() => setConfirmRemove({ userId: m.userId, name: m.name })}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center text-faint hover:text-red-500 hover:bg-red-50 transition">
+                            <TrashIcon />
                           </button>
-                          {m.userId !== user?.userId && (
-                            <button onClick={() => setConfirmRemove({ userId: m.userId, name: m.name })}
-                              className="w-8 h-8 rounded-lg flex items-center justify-center text-faint hover:text-red-500 hover:bg-red-50 transition">
-                              <TrashIcon />
-                            </button>
-                          )}
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </>
                   )}
                 </div>
