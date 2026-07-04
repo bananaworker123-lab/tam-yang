@@ -14,10 +14,10 @@ export class FamilyService {
     private readonly events: EventBus,
   ) {}
 
-  async createFamily(userId: string, name: string) {
+  async createFamily(userId: string, name: string, role: 'parent' | 'child' = 'parent') {
     const family = await this.prisma.family.create({ data: { name } });
     await this.prisma.membership.create({
-      data: { familyId: family.id, userId, role: 'parent' },
+      data: { familyId: family.id, userId, role },
     });
     return family;
   }

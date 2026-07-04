@@ -6,13 +6,14 @@ import { Card, Button, PageHeader } from '../components/ui';
 export function OnboardingPage() {
   const navigate = useNavigate();
   const [name, setName] = useState('');
+  const [role, setRole] = useState<'parent' | 'child'>('parent');
   const [err, setErr] = useState('');
   const createFamily = useCreateFamily();
 
   async function handleCreate() {
     if (!name.trim()) { setErr('Please enter a family name'); return; }
     try {
-      await createFamily.mutateAsync(name.trim());
+      await createFamily.mutateAsync({ name: name.trim(), role });
       navigate('/dashboard', { replace: true });
     } catch (e: unknown) {
       setErr(e instanceof Error ? e.message : 'Failed to create family');
@@ -34,8 +35,26 @@ export function OnboardingPage() {
             onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
             autoFocus
           />
-          {err && <div className="text-status-overdue text-xs mt-1">{err}</div>}
-          <Button className="w-full mt-3" onClick={handleCreate} disabled={createFamily.isPending}>
+
+          <div className="mt-4 mb-1 font-bold text-ink text-sm">คุณเป็น</div>
+          <div className="grid grid-cols-2 gap-2">
+            {(['parent', 'child'] as const).map((r) => (
+              <button
+                key={r}
+                onClick={() => setRole(r)}
+                className={`h-11 rounded-xl border-2 text-sm font-bold transition ${
+                  role === r
+                    ? 'border-accent bg-accent text-white'
+                    : 'border-line bg-white text-ink hover:border-accent'
+                }`}
+              >
+                {r === 'parent' ? 'Parent (ผู้ปกครอง)' : 'Child (นักเรียน)'}
+              </button>
+            ))}
+          </div>
+
+          {err && <div className="text-status-overdue text-xs mt-2">{err}</div>}
+          <Button className="w-full mt-4" onClick={handleCreate} disabled={createFamily.isPending}>
             {createFamily.isPending ? 'Creating…' : 'Create family & continue'}
           </Button>
         </Card>

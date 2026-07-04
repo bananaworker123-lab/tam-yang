@@ -16,7 +16,8 @@ export function useCreateFamily() {
   const qc = useQueryClient();
   const { refetch } = useAuth();
   return useMutation({
-    mutationFn: (name: string) => api.post<{ id: string }>('/families', { name }),
+    mutationFn: ({ name, role }: { name: string; role: 'parent' | 'child' }) =>
+      api.post<{ id: string }>('/families', { name, role }),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['me'] }); refetch(); },
   });
 }

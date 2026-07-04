@@ -13,9 +13,10 @@ export class FamilyController {
   constructor(private readonly families: FamilyService) {}
 
   @Post()
-  async create(@Body() body: { name: string }, @CurrentUser() user: AuthContext) {
+  async create(@Body() body: { name: string; role?: 'parent' | 'child' }, @CurrentUser() user: AuthContext) {
     if (!body.name?.trim()) throw AppError.validation('Family name is required');
-    return this.families.createFamily(user.userId, body.name.trim());
+    const role = body.role === 'child' ? 'child' : 'parent';
+    return this.families.createFamily(user.userId, body.name.trim(), role);
   }
 
   @Get(':id/members')
