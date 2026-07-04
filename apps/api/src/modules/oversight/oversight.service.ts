@@ -7,11 +7,11 @@ export class OversightService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getClassrooms() {
-    return this.prisma.classRoom.findMany({ orderBy: { name: 'asc' } });
+    return this.prisma.classRoom.findMany({ where: { name: { not: '' } }, orderBy: { name: 'asc' } });
   }
 
   async getTerms() {
-    return this.prisma.term.findMany({ orderBy: { name: 'asc' } });
+    return this.prisma.term.findMany({ where: { name: { not: '' } }, orderBy: { name: 'asc' } });
   }
 
   /** Teacher: get progress matrix for classes the teacher is assigned to. */

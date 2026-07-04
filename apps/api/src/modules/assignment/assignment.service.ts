@@ -50,6 +50,9 @@ export class AssignmentService {
   }
 
   async create(input: AssignmentInput) {
+    if (!input.className?.trim()) throw AppError.validation('className is required');
+    if (!input.term?.trim())      throw AppError.validation('term is required');
+
     const cls  = await this.prisma.classRoom.upsert({ where: { name_schoolId: { name: input.className, schoolId: null as unknown as string } }, update: {}, create: { name: input.className }, select: { id: true } }).catch(() =>
       this.prisma.classRoom.findFirst({ where: { name: input.className } }).then((r) => r ?? this.prisma.classRoom.create({ data: { name: input.className } })));
     const term = await this.prisma.term.findFirst({ where: { name: input.term } }) ??
