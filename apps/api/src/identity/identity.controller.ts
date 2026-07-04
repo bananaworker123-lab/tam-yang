@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Req, Body } from '@nestjs/common';
+import { Controller, Get, Patch, Req, Param, Body } from '@nestjs/common';
 import type { Request } from 'express';
 import { AppError } from '@homework-tracker/shared-errors';
 import type { AuthContext } from '@homework-tracker/shared-types';
@@ -21,15 +21,17 @@ export class IdentityController {
   @Patch('users/:id/name')
   async updateName(
     @Req() req: Request,
+    @Param('id') targetId: string,
     @Body() body: { name: string },
-  ): Promise<AuthContext> {
+  ): Promise<{ ok: boolean }> {
     const session = req.session as unknown as { user?: AuthContext };
     if (!session.user) throw AppError.unauthorized();
     if (!body.name?.trim()) throw AppError.validation('Name is required');
-    await this.users.updateName(session.user.userId, body.name.trim());
-    const updated = await this.users.buildAuthContext(session.user.userId);
-    if (!updated) throw AppError.notFound('User not found');
-    session.user = updated;
-    return updated;
+    await this.users.updateName(targetId, body.name.trim());
+    if (session.user.userId === targetId) {
+      const updated = await this.users.buildAuthContext(targetId);
+      if (updated) session.user = updated;
+    }
+    return { ok: true };
   }
 }
