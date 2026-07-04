@@ -11,6 +11,7 @@ export function AdminAssignmentsPage() {
   const { activeClassName, activeTermName } = useActiveClassTerm();
   const { teachers } = useStore();
   const [editing, setEditing] = useState<Partial<AssignmentRow> & { id?: string } | null>(null);
+  const [saveErr, setSaveErr] = useState('');
   const [filterClass, setFilterClass] = useState('');
   const [filterTerm, setFilterTerm]   = useState('');
 
@@ -52,11 +53,18 @@ export function AdminAssignmentsPage() {
 
   async function save() {
     if (!editing || !editing.topic?.trim() || !editing.teacherName?.trim() || !editing.subject?.trim()) return;
+    const className = activeClassName || editing.className || '';
+    const term = activeTermName || editing.term || '';
+    if (!className || !term) {
+      setSaveErr('Please set an active Class and Term in Overview first');
+      return;
+    }
+    setSaveErr('');
     const payload = {
       ...editing,
       topic: editing.topic.slice(0, TOPIC_MAX),
-      className: activeClassName || editing.className || '',
-      term: activeTermName || editing.term || '',
+      className,
+      term,
     } as AssignmentRow;
     if (editing.id) {
       const { id: _id, ...rest } = payload;
@@ -126,8 +134,9 @@ export function AdminAssignmentsPage() {
             <div><label className="text-xs text-muted">Due</label><input type="date" value={editing.dueDate ?? ''} onChange={(e) => setEditing({ ...editing, dueDate: e.target.value })} className="w-full h-11 rounded-xl border border-line px-3 text-sm mt-0.5 outline-none" /></div>
           </div>
 
+          {saveErr && <div className="text-status-overdue text-xs mb-2">{saveErr}</div>}
           <div className="flex gap-2">
-            <Button variant="ghost" className="flex-1" onClick={() => setEditing(null)}>Cancel</Button>
+            <Button variant="ghost" className="flex-1" onClick={() => { setEditing(null); setSaveErr(''); }}>Cancel</Button>
             <Button className="flex-1" onClick={save}>{createAssignment.isPending || updateAssignment.isPending ? 'Saving…' : editing.id ? 'Save' : 'Add assignment'}</Button>
           </div>
         </Card>
