@@ -251,4 +251,61 @@ export class OversightService {
     await this.prisma.teacherAssignment.delete({ where: { id } });
     return { ok: true };
   }
+
+  // ---------- Subject catalog ----------
+
+  private readonly DEFAULT_SUBJECTS = [
+    { name: 'Mathematics',    short: 'MA' },
+    { name: 'English',        short: 'EN' },
+    { name: 'Science',        short: 'SC' },
+    { name: 'History',        short: 'HI' },
+    { name: 'Geography',      short: 'GE' },
+    { name: 'Art',            short: 'AR' },
+    { name: 'P.E.',           short: 'PE' },
+    { name: 'Music',          short: 'MU' },
+    { name: 'Thai',           short: 'TH' },
+    { name: 'Social Studies', short: 'SS' },
+  ];
+
+  async listSubjects() {
+    const count = await this.prisma.subject.count();
+    if (count === 0) {
+      await this.prisma.subject.createMany({ data: this.DEFAULT_SUBJECTS });
+    }
+    return this.prisma.subject.findMany({ orderBy: { name: 'asc' } });
+  }
+
+  async upsertSubject(id: string | undefined, name: string, short: string) {
+    if (id) {
+      return this.prisma.subject.update({ where: { id }, data: { name, short } });
+    }
+    return this.prisma.subject.create({ data: { name, short } });
+  }
+
+  async deleteSubject(id: string) {
+    const s = await this.prisma.subject.findUnique({ where: { id } });
+    if (!s) throw AppError.notFound('Subject not found');
+    await this.prisma.subject.delete({ where: { id } });
+    return { ok: true };
+  }
+
+  // ---------- Teacher catalog ----------
+
+  async listTeacherCatalog() {
+    return this.prisma.teacherCatalog.findMany({ orderBy: [{ className: 'asc' }, { name: 'asc' }] });
+  }
+
+  async upsertTeacherCatalog(id: string | undefined, name: string, subject: string, className: string) {
+    if (id) {
+      return this.prisma.teacherCatalog.update({ where: { id }, data: { name, subject, className } });
+    }
+    return this.prisma.teacherCatalog.create({ data: { name, subject, className } });
+  }
+
+  async deleteTeacherCatalog(id: string) {
+    const t = await this.prisma.teacherCatalog.findUnique({ where: { id } });
+    if (!t) throw AppError.notFound('Teacher not found');
+    await this.prisma.teacherCatalog.delete({ where: { id } });
+    return { ok: true };
+  }
 }

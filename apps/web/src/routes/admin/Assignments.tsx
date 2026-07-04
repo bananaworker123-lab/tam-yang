@@ -1,15 +1,14 @@
 import { useState } from 'react';
-import { useActiveClassTerm } from '../../hooks/useOversight';
+import { useActiveClassTerm, useTeacherCatalog } from '../../hooks/useOversight';
 import { useAllAssignments, useCreateAssignment, useUpdateAssignment, useDeleteAssignment } from '../../hooks/useAssignments';
 import type { AssignmentRow } from '../../hooks/useAssignments';
-import { useStore } from '../../mock/store';
 import { Card, Button, PageHeader } from '../../components/ui';
 
 const TOPIC_MAX = 120;
 
 export function AdminAssignmentsPage() {
   const { activeClassName, activeTermName } = useActiveClassTerm();
-  const { teachers } = useStore();
+  const { data: teachers = [] } = useTeacherCatalog();
   const [editing, setEditing] = useState<Partial<AssignmentRow> & { id?: string } | null>(null);
   const [saveErr, setSaveErr] = useState('');
   const [filterClass, setFilterClass] = useState('');

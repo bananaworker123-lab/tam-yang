@@ -209,6 +209,26 @@ model Request {
   @@schema("requests_audit")
 }
 
+// ---------- subject & teacher catalog (admin-managed) ----------
+model Subject {
+  id    String @id @default(uuid()) @db.Uuid
+  name  String @unique
+  short String
+
+  @@map("subjects")
+  @@schema("assignment")
+}
+
+model TeacherCatalog {
+  id        String @id @default(uuid()) @db.Uuid
+  name      String
+  subject   String
+  className String @map("class_name")
+
+  @@map("teacher_catalog")
+  @@schema("assignment")
+}
+
 model AuditEntry {
   id          String   @id @default(uuid()) @db.Uuid
   eventId     String   @unique @map("event_id") @db.Uuid

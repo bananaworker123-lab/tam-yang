@@ -1,13 +1,16 @@
 import { useState } from 'react';
-import { useAdminOverview, useActiveClassTerm, useAdminFamilies } from '../../hooks/useOversight';
-import { useStore, type TeacherRecord } from '../../mock/store';
-import type { SubjectConfig } from '../../mock/config';
+import {
+  useAdminOverview, useActiveClassTerm, useAdminFamilies,
+  useSubjects, useUpsertSubject, useDeleteSubject,
+  useTeacherCatalog, useUpsertTeacherCatalog, useDeleteTeacherCatalog,
+  type SubjectRow, type TeacherCatalogRow,
+} from '../../hooks/useOversight';
 import { Card, Avatar, Button, PageHeader } from '../../components/ui';
 import type { AdminFamily } from '../../hooks/useOversight';
 
 const CLASSES = ['M.1', 'M.2', 'M.3', 'M.4', 'M.5', 'M.6'];
-const emptySubject = (): SubjectConfig => ({ id: '', name: '', short: '' });
-const emptyTeacher = (): TeacherRecord => ({ id: '', name: '', subject: '', className: '' });
+const emptySubject = (): SubjectRow => ({ id: '', name: '', short: '' });
+const emptyTeacher = (): TeacherCatalogRow => ({ id: '', name: '', subject: '', className: '' });
 
 function FamilyModal({ family, onClose }: { family: AdminFamily; onClose: () => void }) {
   return (
@@ -40,37 +43,35 @@ export function AdminOverviewPage() {
   const { data, isLoading } = useAdminOverview();
   const { data: allFamilies = [] } = useAdminFamilies();
   const { classes, terms, activeClassId, activeTermId, activeClassName, activeTermName, setActiveClassId, setActiveTermId } = useActiveClassTerm();
-  const { subjects, upsertSubject, deleteSubject, teachers, upsertTeacher, deleteTeacher } = useStore();
+  const { data: subjects = [] } = useSubjects();
+  const { data: teachers = [] } = useTeacherCatalog();
+  const upsertSubject = useUpsertSubject();
+  const deleteSubject = useDeleteSubject();
+  const upsertTeacher = useUpsertTeacherCatalog();
+  const deleteTeacher = useDeleteTeacherCatalog();
 
   const [selectedFamily, setSelectedFamily] = useState<AdminFamily | null>(null);
-  const [editingSubject, setEditingSubject] = useState<SubjectConfig | null>(null);
+  const [editingSubject, setEditingSubject] = useState<SubjectRow | null>(null);
   const [subjectErr, setSubjectErr] = useState('');
-  const [editingTeacher, setEditingTeacher] = useState<TeacherRecord | null>(null);
+  const [editingTeacher, setEditingTeacher] = useState<TeacherCatalogRow | null>(null);
   const [teacherErr, setTeacherErr] = useState('');
   const [editingClassTerm, setEditingClassTerm] = useState(false);
 
-  function saveSubject() {
+  async function saveSubject() {
     if (!editingSubject) return;
     if (!editingSubject.name.trim() || !editingSubject.short.trim()) { setSubjectErr('Name and short code are required'); return; }
-    upsertSubject({
-      ...editingSubject,
-      id: editingSubject.id || editingSubject.name.toLowerCase().replace(/\s+/g, '-'),
-      short: editingSubject.short.trim().toUpperCase().slice(0, 4),
-    });
+    await upsertSubject.mutateAsync({ id: editingSubject.id || undefined, name: editingSubject.name.trim(), short: editingSubject.short.trim() });
     setEditingSubject(null);
     setSubjectErr('');
   }
 
-  function saveTeacher() {
+  async function saveTeacher() {
     if (!editingTeacher) return;
     if (!editingTeacher.name.trim() || !editingTeacher.subject.trim() || !editingTeacher.className.trim()) {
       setTeacherErr('Name, subject and class are required');
       return;
     }
-    upsertTeacher({
-      ...editingTeacher,
-      id: editingTeacher.id || `${Date.now()}`,
-    });
+    await upsertTeacher.mutateAsync({ id: editingTeacher.id || undefined, name: editingTeacher.name.trim(), subject: editingTeacher.subject.trim(), className: editingTeacher.className.trim() });
     setEditingTeacher(null);
     setTeacherErr('');
   }
@@ -238,7 +239,7 @@ export function AdminOverviewPage() {
               </span>
               <div className="flex-1 text-sm font-semibold text-ink">{s.name}</div>
               <Button variant="ghost" className="h-7 px-2 text-xs" onClick={() => { setEditingSubject(s); setSubjectErr(''); }}>Edit</Button>
-              <Button variant="danger" className="h-7 px-2 text-xs" onClick={() => deleteSubject(s.id)}>Del</Button>
+              <Button variant="danger" className="h-7 px-2 text-xs" onClick={() => deleteSubject.mutate(s.id)}>Del</Button>
             </div>
           ))}
           {subjects.length === 0 && <div className="text-faint text-xs text-center py-3">No subjects yet</div>}
@@ -297,7 +298,7 @@ export function AdminOverviewPage() {
                   <div className="text-xs text-muted">{t.subject} · <span className="text-accent-ink font-semibold">{t.className}</span></div>
                 </div>
                 <Button variant="ghost" className="h-7 px-2 text-xs" onClick={() => { setEditingTeacher(t); setTeacherErr(''); }}>Edit</Button>
-                <Button variant="danger" className="h-7 px-2 text-xs" onClick={() => deleteTeacher(t.id)}>Del</Button>
+                <Button variant="danger" className="h-7 px-2 text-xs" onClick={() => deleteTeacher.mutate(t.id)}>Del</Button>
               </div>
             ))}
           </div>

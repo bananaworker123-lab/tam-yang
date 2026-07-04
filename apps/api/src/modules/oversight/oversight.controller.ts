@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { Roles, CurrentUser } from '../../common/roles.decorator';
 import { RolesGuard } from '../../common/roles.guard';
 import type { AuthContext } from '@homework-tracker/shared-types';
@@ -79,5 +79,65 @@ export class OversightController {
   @Roles('admin')
   removeTeacher(@Param('id') id: string) {
     return this.svc.removeTeacherAssignment(id);
+  }
+
+  // ---------- Subject catalog ----------
+
+  @Get('admin/subjects')
+  @Roles('admin')
+  listSubjects() {
+    return this.svc.listSubjects();
+  }
+
+  @Post('admin/subjects')
+  @Roles('admin')
+  createSubject(@Body() body: { name: string; short: string }) {
+    if (!body.name?.trim() || !body.short?.trim())
+      throw AppError.validation('name and short are required');
+    return this.svc.upsertSubject(undefined, body.name.trim(), body.short.trim().toUpperCase().slice(0, 4));
+  }
+
+  @Put('admin/subjects/:id')
+  @Roles('admin')
+  updateSubject(@Param('id') id: string, @Body() body: { name: string; short: string }) {
+    if (!body.name?.trim() || !body.short?.trim())
+      throw AppError.validation('name and short are required');
+    return this.svc.upsertSubject(id, body.name.trim(), body.short.trim().toUpperCase().slice(0, 4));
+  }
+
+  @Delete('admin/subjects/:id')
+  @Roles('admin')
+  deleteSubject(@Param('id') id: string) {
+    return this.svc.deleteSubject(id);
+  }
+
+  // ---------- Teacher catalog ----------
+
+  @Get('admin/teacher-catalog')
+  @Roles('admin')
+  listTeacherCatalog() {
+    return this.svc.listTeacherCatalog();
+  }
+
+  @Post('admin/teacher-catalog')
+  @Roles('admin')
+  createTeacherCatalog(@Body() body: { name: string; subject: string; className: string }) {
+    if (!body.name?.trim() || !body.subject?.trim() || !body.className?.trim())
+      throw AppError.validation('name, subject and className are required');
+    return this.svc.upsertTeacherCatalog(undefined, body.name.trim(), body.subject.trim(), body.className.trim());
+  }
+
+  @Put('admin/teacher-catalog/:id')
+  @Roles('admin')
+  updateTeacherCatalog(@Param('id') id: string, @Body() body: { name: string; subject: string; className: string }) {
+    if (!body.name?.trim() || !body.subject?.trim() || !body.className?.trim())
+      throw AppError.validation('name, subject and className are required');
+    return this.svc.upsertTeacherCatalog(id, body.name.trim(), body.subject.trim(), body.className.trim());
+  }
+
+  @Delete('admin/teacher-catalog/:id')
+  @Roles('admin')
+  deleteTeacherCatalog(@Param('id') id: string) {
+    return this.svc.deleteTeacherCatalog(id);
   }
 }

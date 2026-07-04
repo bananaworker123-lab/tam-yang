@@ -168,6 +168,68 @@ export function useRemoveTeacher() {
   });
 }
 
+// ---------- Subject catalog ----------
+
+export interface SubjectRow { id: string; name: string; short: string; }
+
+export function useSubjects() {
+  return useQuery<SubjectRow[]>({
+    queryKey: ['oversight', 'admin', 'subjects'],
+    queryFn: () => api.get('/oversight/admin/subjects'),
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useUpsertSubject() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, name, short }: { id?: string; name: string; short: string }) =>
+      id
+        ? api.put(`/oversight/admin/subjects/${id}`, { name, short })
+        : api.post('/oversight/admin/subjects', { name, short }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['oversight', 'admin', 'subjects'] }),
+  });
+}
+
+export function useDeleteSubject() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.delete(`/oversight/admin/subjects/${id}`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['oversight', 'admin', 'subjects'] }),
+  });
+}
+
+// ---------- Teacher catalog ----------
+
+export interface TeacherCatalogRow { id: string; name: string; subject: string; className: string; }
+
+export function useTeacherCatalog() {
+  return useQuery<TeacherCatalogRow[]>({
+    queryKey: ['oversight', 'admin', 'teacher-catalog'],
+    queryFn: () => api.get('/oversight/admin/teacher-catalog'),
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useUpsertTeacherCatalog() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, name, subject, className }: { id?: string; name: string; subject: string; className: string }) =>
+      id
+        ? api.put(`/oversight/admin/teacher-catalog/${id}`, { name, subject, className })
+        : api.post('/oversight/admin/teacher-catalog', { name, subject, className }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['oversight', 'admin', 'teacher-catalog'] }),
+  });
+}
+
+export function useDeleteTeacherCatalog() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.delete(`/oversight/admin/teacher-catalog/${id}`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['oversight', 'admin', 'teacher-catalog'] }),
+  });
+}
+
 // ---------- Audit ----------
 
 export interface AuditEntry {
