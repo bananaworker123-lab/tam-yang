@@ -93,6 +93,7 @@ const DICT: Dict = {
   // dashboard extras
   'dash.filter.todo': { en: 'To do', th: 'ต้องทำ' },
   'dash.todo': { en: 'to do', th: 'ต้องทำ' },
+  'dash.notStarted': { en: 'not started', th: 'ยังไม่เริ่ม' },
   'dash.overdueCount': { en: 'overdue', th: 'เลยกำหนด' },
   'dash.nothingHere': { en: 'Nothing here 🎉', th: 'ไม่มีงานแล้ว 🎉' },
   'dash.noAssignments': { en: 'No assignments for', th: 'ไม่มีงานสำหรับ' },

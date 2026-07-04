@@ -51,11 +51,12 @@ export function DashboardPage() {
     [progressRows],
   );
 
-  const total     = rows.length;
-  const submitted = rows.filter((r) => r.p.status === ProgressStatus.Submitted).length;
-  const doneOrSub = rows.filter((r) => r.p.status !== ProgressStatus.NotStarted).length;
-  const todo      = rows.filter((r) => r.p.status === ProgressStatus.NotStarted).length;
-  const overdue   = rows.filter((r) => r.due === 'overdue').length;
+  const total      = rows.length;
+  const submitted  = rows.filter((r) => r.p.status === ProgressStatus.Submitted).length;
+  const doneOrSub  = rows.filter((r) => r.p.status !== ProgressStatus.NotStarted).length;
+  const notStarted = rows.filter((r) => r.p.status === ProgressStatus.NotStarted).length;
+  const todo       = rows.filter((r) => r.p.status !== ProgressStatus.Submitted).length;
+  const overdue    = rows.filter((r) => r.due === 'overdue' && r.p.status !== ProgressStatus.Submitted).length;
   const pct = total ? Math.round((doneOrSub / total) * 100) : 0;
 
   const R = 29;
@@ -64,8 +65,8 @@ export function DashboardPage() {
 
   const filtered = rows.filter((r) => {
     if (filter === 'todo') return r.p.status !== ProgressStatus.Submitted;
-    if (filter === 'near') return r.due === 'due_today' || r.due === 'near';
-    if (filter === 'overdue') return r.due === 'overdue';
+    if (filter === 'near') return (r.due === 'due_today' || r.due === 'near') && r.p.status !== ProgressStatus.Submitted;
+    if (filter === 'overdue') return r.due === 'overdue' && r.p.status !== ProgressStatus.Submitted;
     return r.p.status === ProgressStatus.Submitted;
   });
 
@@ -97,9 +98,12 @@ export function DashboardPage() {
             {isChild ? t('dash.myHomeworkLabel') : `${t('dash.homeworkOf2')} ${activeClassName} ${activeTermName}`}
           </div>
           <div className="font-display font-bold text-lg mt-0.5">{t('dash.submittedOf2')} {submitted}/{total}</div>
-          <div className="flex gap-2 mt-2.5">
+          <div className="flex gap-2 mt-2.5 flex-wrap">
             <span className="inline-flex items-center gap-1.5 bg-white/20 rounded-lg px-2.5 py-1 text-[11.5px] font-semibold">
               <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#FFC56B' }} />{todo} {t('dash.todo')}
+            </span>
+            <span className="inline-flex items-center gap-1.5 bg-white/20 rounded-lg px-2.5 py-1 text-[11.5px] font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#C0BFCF' }} />{notStarted} {t('dash.notStarted')}
             </span>
             {overdue > 0 && (
               <span className="inline-flex items-center gap-1.5 bg-white/20 rounded-lg px-2.5 py-1 text-[11.5px] font-semibold">
