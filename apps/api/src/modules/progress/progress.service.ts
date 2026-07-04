@@ -9,6 +9,15 @@ import { randomUUID } from 'node:crypto';
 export class ProgressService {
   constructor(private readonly prisma: PrismaService, private readonly events: EventBus) {}
 
+  /** Resolve the child userId to track for a family. If none found, falls back to fallbackId. */
+  async resolveChildUserId(familyId: string, fallbackId: string): Promise<string> {
+    const m = await this.prisma.membership.findFirst({
+      where: { familyId, role: 'child' },
+      orderBy: { createdAt: 'asc' },
+    });
+    return m?.userId ?? fallbackId;
+  }
+
   async listForChild(childUserId: string, familyId: string, className?: string, termName?: string) {
     // Auto-migrate orphaned assignments (empty class/term) to the first available class/term
     const orphaned = await this.prisma.masterAssignment.findMany({

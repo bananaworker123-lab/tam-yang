@@ -12,25 +12,29 @@ export class ProgressController {
   constructor(private readonly svc: ProgressService) {}
 
   @Get()
-  list(
+  async list(
     @CurrentUser() user: AuthContext,
     @Query('childId') childId?: string,
     @Query('className') className?: string,
     @Query('termName') termName?: string,
   ) {
     if (!user.familyId) throw AppError.forbidden('No family');
-    const effectiveChildId = user.roles.includes('child') ? user.userId : (childId ?? user.userId);
+    const effectiveChildId = user.roles.includes('child')
+      ? user.userId
+      : (childId ?? await this.svc.resolveChildUserId(user.familyId, user.userId));
     return this.svc.listForChild(effectiveChildId, user.familyId, className, termName);
   }
 
   @Patch(':assignmentId')
-  update(
+  async update(
     @Param('assignmentId') assignmentId: string,
     @Body() body: { status: string; progressId?: string; childId?: string },
     @CurrentUser() user: AuthContext,
   ) {
     if (!user.familyId) throw AppError.forbidden('No family');
-    const childId = user.roles.includes('child') ? user.userId : (body.childId ?? user.userId);
+    const childId = user.roles.includes('child')
+      ? user.userId
+      : (body.childId ?? await this.svc.resolveChildUserId(user.familyId, user.userId));
     return this.svc.updateStatus(
       body.progressId ?? null, assignmentId,
       childId, user.familyId,
