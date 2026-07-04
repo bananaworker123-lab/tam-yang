@@ -71,7 +71,9 @@ export function Layout() {
   );
 
   const activeRole: AppRole = viewingAdmin ? 'admin' : baseRole;
-  const navItems = NAV[activeRole] ?? NAV.parent;
+  const navItems = (NAV[activeRole] ?? NAV.parent).filter(
+    (n) => !(isAdmin && n.to === '/requests'),
+  );
   const bottomNav = navItems.slice(0, 5);
 
   function switchToAdmin() {

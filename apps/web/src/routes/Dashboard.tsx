@@ -57,7 +57,7 @@ export function DashboardPage() {
   const notStarted = rows.filter((r) => r.p.status === ProgressStatus.NotStarted).length;
   const todo       = rows.filter((r) => r.p.status !== ProgressStatus.Submitted).length;
   const overdue    = rows.filter((r) => r.due === 'overdue' && r.p.status !== ProgressStatus.Submitted).length;
-  const pct = total ? Math.round((doneOrSub / total) * 100) : 0;
+  const pct = total ? Math.round((submitted / total) * 100) : 0;
 
   const R = 29;
   const CIRC = 2 * Math.PI * R;
