@@ -4,7 +4,7 @@ import { useAdminAllProgress, useActiveClassTerm } from '../../hooks/useOversigh
 import { computeDueState, STATUS_LABEL } from '../../lib/dueState';
 import { Card, Avatar, PageHeader, SkeletonCard } from '../../components/ui';
 
-type Filter = 'all' | 'todo' | 'overdue' | 'submitted';
+type Filter = 'all' | 'not_started' | 'working_on' | 'overdue' | 'submitted';
 
 export function AdminProgressPage() {
   const { classes, terms, activeClassId, activeTermId, activeClassName, activeTermName, setActiveClassId, setActiveTermId } = useActiveClassTerm();
@@ -41,7 +41,8 @@ export function AdminProgressPage() {
       <select value={filter} onChange={(e) => setFilter(e.target.value as Filter)}
         className="w-full h-11 rounded-xl border border-line px-3 text-sm mb-4 outline-none focus:border-accent">
         <option value="all">All statuses</option>
-        <option value="todo">Not started</option>
+        <option value="not_started">Not started</option>
+        <option value="working_on">Working on</option>
         <option value="overdue">Overdue</option>
         <option value="submitted">Submitted</option>
       </select>
@@ -64,8 +65,9 @@ export function AdminProgressPage() {
               })
               .filter((x) => {
                 if (filter === 'all') return true;
-                if (filter === 'todo') return x.status === ProgressStatus.NotStarted;
-                if (filter === 'overdue') return x.overdue;
+                if (filter === 'not_started') return x.status === ProgressStatus.NotStarted;
+                if (filter === 'working_on') return x.status === ProgressStatus.WorkingOn;
+                if (filter === 'overdue') return x.overdue && x.status !== ProgressStatus.Submitted;
                 return x.status === ProgressStatus.Submitted;
               });
 
@@ -80,7 +82,7 @@ export function AdminProgressPage() {
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {cells.length === 0 ? <span className="text-faint text-xs">—</span> : cells.map((x) => (
-                    <span key={x.a.id} className={`text-[11px] font-semibold rounded px-2 py-0.5 ${x.overdue && x.status !== ProgressStatus.Submitted ? 'bg-status-overdue/15 text-status-overdue' : x.status === ProgressStatus.Submitted ? 'bg-status-submitted/15 text-[#1F7D52]' : x.status === ProgressStatus.Done ? 'bg-status-done/20 text-[#8A5D0E]' : 'bg-bg text-faint'}`}>
+                    <span key={x.a.id} className={`text-[11px] font-semibold rounded px-2 py-0.5 ${x.overdue && x.status !== ProgressStatus.Submitted ? 'bg-status-overdue/15 text-status-overdue' : x.status === ProgressStatus.Submitted ? 'bg-status-submitted/15 text-[#1F7D52]' : x.status === ProgressStatus.Done ? 'bg-status-done/20 text-[#8A5D0E]' : x.status === ProgressStatus.WorkingOn ? 'bg-[#38BDF8]/15 text-[#0369A1]' : 'bg-bg text-faint'}`}>
                       {x.a.subject}: {STATUS_LABEL[x.status]}
                     </span>
                   ))}

@@ -214,16 +214,18 @@ export function PageHeader({
 
 const SEG_ACTIVE: Record<ProgressStatus, string> = {
   not_started: 'bg-status-notstarted/40 text-ink',
+  working_on:  'bg-[#38BDF8]/20 text-[#0369A1]',
   done: 'bg-status-done/25 text-[#8A5D0E]',
   submitted: 'bg-status-submitted/20 text-[#1F7D52]',
 };
 const SEG_DOT: Record<ProgressStatus, string> = {
   not_started: 'bg-status-notstarted',
+  working_on:  'bg-[#38BDF8]',
   done: 'bg-status-done',
   submitted: 'bg-status-submitted',
 };
 
-/** 3-segment status selector (design prototype: Not started / Done / Submitted). */
+/** 4-segment status selector: Not started / Working on / Done / Submitted. */
 export function StatusSegment({
   value,
   onChange,
@@ -235,6 +237,7 @@ export function StatusSegment({
 }) {
   const options: ProgressStatus[] = [
     ProgressStatus.NotStarted,
+    ProgressStatus.WorkingOn,
     ProgressStatus.Done,
     ProgressStatus.Submitted,
   ];
