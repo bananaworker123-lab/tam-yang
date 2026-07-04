@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Role, type AuthContext } from '@homework-tracker/shared-types';
+import { AppError } from '@homework-tracker/shared-errors';
 
 export interface GoogleProfileInput {
   googleSub: string;
