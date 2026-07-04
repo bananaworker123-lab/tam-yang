@@ -10,6 +10,7 @@ export function AdminAssignmentsPage() {
   const { activeClassName, activeTermName } = useActiveClassTerm();
   const { data: teachers = [] } = useTeacherCatalog();
   const [editing, setEditing] = useState<Partial<AssignmentRow> & { id?: string } | null>(null);
+  const [selectedTeacherId, setSelectedTeacherId] = useState('');
   const [saveErr, setSaveErr] = useState('');
   const [filterClass, setFilterClass] = useState('');
   const [filterTerm, setFilterTerm]   = useState('');
@@ -36,15 +37,19 @@ export function AdminAssignmentsPage() {
       dueDate: new Date().toISOString().slice(0, 10),
       active: true,
     });
+    setSelectedTeacherId('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function openEdit(a: AssignmentRow) {
     setEditing({ ...a });
+    const match = teachers.find((t) => t.name === a.teacherName);
+    setSelectedTeacherId(match?.id ?? '');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function handleTeacherSelect(teacherId: string) {
+    setSelectedTeacherId(teacherId);
     const t = teachers.find((x) => x.id === teacherId);
     if (!t) return;
     setEditing((prev) => prev ? { ...prev, teacherName: t.name, subject: t.subject } : prev);
@@ -98,8 +103,8 @@ export function AdminAssignmentsPage() {
           <label className="text-xs text-muted">Teacher</label>
           {teachers.length > 0 ? (
             <select
+              value={selectedTeacherId}
               onChange={(e) => handleTeacherSelect(e.target.value)}
-              defaultValue=""
               className="w-full h-11 rounded-xl border border-line px-3 text-sm mt-0.5 mb-3 outline-none focus:border-accent">
               <option value="" disabled>— select teacher —</option>
               {teachers.map((t) => (
@@ -112,11 +117,14 @@ export function AdminAssignmentsPage() {
               className="w-full h-11 rounded-xl border border-line px-3 text-sm mt-0.5 mb-3 outline-none focus:border-accent" />
           )}
 
-          {/* Subject (auto-filled or manual) */}
+          {/* Subject — read-only when teacher is selected from catalog */}
           <label className="text-xs text-muted">Subject</label>
-          <input value={editing.subject ?? ''} onChange={(e) => setEditing({ ...editing, subject: e.target.value })}
+          <input
+            value={editing.subject ?? ''}
+            readOnly={!!selectedTeacherId}
+            onChange={(e) => !selectedTeacherId && setEditing({ ...editing, subject: e.target.value })}
             placeholder={teachers.length > 0 ? 'Auto-filled from teacher' : 'e.g. Mathematics'}
-            className="w-full h-11 rounded-xl border border-line px-3 text-sm mt-0.5 mb-3 outline-none focus:border-accent bg-bg" />
+            className={`w-full h-11 rounded-xl border border-line px-3 text-sm mt-0.5 mb-3 outline-none focus:border-accent ${selectedTeacherId ? 'bg-bg text-muted cursor-not-allowed' : 'bg-white'}`} />
 
           <label className="text-xs text-muted">Topic</label>
           <input value={editing.topic ?? ''} onChange={(e) => setEditing({ ...editing, topic: e.target.value.slice(0, TOPIC_MAX) })}
