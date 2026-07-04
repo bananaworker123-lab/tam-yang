@@ -76,15 +76,31 @@ export class AssignmentService {
     const existing = await this.prisma.masterAssignment.findUnique({ where: { id } });
     if (!existing) throw AppError.notFound('Assignment not found');
 
+    // Resolve updated class/term IDs when provided
+    let classId: string | undefined;
+    let termId: string | undefined;
+    if (input.className?.trim()) {
+      const cls = await this.prisma.classRoom.findFirst({ where: { name: input.className.trim() } })
+        ?? await this.prisma.classRoom.create({ data: { name: input.className.trim() } });
+      classId = cls.id;
+    }
+    if (input.term?.trim()) {
+      const term = await this.prisma.term.findFirst({ where: { name: input.term.trim() } })
+        ?? await this.prisma.term.create({ data: { name: input.term.trim() } });
+      termId = term.id;
+    }
+
     const a = await this.prisma.masterAssignment.update({
       where: { id },
       data: {
-        ...(input.subject   ? { subject:     input.subject }   : {}),
-        ...(input.teacherName ? { teacherName: input.teacherName } : {}),
-        ...(input.topic     ? { topic:       input.topic }     : {}),
-        ...(input.assignedDate ? { assignedDate: new Date(input.assignedDate) } : {}),
-        ...(input.dueDate   ? { dueDate:     new Date(input.dueDate) }   : {}),
-        ...(input.active !== undefined ? { active: input.active } : {}),
+        ...(input.subject     ? { subject:      input.subject }                   : {}),
+        ...(input.teacherName ? { teacherName:  input.teacherName }               : {}),
+        ...(input.topic       ? { topic:        input.topic }                     : {}),
+        ...(input.assignedDate? { assignedDate: new Date(input.assignedDate) }    : {}),
+        ...(input.dueDate     ? { dueDate:      new Date(input.dueDate) }         : {}),
+        ...(input.active !== undefined ? { active: input.active }                 : {}),
+        ...(classId           ? { classId }                                       : {}),
+        ...(termId            ? { termId }                                        : {}),
       },
       include: { classRoom: true, term: true },
     });
