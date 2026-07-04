@@ -82,6 +82,10 @@ const DICT: Dict = {
   'profile.logout': { en: 'Sign out', th: 'ออกจากระบบ' },
   'profile.settings': { en: 'Settings', th: 'การตั้งค่า' },
   'profile.language': { en: 'Language', th: 'ภาษา' },
+  'profile.share': { en: 'Share App', th: 'แชร์แอป' },
+  'profile.shareDesc': { en: 'Invite others to use Tam-Yang', th: 'ชวนคนอื่นมาใช้ Tam-Yang' },
+  'profile.copyUrl': { en: 'Copy URL', th: 'คัดลอกลิงก์' },
+  'profile.copied': { en: 'Copied!', th: 'คัดลอกแล้ว!' },
 
   // nav extras
   'nav.class': { en: 'Class', th: 'ชั้นเรียน' },

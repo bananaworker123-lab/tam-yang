@@ -9,6 +9,56 @@ import { Card, Avatar, Button, PageHeader, SkeletonLine } from '../components/ui
 import type { Locale } from '../i18n';
 import { useT } from '../i18n';
 
+function ShareCard() {
+  const { t } = useT();
+  const appUrl = window.location.origin;
+  const [copied, setCopied] = useState(false);
+
+  function shareViaLine() {
+    const text = encodeURIComponent(`ลองใช้แอป Tam-Yang ติดตามการบ้านกัน! ${appUrl}`);
+    window.open(`https://line.me/R/msg/text/?${text}`, '_blank');
+  }
+
+  function copyUrl() {
+    navigator.clipboard.writeText(appUrl).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  return (
+    <Card className="mb-4">
+      <div className="font-semibold text-ink text-sm mb-3">{t('profile.shareDesc')}</div>
+      <div className="flex gap-2">
+        <button onClick={shareViaLine}
+          className="flex-1 h-11 rounded-xl flex items-center justify-center gap-2 font-bold text-sm text-white transition active:scale-95"
+          style={{ background: '#06C755' }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.03 2 11c0 3.16 1.73 5.95 4.35 7.65-.19.69-.7 2.52-.8 2.91-.13.48.18.47.37.35.15-.1 2.37-1.56 3.33-2.19.56.08 1.14.13 1.75.13 5.52 0 10-4.03 10-9S17.52 2 12 2zm-3.5 11.5h-1a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5zm6 0h-3.5a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v3h2a.5.5 0 0 1 0 1zm1-4.5v1.5h1v1h-1V13h-1V9h1zm-3.5 0h1v3.5h-1z"/>
+          </svg>
+          LINE
+        </button>
+        <button onClick={copyUrl}
+          className="flex-1 h-11 rounded-xl flex items-center justify-center gap-2 font-bold text-sm border border-line text-ink hover:bg-bg transition active:scale-95">
+          {copied ? (
+            <>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              {t('profile.copied')}
+            </>
+          ) : (
+            <>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+              {t('profile.copyUrl')}
+            </>
+          )}
+        </button>
+      </div>
+    </Card>
+  );
+}
+
 function PencilIcon() {
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -251,6 +301,10 @@ export function ProfilePage() {
           )}
         </Card>
       )}
+
+      {/* Share App */}
+      <div className="text-[11px] font-extrabold tracking-widest text-faint uppercase mb-2">{t('profile.share')}</div>
+      <ShareCard />
 
       {/* Settings */}
       <div className="text-[11px] font-extrabold tracking-widest text-faint uppercase mb-2">{t('profile.settings')}</div>
