@@ -110,13 +110,8 @@ export function DashboardPage() {
             <span className="inline-flex items-center gap-1.5 bg-white/20 rounded-lg px-2.5 py-1 text-[11.5px] font-semibold">
               <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#7EC8E3' }} />{workingOn} {t('dash.workingOn')}
             </span>
-            {overdue > 0 && (
-              <span className="inline-flex items-center gap-1.5 bg-white/20 rounded-lg px-2.5 py-1 text-[11.5px] font-semibold">
-                <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#FF9A8B' }} />{overdue} {t('dash.overdueCount')}
-              </span>
-            )}
             <span className="inline-flex items-center gap-1.5 bg-white/20 rounded-lg px-2.5 py-1 text-[11.5px] font-semibold">
-              <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#6EE7B7' }} />{submitted} {t('dash.submittedCount')}
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#FF9A8B' }} />{overdue} {t('dash.overdueCount')}
             </span>
           </div>
         </div>
