@@ -24,8 +24,8 @@ export function useTerms() {
 
 /** Persists active class/term in localStorage; auto-selects first when data loads. */
 export function useActiveClassTerm() {
-  const { data: classes = [] } = useClasses();
-  const { data: terms = [] } = useTerms();
+  const { data: classes = [], isLoading: classesLoading } = useClasses();
+  const { data: terms = [], isLoading: termsLoading } = useTerms();
 
   const [activeClassId, setActiveClassIdState] = useState<string>(
     () => localStorage.getItem('activeClassId') ?? '',
@@ -72,6 +72,7 @@ export function useActiveClassTerm() {
     activeTermName:  activeTerm?.name  ?? '',
     setActiveClassId,
     setActiveTermId,
+    isLoading: classesLoading || termsLoading,
   };
 }
 

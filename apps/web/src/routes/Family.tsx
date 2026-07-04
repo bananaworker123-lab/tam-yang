@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useAuth } from '../context/AuthContext';
 import { useFamily, useInviteMember, useRemoveMember, useUpdateMemberName } from '../hooks/useFamily';
-import { Card, Avatar, Button, PageHeader, EmptyState } from '../components/ui';
+import { Card, Avatar, Button, PageHeader, EmptyState, SkeletonLine } from '../components/ui';
 import { useT } from '../i18n';
 
 function CopyIcon() {
@@ -135,12 +135,6 @@ export function FamilyPage() {
     }
   }
 
-  if (isLoading) return (
-    <div className="flex items-center justify-center py-20">
-      <div className="w-8 h-8 rounded-full border-2 border-accent border-t-transparent animate-spin" />
-    </div>
-  );
-
   const members = (data as any)?.members ?? [];
   const invites = (data as any)?.invites ?? [];
 
@@ -160,7 +154,16 @@ export function FamilyPage() {
 
       <Card className="mb-4">
         <div className="font-bold text-ink mb-3">{t('family.members')}</div>
-        {members.length === 0 ? <EmptyState title={t('family.noMembers')} /> : (
+        {isLoading ? (
+          <div className="flex flex-col gap-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center gap-3 animate-pulse">
+                <div className="w-10 h-10 rounded-full bg-line flex-none" />
+                <SkeletonLine className="flex-1" />
+              </div>
+            ))}
+          </div>
+        ) : members.length === 0 ? <EmptyState title={t('family.noMembers')} /> : (
           <div className="flex flex-col gap-3">
             {members.map((m: any) => (
               <div key={m.userId} className="flex items-center gap-3">

@@ -5,7 +5,7 @@ import { useActiveClassTerm } from '../hooks/useOversight';
 import { useAuth } from '../context/AuthContext';
 import { useProgress, useUpdateProgress } from '../hooks/useProgress';
 import { computeDueState, STATUS_LABEL } from '../lib/dueState';
-import { SubjectBadge, DueChip } from '../components/ui';
+import { SubjectBadge, DueChip, SkeletonCard } from '../components/ui';
 import { useT } from '../i18n';
 import { subjectColor, subjectShort } from '../lib/subjects';
 
@@ -13,7 +13,7 @@ type Filter = 'todo' | 'near' | 'overdue' | 'submitted';
 
 export function DashboardPage() {
   const { user } = useAuth();
-  const { activeClassName, activeTermName } = useActiveClassTerm();
+  const { activeClassName, activeTermName, isLoading: classTermLoading } = useActiveClassTerm();
   const navigate = useNavigate();
   const { t } = useT();
 
@@ -76,13 +76,7 @@ export function DashboardPage() {
     { key: 'submitted', label: t('dash.filter.submitted') },
   ];
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="w-8 h-8 rounded-full border-2 border-accent border-t-transparent animate-spin" />
-      </div>
-    );
-  }
+  const showSkeleton = classTermLoading || (isLoading && progressRows.length === 0);
 
   return (
     <div>
@@ -127,7 +121,11 @@ export function DashboardPage() {
       </div>
 
       {/* list */}
-      {filtered.length === 0 ? (
+      {showSkeleton ? (
+        <div className="flex flex-col gap-3">
+          {[1, 2, 3].map((i) => <SkeletonCard key={i} />)}
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="text-center py-10 text-faint text-sm">
           {total === 0
             ? <><div>{t('dash.noAssignments')} <span className="font-semibold text-accent-ink">{activeClassName} · {activeTermName}</span></div><div className="mt-1 text-[11px]">{t('dash.noAssignmentsHint')}</div></>

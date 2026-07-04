@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ProgressStatus } from '@homework-tracker/shared-types';
 import { useAdminAllProgress, useActiveClassTerm } from '../../hooks/useOversight';
 import { computeDueState, STATUS_LABEL } from '../../lib/dueState';
-import { Card, Avatar, PageHeader } from '../../components/ui';
+import { Card, Avatar, PageHeader, SkeletonCard } from '../../components/ui';
 
 type Filter = 'all' | 'todo' | 'overdue' | 'submitted';
 
@@ -46,8 +46,8 @@ export function AdminProgressPage() {
         <option value="submitted">Submitted</option>
       </select>
 
-      {isLoading ? (
-        <div className="flex items-center justify-center py-10"><div className="w-8 h-8 rounded-full border-2 border-accent border-t-transparent animate-spin" /></div>
+      {isLoading && rows.length === 0 ? (
+        <div className="flex flex-col gap-3">{[1, 2, 3].map((i) => <SkeletonCard key={i} />)}</div>
       ) : rows.length === 0 ? (
         <div className="text-center py-10 text-faint text-sm">
           {!activeClassName ? 'Select a class above' : 'No data for this class/term'}

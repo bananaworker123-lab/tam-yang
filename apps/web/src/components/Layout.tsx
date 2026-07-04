@@ -48,13 +48,14 @@ export function Layout() {
   const { t } = useT();
   const qc = useQueryClient();
 
-  // Prefetch admin data in background as soon as we know the user is admin
+  // Prefetch classes+terms for every user (Dashboard and Teacher need these to fire their queries)
   useEffect(() => {
-    if (!user?.roles.includes('admin')) return;
-    qc.prefetchQuery({ queryKey: ['oversight', 'admin', 'overview'], queryFn: () => api.get('/oversight/admin/overview'), staleTime: 1000 * 60 * 2 });
-    qc.prefetchQuery({ queryKey: ['oversight', 'admin', 'families'], queryFn: () => api.get('/oversight/admin/families'), staleTime: 1000 * 60 * 2 });
+    if (!user?.userId) return;
     qc.prefetchQuery({ queryKey: ['oversight', 'classes'], queryFn: () => api.get('/oversight/classes'), staleTime: 1000 * 60 * 5 });
     qc.prefetchQuery({ queryKey: ['oversight', 'terms'],   queryFn: () => api.get('/oversight/terms'),   staleTime: 1000 * 60 * 5 });
+    if (!user.roles.includes('admin')) return;
+    qc.prefetchQuery({ queryKey: ['oversight', 'admin', 'overview'], queryFn: () => api.get('/oversight/admin/overview'), staleTime: 1000 * 60 * 2 });
+    qc.prefetchQuery({ queryKey: ['oversight', 'admin', 'families'], queryFn: () => api.get('/oversight/admin/families'), staleTime: 1000 * 60 * 2 });
   }, [user?.userId]);
 
   // Determine non-admin base role

@@ -30,6 +30,17 @@ export function useUpdateProgress() {
     mutationFn: ({ assignmentId, progressId, childId, status }: {
       assignmentId: string; progressId: string | null; childId?: string; status: ProgressStatus;
     }) => api.patch(`/progress/${assignmentId}`, { progressId, childId, status }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['progress'] }),
+    onMutate: async ({ assignmentId, status }) => {
+      await qc.cancelQueries({ queryKey: ['progress'] });
+      const snapshots = qc.getQueriesData<ProgressRow[]>({ queryKey: ['progress'] });
+      qc.setQueriesData<ProgressRow[]>({ queryKey: ['progress'] }, (old) =>
+        old?.map((r) => r.assignmentId === assignmentId ? { ...r, status } : r),
+      );
+      return { snapshots };
+    },
+    onError: (_err, _vars, ctx) => {
+      ctx?.snapshots.forEach(([key, val]) => qc.setQueryData(key, val));
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ['progress'] }),
   });
 }

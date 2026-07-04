@@ -5,7 +5,7 @@ import {
   useTeacherCatalog, useUpsertTeacherCatalog, useDeleteTeacherCatalog,
   type SubjectRow, type TeacherCatalogRow,
 } from '../../hooks/useOversight';
-import { Card, Avatar, Button, PageHeader } from '../../components/ui';
+import { Card, Avatar, Button, PageHeader, SkeletonLine } from '../../components/ui';
 import type { AdminFamily } from '../../hooks/useOversight';
 
 const CLASSES = ['M.1', 'M.2', 'M.3', 'M.4', 'M.5', 'M.6'];
@@ -76,22 +76,18 @@ export function AdminOverviewPage() {
     setTeacherErr('');
   }
 
-  if (!data) {
-    return <div className="flex items-center justify-center py-20"><div className="w-8 h-8 rounded-full border-2 border-accent border-t-transparent animate-spin" /></div>;
-  }
-
   const d = data;
-  type StatCard = { label: string; value: number; icon: string; color?: string };
+  type StatCard = { label: string; value: number | undefined; icon: string; color?: string };
   const stats: StatCard[] = [
-    { label: 'Families',         value: d.familyCount,           icon: '🏠' },
-    { label: 'Parents',          value: d.parentCount,           icon: '👨‍👩‍👧' },
-    { label: 'Students',         value: d.childCount,            icon: '🎒' },
-    { label: 'Teachers',         value: d.teacherCount,          icon: '🧑‍🏫' },
-    { label: 'Active tasks',     value: d.activeAssignmentCount, icon: '📚' },
-    { label: 'Pending requests', value: d.pendingRequestCount,   icon: '📨', color: d.pendingRequestCount > 0 ? '#D5403F' : undefined },
+    { label: 'Families',         value: d?.familyCount,           icon: '🏠' },
+    { label: 'Parents',          value: d?.parentCount,           icon: '👨‍👩‍👧' },
+    { label: 'Students',         value: d?.childCount,            icon: '🎒' },
+    { label: 'Teachers',         value: d?.teacherCount,          icon: '🧑‍🏫' },
+    { label: 'Active tasks',     value: d?.activeAssignmentCount, icon: '📚' },
+    { label: 'Pending requests', value: d?.pendingRequestCount,   icon: '📨', color: (d?.pendingRequestCount ?? 0) > 0 ? '#D5403F' : undefined },
   ];
 
-  const displayFamilies = allFamilies.length > 0 ? allFamilies : d.families;
+  const displayFamilies = allFamilies.length > 0 ? allFamilies : (d?.families ?? []);
 
   return (
     <div>
@@ -107,9 +103,13 @@ export function AdminOverviewPage() {
               <span className="text-lg">{s.icon}</span>
               <span className="text-xs text-muted font-semibold">{s.label}</span>
             </div>
-            <div className="font-display font-extrabold text-3xl" style={{ color: s.color ?? '#1B1A2A' }}>
-              {s.value}
-            </div>
+            {s.value === undefined ? (
+              <SkeletonLine className="w-12 h-8 mt-1 animate-pulse" />
+            ) : (
+              <div className="font-display font-extrabold text-3xl" style={{ color: s.color ?? '#1B1A2A' }}>
+                {s.value}
+              </div>
+            )}
           </Card>
         ))}
       </div>

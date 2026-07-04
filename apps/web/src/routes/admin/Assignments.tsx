@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useActiveClassTerm, useTeacherCatalog } from '../../hooks/useOversight';
 import { useAllAssignments, useCreateAssignment, useUpdateAssignment, useDeleteAssignment } from '../../hooks/useAssignments';
 import type { AssignmentRow } from '../../hooks/useAssignments';
-import { Card, Button, PageHeader } from '../../components/ui';
+import { Card, Button, PageHeader, SkeletonCard } from '../../components/ui';
 
 const TOPIC_MAX = 120;
 
@@ -73,8 +73,6 @@ export function AdminAssignmentsPage() {
     }
     setEditing(null);
   }
-
-  if (isLoading) return <div className="flex items-center justify-center py-20"><div className="w-8 h-8 rounded-full border-2 border-accent border-t-transparent animate-spin" /></div>;
 
   return (
     <div>
@@ -152,6 +150,7 @@ export function AdminAssignmentsPage() {
       )}
 
       <div className="flex flex-col gap-3">
+        {isLoading && assignments.length === 0 && [1, 2, 3].map((i) => <SkeletonCard key={i} />)}
         {filtered.map((a) => (
           <Card key={a.id}>
             <div className="flex items-start justify-between gap-2">

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuditLog } from '../../hooks/useOversight';
 import { STATUS_LABEL } from '../../lib/dueState';
-import { Card, PageHeader, EmptyState } from '../../components/ui';
+import { Card, PageHeader, EmptyState, SkeletonCard } from '../../components/ui';
 import type { ProgressStatus } from '@homework-tracker/shared-types';
 
 export function AdminAuditPage() {
@@ -16,8 +16,8 @@ export function AdminAuditPage() {
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search (user ID / assignment ID)…" className="flex-1 text-sm outline-none" />
       </div>
 
-      {isLoading ? (
-        <div className="flex items-center justify-center py-20"><div className="w-8 h-8 rounded-full border-2 border-accent border-t-transparent animate-spin" /></div>
+      {isLoading && entries.length === 0 ? (
+        <div className="flex flex-col gap-2">{[1, 2, 3].map((i) => <SkeletonCard key={i} />)}</div>
       ) : entries.length === 0 ? (
         <EmptyState title="No matching entries" />
       ) : (

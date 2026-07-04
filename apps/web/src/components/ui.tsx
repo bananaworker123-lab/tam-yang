@@ -3,6 +3,36 @@ import { DueState, ProgressStatus } from '@homework-tracker/shared-types';
 import { subjectColor, subjectShort } from '../lib/subjects';
 import { useT } from '../i18n';
 
+/** Pulsing placeholder bar for skeleton loading states. */
+export function SkeletonLine({ className = '' }: { className?: string }) {
+  return <div className={`h-4 bg-line rounded animate-pulse ${className}`} />;
+}
+
+/** Full-card skeleton that mimics a homework/assignment row. */
+export function SkeletonCard() {
+  return (
+    <div className="bg-white border border-line rounded-[18px] px-4 py-4 animate-pulse">
+      <div className="flex items-start gap-3">
+        <div className="w-11 h-11 rounded-xl bg-line flex-none" />
+        <div className="flex-1 space-y-2 pt-1">
+          <div className="h-4 bg-line rounded w-3/4" />
+          <div className="h-3 bg-line rounded w-1/2" />
+          <div className="h-7 w-24 bg-line rounded-full mt-2" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Generic spinner, used inline (not full-page block). */
+export function Spinner({ size = 6 }: { size?: number }) {
+  return (
+    <div
+      className={`w-${size} h-${size} rounded-full border-2 border-accent border-t-transparent animate-spin flex-none`}
+    />
+  );
+}
+
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
     <div

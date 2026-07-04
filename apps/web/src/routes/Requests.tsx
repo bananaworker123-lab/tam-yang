@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useMyRequests } from '../hooks/useRequests';
-import { Card, Button, PageHeader, EmptyState } from '../components/ui';
+import { Card, Button, PageHeader, EmptyState, SkeletonCard } from '../components/ui';
 
 const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
   pending:  { label: 'Pending',  cls: 'bg-status-done/25 text-[#8A5D0E]' },
@@ -12,17 +12,15 @@ export function RequestsPage() {
   const navigate = useNavigate();
   const { data: requests = [], isLoading } = useMyRequests();
 
-  if (isLoading) {
-    return <div className="flex items-center justify-center py-20"><div className="w-8 h-8 rounded-full border-2 border-accent border-t-transparent animate-spin" /></div>;
-  }
-
   return (
     <div>
       <PageHeader title="My requests" sub="Status & admin replies" />
       <Button variant="ghost" className="w-full mb-4 border-dashed" onClick={() => navigate('/report')}>
         + New request
       </Button>
-      {requests.length === 0 ? (
+      {isLoading ? (
+        <div className="flex flex-col gap-3">{[1, 2].map((i) => <SkeletonCard key={i} />)}</div>
+      ) : requests.length === 0 ? (
         <EmptyState title="No requests yet" />
       ) : (
         <div className="flex flex-col gap-3">

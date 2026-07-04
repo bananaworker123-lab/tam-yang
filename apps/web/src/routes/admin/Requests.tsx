@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAllRequests, useResolveRequest, useRejectRequest } from '../../hooks/useRequests';
-import { Card, Button, PageHeader, EmptyState } from '../../components/ui';
+import { Card, Button, PageHeader, EmptyState, SkeletonCard } from '../../components/ui';
 
 export function AdminRequestsPage() {
   const { data: requests = [], isLoading } = useAllRequests();
@@ -8,14 +8,12 @@ export function AdminRequestsPage() {
   const rejectRequest  = useRejectRequest();
   const [replies, setReplies] = useState<Record<string, string>>({});
 
-  if (isLoading && !requests.length) {
-    return <div className="flex items-center justify-center py-20"><div className="w-8 h-8 rounded-full border-2 border-accent border-t-transparent animate-spin" /></div>;
-  }
-
   return (
     <div>
       <PageHeader kicker="Admin" title="Manage requests" />
-      {requests.length === 0 ? (
+      {isLoading && requests.length === 0 ? (
+        <div className="flex flex-col gap-3">{[1, 2, 3].map((i) => <SkeletonCard key={i} />)}</div>
+      ) : requests.length === 0 ? (
         <EmptyState title="No requests" />
       ) : (
         <div className="flex flex-col gap-3">

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAdminTeachers, useAssignTeacher, useRemoveTeacher, useClasses } from '../../hooks/useOversight';
-import { Card, Avatar, Button, PageHeader, EmptyState } from '../../components/ui';
+import { Card, Avatar, Button, PageHeader, EmptyState, SkeletonLine } from '../../components/ui';
 
 function initials(name: string): string {
   const parts = name.trim().split(' ').filter(Boolean);
@@ -37,10 +37,6 @@ export function AdminTeachersPage() {
     } catch (e: unknown) {
       setErr(e instanceof Error ? e.message : 'Failed to assign teacher');
     }
-  }
-
-  if (isLoading) {
-    return <div className="flex items-center justify-center py-20"><div className="w-8 h-8 rounded-full border-2 border-accent border-t-transparent animate-spin" /></div>;
   }
 
   return (
@@ -83,7 +79,18 @@ export function AdminTeachersPage() {
         <Button className="w-full mb-4" onClick={() => setShowing(true)}>+ Assign teacher</Button>
       )}
 
-      {teachers.length === 0 ? (
+      {isLoading ? (
+        <div className="flex flex-col gap-2">
+          {[1, 2].map((i) => (
+            <Card key={i} className="animate-pulse">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-line flex-none" />
+                <SkeletonLine className="flex-1" />
+              </div>
+            </Card>
+          ))}
+        </div>
+      ) : teachers.length === 0 ? (
         <EmptyState title="No teachers assigned yet" />
       ) : (
         <div className="flex flex-col gap-2">

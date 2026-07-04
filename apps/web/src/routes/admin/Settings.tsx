@@ -1,27 +1,27 @@
 import { useState } from 'react';
-import { useActiveClassTerm } from '../../hooks/useOversight';
-import { useStore } from '../../mock/store';
-import type { SubjectConfig } from '../../mock/config';
-import { Card, Button, PageHeader } from '../../components/ui';
+import { useActiveClassTerm, useSubjects, useUpsertSubject, useDeleteSubject, type SubjectRow } from '../../hooks/useOversight';
+import { Card, Button, PageHeader, SkeletonLine } from '../../components/ui';
 
-const emptySubject = (): SubjectConfig => ({ id: '', name: '', short: '' });
+const emptySubject = (): SubjectRow => ({ id: '', name: '', short: '' });
 
 export function AdminSettingsPage() {
   const { classes, terms, activeClassId, activeTermId, activeClassName, activeTermName, setActiveClassId, setActiveTermId } = useActiveClassTerm();
-  const { subjects, upsertSubject, deleteSubject } = useStore();
+  const { data: subjects = [], isLoading: subjectsLoading } = useSubjects();
+  const upsertSubject = useUpsertSubject();
+  const deleteSubject = useDeleteSubject();
 
-  const [editingSubject, setEditingSubject] = useState<SubjectConfig | null>(null);
+  const [editingSubject, setEditingSubject] = useState<SubjectRow | null>(null);
   const [err, setErr] = useState('');
 
-  function saveSubject() {
+  async function saveSubject() {
     if (!editingSubject) return;
     if (!editingSubject.name.trim() || !editingSubject.short.trim()) {
       setErr('Name and short code are required');
       return;
     }
-    upsertSubject({
-      ...editingSubject,
-      id:    editingSubject.id || editingSubject.name.toLowerCase().replace(/\s+/g, '-'),
+    await upsertSubject.mutateAsync({
+      id: editingSubject.id || undefined,
+      name: editingSubject.name.trim(),
       short: editingSubject.short.trim().toUpperCase().slice(0, 4),
     });
     setEditingSubject(null);
@@ -96,26 +96,39 @@ export function AdminSettingsPage() {
             {err && <div className="text-status-overdue text-xs mb-2">{err}</div>}
             <div className="flex gap-2">
               <Button variant="ghost" className="flex-1 h-9 text-xs" onClick={() => { setEditingSubject(null); setErr(''); }}>Cancel</Button>
-              <Button className="flex-1 h-9 text-xs" onClick={saveSubject}>Save</Button>
+              <Button className="flex-1 h-9 text-xs" onClick={saveSubject}>
+                {upsertSubject.isPending ? 'Saving…' : 'Save'}
+              </Button>
             </div>
           </div>
         ) : null}
 
-        <div className="flex flex-col gap-2">
-          {subjects.map((s) => (
-            <div key={s.id} className="flex items-center gap-3">
-              <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl font-display font-extrabold text-sm flex-none" style={{ background: '#ECEBFD', color: '#463FBF' }}>
-                {s.short}
-              </span>
-              <div className="flex-1 text-sm font-semibold text-ink">{s.name}</div>
-              <div className="flex gap-1">
-                <Button variant="ghost" className="h-8 px-2.5 text-xs" onClick={() => { setEditingSubject(s); setErr(''); }}>Edit</Button>
-                <Button variant="danger" className="h-8 px-2.5 text-xs" onClick={() => deleteSubject(s.id)}>Delete</Button>
+        {subjectsLoading ? (
+          <div className="flex flex-col gap-2">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center gap-3 animate-pulse">
+                <div className="w-10 h-10 rounded-xl bg-line flex-none" />
+                <SkeletonLine className="flex-1" />
               </div>
-            </div>
-          ))}
-          {subjects.length === 0 && <div className="text-faint text-sm text-center py-4">No subjects yet</div>}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {subjects.map((s) => (
+              <div key={s.id} className="flex items-center gap-3">
+                <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl font-display font-extrabold text-sm flex-none" style={{ background: '#ECEBFD', color: '#463FBF' }}>
+                  {s.short}
+                </span>
+                <div className="flex-1 text-sm font-semibold text-ink">{s.name}</div>
+                <div className="flex gap-1">
+                  <Button variant="ghost" className="h-8 px-2.5 text-xs" onClick={() => { setEditingSubject(s); setErr(''); }}>Edit</Button>
+                  <Button variant="danger" className="h-8 px-2.5 text-xs" onClick={() => deleteSubject.mutate(s.id)}>Delete</Button>
+                </div>
+              </div>
+            ))}
+            {subjects.length === 0 && <div className="text-faint text-sm text-center py-4">No subjects yet</div>}
+          </div>
+        )}
       </Card>
     </div>
   );
