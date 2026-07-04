@@ -9,10 +9,13 @@ export class IdentityController {
   constructor(private readonly users: UserService) {}
 
   @Get('me')
-  me(@Req() req: Request): AuthContext {
-    const user = (req.session as unknown as { user?: AuthContext }).user;
-    if (!user) throw AppError.unauthorized();
-    return user;
+  async me(@Req() req: Request): Promise<AuthContext> {
+    const session = req.session as unknown as { user?: AuthContext };
+    if (!session.user) throw AppError.unauthorized();
+    const fresh = await this.users.buildAuthContext(session.user.userId);
+    if (!fresh) throw AppError.unauthorized();
+    session.user = fresh;
+    return fresh;
   }
 
   @Patch('users/:id/name')
