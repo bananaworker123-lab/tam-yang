@@ -84,46 +84,41 @@ export function DashboardPage() {
   return (
     <div>
       {/* progress header */}
-      <div className="rounded-[22px] p-5 text-white" style={{ background: 'linear-gradient(140deg,#5B53E0 0%,#7A5AF0 100%)', boxShadow: '0 18px 34px -16px rgba(91,83,224,.7)' }}>
-        <div className="text-sm opacity-90 font-semibold mb-3 text-center">
-          {isChild ? t('dash.myHomeworkLabel') : `${t('dash.homeworkOf2')} ${activeClassName} ${activeTermName}`}
-        </div>
-        <div className="flex items-center gap-4">
-          {/* Ring */}
-          <div className="flex flex-col items-center flex-none">
-            <div className="relative w-[86px] h-[86px]">
-              <svg width="86" height="86" viewBox="0 0 86 86">
-                <circle cx="43" cy="43" r={R} fill="none" stroke="rgba(255,255,255,.2)" strokeWidth="9" />
-                <circle cx="43" cy="43" r={R} fill="none" stroke="#fff" strokeWidth="9" strokeLinecap="round" strokeDasharray={ringDash} transform="rotate(-90 43 43)" />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="font-display font-extrabold text-2xl leading-none">{pct}%</span>
-              </div>
+      <div className="rounded-[22px] text-white overflow-hidden" style={{ background: 'linear-gradient(140deg,#5B53E0 0%,#7A5AF0 100%)', boxShadow: '0 18px 34px -16px rgba(91,83,224,.7)' }}>
+        {/* Top row: ring + title */}
+        <div className="flex items-center gap-4 px-5 pt-5 pb-4">
+          <div className="relative w-[80px] h-[80px] flex-none">
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r={R} fill="none" stroke="rgba(255,255,255,.2)" strokeWidth="9" />
+              <circle cx="40" cy="40" r={R} fill="none" stroke="#fff" strokeWidth="9" strokeLinecap="round" strokeDasharray={ringDash} transform="rotate(-90 40 40)" />
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="font-display font-extrabold text-xl leading-none">{pct}%</span>
             </div>
-            <div className="text-[9px] font-bold uppercase tracking-widest opacity-70 mt-1">Overall Status</div>
-            <div className="font-display font-bold text-base leading-tight">{t('dash.submittedOf2')} {submitted}/{total}</div>
           </div>
+          <div>
+            <div className="text-xs opacity-75 font-semibold uppercase tracking-widest">
+              {isChild ? t('dash.myHomeworkLabel') : `${activeClassName} · ${activeTermName}`}
+            </div>
+            <div className="font-display font-extrabold text-2xl mt-0.5">{submitted}<span className="text-base font-semibold opacity-70">/{total}</span></div>
+            <div className="text-xs opacity-75 font-semibold">{t('dash.submittedOf2')}</div>
+          </div>
+        </div>
 
-          {/* 2×2 stat grid */}
-          <div className="flex-1 grid grid-cols-2 gap-2">
-            {[
-              { label: t('dash.todo'),       count: todo,       color: '#F97316', bar: '#F97316' },
-              { label: t('dash.notStarted'), count: notStarted, color: '#9CA3AF', bar: '#9CA3AF' },
-              { label: t('dash.workingOn'),  count: workingOn,  color: '#38BDF8', bar: '#38BDF8' },
-              { label: t('dash.overdueCount'), count: overdue,  color: '#F87171', bar: '#F87171' },
-            ].map(({ label, count, color, bar }) => (
-              <div key={label} className="bg-white/15 rounded-xl px-3 py-2.5">
-                <div className="flex items-center gap-1.5 mb-1.5">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill={color}><rect x="1" y="12" width="4" height="11" rx="1"/><rect x="9" y="7" width="4" height="16" rx="1"/><rect x="17" y="2" width="4" height="21" rx="1"/></svg>
-                  <span className="text-[11px] font-semibold opacity-90">{label}: <span className="font-extrabold">{count}</span></span>
-                </div>
-                <div className="h-1 rounded-full bg-white/20 overflow-hidden">
-                  <div className="h-full rounded-full transition-all duration-500"
-                    style={{ width: total ? `${Math.round((count / total) * 100)}%` : '0%', background: bar }} />
-                </div>
-              </div>
-            ))}
-          </div>
+        {/* Stat cards row */}
+        <div className="grid grid-cols-4 border-t border-white/15">
+          {[
+            { label: t('dash.todo'),         count: todo,       accent: '#FB923C' },
+            { label: t('dash.notStarted'),   count: notStarted, accent: '#CBD5E1' },
+            { label: t('dash.workingOn'),    count: workingOn,  accent: '#38BDF8' },
+            { label: t('dash.overdueCount'), count: overdue,    accent: '#F87171' },
+          ].map(({ label, count, accent }, i) => (
+            <div key={label} className={`flex flex-col items-center py-3 px-1 ${i < 3 ? 'border-r border-white/15' : ''}`}>
+              <span className="font-display font-extrabold text-2xl leading-none">{count}</span>
+              <span className="text-[10px] font-semibold opacity-70 mt-1 text-center leading-tight">{label}</span>
+              <div className="w-8 h-1 rounded-full mt-2" style={{ background: accent }} />
+            </div>
+          ))}
         </div>
       </div>
 
