@@ -119,6 +119,7 @@ export class OversightService {
         members: f.members.map((m) => ({
           userId: m.userId,
           name: m.user.name,
+          shortName: m.user.shortName ?? null,
           email: m.user.email,
           role: m.role,
           pictureUrl: m.user.pictureUrl,
@@ -146,6 +147,7 @@ export class OversightService {
       members: f.members.map((m) => ({
         userId: m.userId,
         name: m.user.name,
+        shortName: m.user.shortName ?? null,
         email: m.user.email,
         role: m.role,
         pictureUrl: m.user.pictureUrl,
@@ -263,6 +265,12 @@ export class OversightService {
     return this.prisma.classRoom.create({ data: { name: name.trim() } });
   }
 
+  async renameClassroom(id: string, name: string) {
+    const dup = await this.prisma.classRoom.findFirst({ where: { name: name.trim(), NOT: { id } } });
+    if (dup) throw AppError.conflict('Class name already exists');
+    return this.prisma.classRoom.update({ where: { id }, data: { name: name.trim() } });
+  }
+
   async deleteClassroom(id: string) {
     const inUse = await this.prisma.masterAssignment.count({ where: { classId: id } });
     if (inUse > 0) throw AppError.conflict('Class has assignments — remove them first');
@@ -274,6 +282,12 @@ export class OversightService {
     const existing = await this.prisma.term.findFirst({ where: { name: name.trim() } });
     if (existing) throw AppError.conflict('Term already exists');
     return this.prisma.term.create({ data: { name: name.trim() } });
+  }
+
+  async renameTerm(id: string, name: string) {
+    const dup = await this.prisma.term.findFirst({ where: { name: name.trim(), NOT: { id } } });
+    if (dup) throw AppError.conflict('Term name already exists');
+    return this.prisma.term.update({ where: { id }, data: { name: name.trim() } });
   }
 
   async deleteTerm(id: string) {

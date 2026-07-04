@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Patch, Delete, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { Roles, CurrentUser } from '../../common/roles.decorator';
 import { RolesGuard } from '../../common/roles.guard';
 import type { AuthContext } from '@homework-tracker/shared-types';
@@ -30,6 +30,13 @@ export class OversightController {
     return this.svc.createClassroom(body.name);
   }
 
+  @Patch('admin/classes/:id')
+  @Roles('admin')
+  renameClass(@Param('id') id: string, @Body() body: { name: string }) {
+    if (!body.name?.trim()) throw AppError.validation('name is required');
+    return this.svc.renameClassroom(id, body.name);
+  }
+
   @Delete('admin/classes/:id')
   @Roles('admin')
   deleteClass(@Param('id') id: string) {
@@ -41,6 +48,13 @@ export class OversightController {
   createTerm(@Body() body: { name: string }) {
     if (!body.name?.trim()) throw AppError.validation('name is required');
     return this.svc.createTerm(body.name);
+  }
+
+  @Patch('admin/terms/:id')
+  @Roles('admin')
+  renameTerm(@Param('id') id: string, @Body() body: { name: string }) {
+    if (!body.name?.trim()) throw AppError.validation('name is required');
+    return this.svc.renameTerm(id, body.name);
   }
 
   @Delete('admin/terms/:id')

@@ -22,6 +22,21 @@ export function useCreateClass() {
   });
 }
 
+export function useRenameClass() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, name }: { id: string; name: string }) => api.patch(`/oversight/admin/classes/${id}`, { name }),
+    onMutate: async ({ id, name }) => {
+      await qc.cancelQueries({ queryKey: ['oversight', 'classes'] });
+      const prev = qc.getQueryData(['oversight', 'classes']);
+      qc.setQueryData<ClassRow[]>(['oversight', 'classes'], (old) => old?.map((c) => c.id === id ? { ...c, name } : c));
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => qc.setQueryData(['oversight', 'classes'], ctx?.prev),
+    onSettled: () => qc.invalidateQueries({ queryKey: ['oversight', 'classes'] }),
+  });
+}
+
 export function useDeleteClass() {
   const qc = useQueryClient();
   return useMutation({
@@ -50,6 +65,21 @@ export function useCreateTerm() {
   return useMutation({
     mutationFn: (name: string) => api.post('/oversight/admin/terms', { name }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['oversight', 'terms'] }),
+  });
+}
+
+export function useRenameTerm() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, name }: { id: string; name: string }) => api.patch(`/oversight/admin/terms/${id}`, { name }),
+    onMutate: async ({ id, name }) => {
+      await qc.cancelQueries({ queryKey: ['oversight', 'terms'] });
+      const prev = qc.getQueryData(['oversight', 'terms']);
+      qc.setQueryData<TermRow[]>(['oversight', 'terms'], (old) => old?.map((t) => t.id === id ? { ...t, name } : t));
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => qc.setQueryData(['oversight', 'terms'], ctx?.prev),
+    onSettled: () => qc.invalidateQueries({ queryKey: ['oversight', 'terms'] }),
   });
 }
 

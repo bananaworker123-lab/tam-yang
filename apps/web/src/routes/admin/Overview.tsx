@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   useAdminOverview, useActiveClassTerm, useAdminFamilies,
-  useCreateClass, useDeleteClass, useCreateTerm, useDeleteTerm,
+  useCreateClass, useRenameClass, useDeleteClass, useCreateTerm, useRenameTerm, useDeleteTerm,
   useSubjects, useUpsertSubject, useDeleteSubject,
   useTeacherCatalog, useUpsertTeacherCatalog, useDeleteTeacherCatalog,
   type SubjectRow, type TeacherCatalogRow,
@@ -25,7 +25,7 @@ function FamilyModal({ family, onClose }: { family: AdminFamily; onClose: () => 
         <div className="flex flex-col gap-2.5">
           {family.members.map((m) => (
             <div key={m.userId} className="flex items-center gap-3">
-              <Avatar initials={m.name.slice(0, 2).toUpperCase()} />
+              <Avatar initials={(m as any).shortName?.toUpperCase() || m.name.slice(0, 2).toUpperCase()} />
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-semibold text-ink">{m.name}</div>
                 <div className="text-xs text-faint">{m.email}</div>
@@ -55,8 +55,10 @@ export function AdminOverviewPage() {
   const upsertTeacher   = useUpsertTeacherCatalog();
   const deleteTeacher   = useDeleteTeacherCatalog();
   const createClass     = useCreateClass();
+  const renameClass     = useRenameClass();
   const deleteClass     = useDeleteClass();
   const createTerm      = useCreateTerm();
+  const renameTerm      = useRenameTerm();
   const deleteTerm      = useDeleteTerm();
 
   const [selectedFamily, setSelectedFamily] = useState<AdminFamily | null>(null);
@@ -69,6 +71,10 @@ export function AdminOverviewPage() {
   const [newTermName, setNewTermName]       = useState('');
   const [classErr, setClassErr]             = useState('');
   const [termErr, setTermErr]               = useState('');
+  const [renamingClassId, setRenamingClassId] = useState('');
+  const [renamingClassName, setRenamingClassName] = useState('');
+  const [renamingTermId, setRenamingTermId]   = useState('');
+  const [renamingTermName, setRenamingTermName] = useState('');
 
   async function saveSubject() {
     if (!editingSubject) return;
@@ -184,18 +190,46 @@ export function AdminOverviewPage() {
               <div className="flex flex-wrap gap-2 mb-2">
                 {classes.map((c) => (
                   <div key={c.id} className="flex items-center gap-1">
-                    <button
-                      onClick={() => setActiveClassId(c.id)}
-                      className={`h-9 px-4 rounded-full text-sm font-bold transition ${c.id === activeClassId ? 'bg-accent text-white shadow-sm' : 'bg-bg text-ink border border-line hover:border-accent'}`}>
-                      {c.name}
-                    </button>
-                    {c.id !== activeClassId && (
-                      <button
-                        onClick={() => deleteClass.mutate(c.id)}
-                        className="w-5 h-5 rounded-full flex items-center justify-center text-faint hover:text-status-overdue hover:bg-status-overdue/10 transition"
-                        title="Delete class">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
-                      </button>
+                    {renamingClassId === c.id ? (
+                      <div className="flex items-center gap-1">
+                        <input
+                          autoFocus
+                          value={renamingClassName}
+                          onChange={(e) => setRenamingClassName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && renamingClassName.trim()) {
+                              renameClass.mutate({ id: c.id, name: renamingClassName.trim() }, { onSuccess: () => setRenamingClassId('') });
+                            } else if (e.key === 'Escape') setRenamingClassId('');
+                          }}
+                          className="h-8 w-24 px-2 text-sm rounded-lg border border-accent outline-none text-center font-bold"
+                        />
+                        <button onClick={() => { if (renamingClassName.trim()) renameClass.mutate({ id: c.id, name: renamingClassName.trim() }, { onSuccess: () => setRenamingClassId('') }); }}
+                          className="h-8 px-2 rounded-lg bg-accent text-white text-xs font-bold">✓</button>
+                        <button onClick={() => setRenamingClassId('')}
+                          className="h-8 px-2 rounded-lg border border-line text-xs text-muted">✕</button>
+                      </div>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => setActiveClassId(c.id)}
+                          className={`h-9 px-4 rounded-full text-sm font-bold transition ${c.id === activeClassId ? 'bg-accent text-white shadow-sm' : 'bg-bg text-ink border border-line hover:border-accent'}`}>
+                          {c.name}
+                        </button>
+                        <button
+                          onClick={() => { setRenamingClassId(c.id); setRenamingClassName(c.name); }}
+                          className="w-5 h-5 rounded-full flex items-center justify-center text-faint hover:text-accent hover:bg-accent/10 transition"
+                          title="Rename class">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
+                        {c.id !== activeClassId && (
+                          <button
+                            onClick={() => deleteClass.mutate(c.id)}
+                            className="w-5 h-5 rounded-full flex items-center justify-center text-faint hover:text-status-overdue hover:bg-status-overdue/10 transition"
+                            title="Delete class">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
                 ))}
@@ -221,18 +255,46 @@ export function AdminOverviewPage() {
               <div className="flex flex-wrap gap-2 mb-2">
                 {terms.map((t) => (
                   <div key={t.id} className="flex items-center gap-1">
-                    <button
-                      onClick={() => setActiveTermId(t.id)}
-                      className={`h-9 px-4 rounded-full text-sm font-bold transition ${t.id === activeTermId ? 'bg-accent/15 text-accent-ink border border-accent' : 'bg-bg text-ink border border-line hover:border-accent'}`}>
-                      {t.name}
-                    </button>
-                    {t.id !== activeTermId && (
-                      <button
-                        onClick={() => deleteTerm.mutate(t.id)}
-                        className="w-5 h-5 rounded-full flex items-center justify-center text-faint hover:text-status-overdue hover:bg-status-overdue/10 transition"
-                        title="Delete term">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
-                      </button>
+                    {renamingTermId === t.id ? (
+                      <div className="flex items-center gap-1">
+                        <input
+                          autoFocus
+                          value={renamingTermName}
+                          onChange={(e) => setRenamingTermName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && renamingTermName.trim()) {
+                              renameTerm.mutate({ id: t.id, name: renamingTermName.trim() }, { onSuccess: () => setRenamingTermId('') });
+                            } else if (e.key === 'Escape') setRenamingTermId('');
+                          }}
+                          className="h-8 w-24 px-2 text-sm rounded-lg border border-accent outline-none text-center font-bold"
+                        />
+                        <button onClick={() => { if (renamingTermName.trim()) renameTerm.mutate({ id: t.id, name: renamingTermName.trim() }, { onSuccess: () => setRenamingTermId('') }); }}
+                          className="h-8 px-2 rounded-lg bg-accent text-white text-xs font-bold">✓</button>
+                        <button onClick={() => setRenamingTermId('')}
+                          className="h-8 px-2 rounded-lg border border-line text-xs text-muted">✕</button>
+                      </div>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => setActiveTermId(t.id)}
+                          className={`h-9 px-4 rounded-full text-sm font-bold transition ${t.id === activeTermId ? 'bg-accent/15 text-accent-ink border border-accent' : 'bg-bg text-ink border border-line hover:border-accent'}`}>
+                          {t.name}
+                        </button>
+                        <button
+                          onClick={() => { setRenamingTermId(t.id); setRenamingTermName(t.name); }}
+                          className="w-5 h-5 rounded-full flex items-center justify-center text-faint hover:text-accent hover:bg-accent/10 transition"
+                          title="Rename term">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
+                        {t.id !== activeTermId && (
+                          <button
+                            onClick={() => deleteTerm.mutate(t.id)}
+                            className="w-5 h-5 rounded-full flex items-center justify-center text-faint hover:text-status-overdue hover:bg-status-overdue/10 transition"
+                            title="Delete term">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
                 ))}

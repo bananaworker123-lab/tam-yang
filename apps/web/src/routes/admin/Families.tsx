@@ -29,7 +29,7 @@ export function AdminFamiliesPage() {
             <div className="flex flex-col gap-2">
               {f.members.map((m) => (
                 <div key={m.userId} className="flex items-center gap-3">
-                  <Avatar initials={m.name.slice(0, 2).toUpperCase()} />
+                  <Avatar initials={(m as any).shortName?.toUpperCase() || m.name.slice(0, 2).toUpperCase()} />
                   <div className="flex-1 min-w-0">
                     <span className="text-sm font-semibold text-ink">{m.name}</span>
                     <div className="text-xs text-faint">{m.email}</div>

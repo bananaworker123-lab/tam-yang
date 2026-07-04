@@ -105,7 +105,7 @@ export function Layout() {
               <img src={user.pictureUrl} className="w-8 h-8 rounded-full flex-none object-cover" alt="" />
             ) : (
               <div className="w-8 h-8 rounded-full bg-accent-soft flex items-center justify-center text-xs font-bold text-accent-ink flex-none">
-                {user.name.slice(0, 2).toUpperCase()}
+                {(user.shortName?.toUpperCase() || user.name.slice(0, 2).toUpperCase())}
               </div>
             )}
             <div className="flex-1 min-w-0">
@@ -181,7 +181,7 @@ export function Layout() {
                 <img src={user.pictureUrl} className="w-8 h-8 rounded-full object-cover" alt="" />
               ) : (
                 <div className="w-8 h-8 rounded-full bg-accent-soft flex items-center justify-center text-xs font-bold text-accent-ink">
-                  {user.name.slice(0, 2).toUpperCase()}
+                  {(user.shortName?.toUpperCase() || user.name.slice(0, 2).toUpperCase())}
                 </div>
               )
             )}

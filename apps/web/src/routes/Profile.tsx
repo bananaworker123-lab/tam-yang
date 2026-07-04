@@ -15,7 +15,7 @@ export function ProfilePage() {
   const { t, locale, setLocale } = useT();
   const { data: familyData, isLoading: familyLoading } = useFamily();
 
-  const initials = user ? (user.name?.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase() ?? '??') : '??';
+  const initials = user ? (user.shortName?.toUpperCase() || user.name?.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase() || '??') : '??';
 
   async function logout() {
     await api.post('/auth/logout').catch(() => {});
