@@ -26,7 +26,14 @@ export function useDeleteClass() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api.delete(`/oversight/admin/classes/${id}`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['oversight', 'classes'] }),
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: ['oversight', 'classes'] });
+      const prev = qc.getQueryData(['oversight', 'classes']);
+      qc.setQueryData<ClassRow[]>(['oversight', 'classes'], (old) => old?.filter((c) => c.id !== id));
+      return { prev };
+    },
+    onError: (_err, _id, ctx) => qc.setQueryData(['oversight', 'classes'], ctx?.prev),
+    onSettled: () => qc.invalidateQueries({ queryKey: ['oversight', 'classes'] }),
   });
 }
 
@@ -50,7 +57,14 @@ export function useDeleteTerm() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api.delete(`/oversight/admin/terms/${id}`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['oversight', 'terms'] }),
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: ['oversight', 'terms'] });
+      const prev = qc.getQueryData(['oversight', 'terms']);
+      qc.setQueryData<TermRow[]>(['oversight', 'terms'], (old) => old?.filter((t) => t.id !== id));
+      return { prev };
+    },
+    onError: (_err, _id, ctx) => qc.setQueryData(['oversight', 'terms'], ctx?.prev),
+    onSettled: () => qc.invalidateQueries({ queryKey: ['oversight', 'terms'] }),
   });
 }
 
@@ -228,7 +242,14 @@ export function useDeleteSubject() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api.delete(`/oversight/admin/subjects/${id}`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['oversight', 'admin', 'subjects'] }),
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: ['oversight', 'admin', 'subjects'] });
+      const prev = qc.getQueryData(['oversight', 'admin', 'subjects']);
+      qc.setQueryData<SubjectRow[]>(['oversight', 'admin', 'subjects'], (old) => old?.filter((s) => s.id !== id));
+      return { prev };
+    },
+    onError: (_err, _id, ctx) => qc.setQueryData(['oversight', 'admin', 'subjects'], ctx?.prev),
+    onSettled: () => qc.invalidateQueries({ queryKey: ['oversight', 'admin', 'subjects'] }),
   });
 }
 
@@ -259,7 +280,14 @@ export function useDeleteTeacherCatalog() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api.delete(`/oversight/admin/teacher-catalog/${id}`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['oversight', 'admin', 'teacher-catalog'] }),
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: ['oversight', 'admin', 'teacher-catalog'] });
+      const prev = qc.getQueryData(['oversight', 'admin', 'teacher-catalog']);
+      qc.setQueryData<TeacherCatalogRow[]>(['oversight', 'admin', 'teacher-catalog'], (old) => old?.filter((t) => t.id !== id));
+      return { prev };
+    },
+    onError: (_err, _id, ctx) => qc.setQueryData(['oversight', 'admin', 'teacher-catalog'], ctx?.prev),
+    onSettled: () => qc.invalidateQueries({ queryKey: ['oversight', 'admin', 'teacher-catalog'] }),
   });
 }
 
