@@ -42,6 +42,24 @@ export class AssignmentService {
   }
 
   async listAll() {
+    // Auto-migrate: assignments with empty classRoom/term name get the first available class/term
+    const orphaned = await this.prisma.masterAssignment.findMany({
+      where: { OR: [{ classRoom: { name: '' } }, { term: { name: '' } }] },
+      select: { id: true },
+    });
+    if (orphaned.length > 0) {
+      const [firstClass, firstTerm] = await Promise.all([
+        this.prisma.classRoom.findFirst({ where: { name: { not: '' } }, orderBy: { name: 'asc' } }),
+        this.prisma.term.findFirst({ where: { name: { not: '' } }, orderBy: { name: 'asc' } }),
+      ]);
+      if (firstClass && firstTerm) {
+        await this.prisma.masterAssignment.updateMany({
+          where: { id: { in: orphaned.map((o) => o.id) } },
+          data: { classId: firstClass.id, termId: firstTerm.id },
+        });
+      }
+    }
+
     const rows = await this.prisma.masterAssignment.findMany({
       include: { classRoom: true, term: true },
       orderBy: { createdAt: 'desc' },
