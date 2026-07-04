@@ -189,6 +189,7 @@ model Progress {
   @@index([familyId])
   @@index([childUserId])
   @@index([assignmentId])
+  @@index([childUserId, assignmentId])
   @@map("progress")
   @@schema("progress")
 }

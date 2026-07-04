@@ -19,24 +19,6 @@ export class ProgressService {
   }
 
   async listForChild(childUserId: string, familyId: string, className?: string, termName?: string) {
-    // Auto-migrate orphaned assignments (empty class/term) to the first available class/term
-    const orphaned = await this.prisma.masterAssignment.findMany({
-      where: { active: true, OR: [{ classRoom: { name: '' } }, { term: { name: '' } }] },
-      select: { id: true },
-    });
-    if (orphaned.length > 0) {
-      const [firstClass, firstTerm] = await Promise.all([
-        this.prisma.classRoom.findFirst({ where: { name: { not: '' } }, orderBy: { name: 'asc' } }),
-        this.prisma.term.findFirst({ where: { name: { not: '' } }, orderBy: { name: 'asc' } }),
-      ]);
-      if (firstClass && firstTerm) {
-        await this.prisma.masterAssignment.updateMany({
-          where: { id: { in: orphaned.map((o) => o.id) } },
-          data: { classId: firstClass.id, termId: firstTerm.id },
-        });
-      }
-    }
-
     const assignments = await this.prisma.masterAssignment.findMany({
       where: {
         active: true,

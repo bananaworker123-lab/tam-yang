@@ -20,7 +20,7 @@ export function useProgress(childId?: string, className?: string, termName?: str
     queryKey: ['progress', childId, className, termName],
     queryFn: () => api.get(`/progress?${params.toString()}`),
     enabled: !!className && !!termName,
-    staleTime: 0,
+    staleTime: 1000 * 60 * 2,
   });
 }
 

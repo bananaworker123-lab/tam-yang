@@ -51,13 +51,15 @@ export class OversightService {
       });
     }
 
+    const progressMap = new Map(progress.map((p) => [`${p.childUserId}:${p.assignmentId}`, p]));
+
     const rows = [...childMap.values()].map((c) => ({
       childId: c.id,
       childName: c.name,
       childShort: c.shortName ?? null,
       pictureUrl: c.pictureUrl,
       cells: assignments.map((a) => {
-        const p = progress.find((x) => x.childUserId === c.id && x.assignmentId === a.id);
+        const p = progressMap.get(`${c.id}:${a.id}`);
         return { assignmentId: a.id, status: p?.status ?? 'not_started' };
       }),
     }));
@@ -179,13 +181,15 @@ export class OversightService {
       }),
     ]);
 
+    const progressMap = new Map(progress.map((p) => [`${p.childUserId}:${p.assignmentId}`, p]));
+
     const rows = memberships.map((m) => ({
       childId: m.userId,
       childName: m.user.name,
       childShort: m.user.shortName ?? null,
       familyName: m.family.name,
       cells: assignments.map((a) => {
-        const p = progress.find((x) => x.childUserId === m.userId && x.assignmentId === a.id);
+        const p = progressMap.get(`${m.userId}:${a.id}`);
         return { assignmentId: a.id, status: p?.status ?? 'not_started' };
       }),
     }));
