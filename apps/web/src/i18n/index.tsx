@@ -70,6 +70,8 @@ const DICT: Dict = {
   'detail.class': { en: 'Class', th: 'ชั้นเรียน' },
   'detail.term': { en: 'Term', th: 'เทอม' },
   'detail.statusHeading': { en: 'Homework status', th: 'สถานะการบ้าน' },
+  'detail.save': { en: 'Save status', th: 'บันทึกสถานะ' },
+  'detail.saving': { en: 'Saving…', th: 'กำลังบันทึก…' },
   'detail.readonly': { en: "Read-only — teachers can't change status.", th: 'อ่านอย่างเดียว — ครูเปลี่ยนสถานะไม่ได้' },
   'detail.report': { en: 'Something looks wrong? Tell the admin', th: 'ข้อมูลผิด? แจ้งแอดมิน' },
   'detail.notFound': { en: 'Assignment not found', th: 'ไม่พบงานนี้' },

@@ -252,11 +252,10 @@ export function StatusSegment({
             type="button"
             disabled={disabled}
             onClick={() => onChange?.(s)}
-            className={`flex-1 inline-flex items-center justify-center gap-2 h-10 rounded-xl text-xs font-bold transition active:scale-[.98] disabled:opacity-100 ${
+            className={`flex-1 flex items-center justify-center h-10 rounded-xl text-xs font-bold transition active:scale-[.98] disabled:opacity-100 ${
               active ? SEG_ACTIVE[s] : 'bg-bg text-faint'
             }`}
           >
-            <span className={`w-2 h-2 rounded-full ${active ? SEG_DOT[s] : 'bg-faint/50'}`} />
             {t(`status.${s}`)}
           </button>
         );
