@@ -139,22 +139,33 @@ export function AdminOverviewPage() {
       <PageHeader kicker="Admin" title="Overview" />
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-3 mb-5">
-        {stats.map((s) => (
-          <Card key={s.label}>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-lg">{s.icon}</span>
-              <span className="text-xs text-muted font-semibold">{s.label}</span>
+      <div className="rounded-[22px] text-white mb-5 overflow-hidden" style={{ background: 'linear-gradient(140deg,#5B53E0 0%,#7A5AF0 100%)', boxShadow: '0 18px 34px -16px rgba(91,83,224,.7)' }}>
+        <div className="grid grid-cols-3 divide-x divide-white/15">
+          {stats.slice(0, 3).map((s, i) => (
+            <div key={s.label} className="flex flex-col items-center py-4 px-2">
+              <span className="text-xl mb-1">{s.icon}</span>
+              {s.value === undefined ? (
+                <div className="w-8 h-7 rounded-lg bg-white/20 animate-pulse mb-1" />
+              ) : (
+                <span className="font-display font-extrabold text-3xl leading-none" style={{ color: s.color ? '#FCA5A5' : '#fff' }}>{s.value}</span>
+              )}
+              <span className="text-[10px] font-semibold opacity-70 mt-1.5 text-center">{s.label}</span>
             </div>
-            {s.value === undefined ? (
-              <SkeletonLine className="w-12 h-8 mt-1 animate-pulse" />
-            ) : (
-              <div className="font-display font-extrabold text-3xl" style={{ color: s.color ?? '#1B1A2A' }}>
-                {s.value}
-              </div>
-            )}
-          </Card>
-        ))}
+          ))}
+        </div>
+        <div className="grid grid-cols-3 divide-x divide-white/15 border-t border-white/15">
+          {stats.slice(3).map((s) => (
+            <div key={s.label} className="flex flex-col items-center py-4 px-2">
+              <span className="text-xl mb-1">{s.icon}</span>
+              {s.value === undefined ? (
+                <div className="w-8 h-7 rounded-lg bg-white/20 animate-pulse mb-1" />
+              ) : (
+                <span className="font-display font-extrabold text-3xl leading-none" style={{ color: s.color ? '#FCA5A5' : '#fff' }}>{s.value}</span>
+              )}
+              <span className="text-[10px] font-semibold opacity-70 mt-1.5 text-center">{s.label}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Active class & term inline */}
