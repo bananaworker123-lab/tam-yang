@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
 import { useT } from '../i18n';
+import { api } from '../lib/api';
 import type { Role } from '@homework-tracker/shared-types';
 
 type AppRole = Role;
@@ -44,6 +46,16 @@ export function Layout() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { t } = useT();
+  const qc = useQueryClient();
+
+  // Prefetch admin data in background as soon as we know the user is admin
+  useEffect(() => {
+    if (!user?.roles.includes('admin')) return;
+    qc.prefetchQuery({ queryKey: ['oversight', 'admin', 'overview'], queryFn: () => api.get('/oversight/admin/overview'), staleTime: 1000 * 60 * 2 });
+    qc.prefetchQuery({ queryKey: ['oversight', 'admin', 'families'], queryFn: () => api.get('/oversight/admin/families'), staleTime: 1000 * 60 * 2 });
+    qc.prefetchQuery({ queryKey: ['oversight', 'classes'], queryFn: () => api.get('/oversight/classes'), staleTime: 1000 * 60 * 5 });
+    qc.prefetchQuery({ queryKey: ['oversight', 'terms'],   queryFn: () => api.get('/oversight/terms'),   staleTime: 1000 * 60 * 5 });
+  }, [user?.userId]);
 
   // Determine non-admin base role
   const baseRole: AppRole =
