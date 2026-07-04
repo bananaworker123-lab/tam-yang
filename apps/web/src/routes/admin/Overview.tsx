@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
   useAdminOverview, useActiveClassTerm, useAdminFamilies,
+  useCreateClass, useDeleteClass, useCreateTerm, useDeleteTerm,
   useSubjects, useUpsertSubject, useDeleteSubject,
   useTeacherCatalog, useUpsertTeacherCatalog, useDeleteTeacherCatalog,
   type SubjectRow, type TeacherCatalogRow,
@@ -8,7 +9,6 @@ import {
 import { Card, Avatar, Button, PageHeader, SkeletonLine } from '../../components/ui';
 import type { AdminFamily } from '../../hooks/useOversight';
 
-const CLASSES = ['M.1', 'M.2', 'M.3', 'M.4', 'M.5', 'M.6'];
 const emptySubject = (): SubjectRow => ({ id: '', name: '', short: '' });
 const emptyTeacher = (): TeacherCatalogRow => ({ id: '', name: '', subject: '', className: '' });
 
@@ -40,15 +40,24 @@ function FamilyModal({ family, onClose }: { family: AdminFamily; onClose: () => 
 }
 
 export function AdminOverviewPage() {
-  const { data, isLoading } = useAdminOverview();
+  const { data, isLoading: overviewLoading } = useAdminOverview();
   const { data: allFamilies = [] } = useAdminFamilies();
-  const { classes, terms, activeClassId, activeTermId, activeClassName, activeTermName, setActiveClassId, setActiveTermId } = useActiveClassTerm();
+  const {
+    classes, terms,
+    activeClassId, activeTermId,
+    activeClassName, activeTermName,
+    setActiveClassId, setActiveTermId,
+  } = useActiveClassTerm();
   const { data: subjects = [] } = useSubjects();
   const { data: teachers = [] } = useTeacherCatalog();
-  const upsertSubject = useUpsertSubject();
-  const deleteSubject = useDeleteSubject();
-  const upsertTeacher = useUpsertTeacherCatalog();
-  const deleteTeacher = useDeleteTeacherCatalog();
+  const upsertSubject   = useUpsertSubject();
+  const deleteSubject   = useDeleteSubject();
+  const upsertTeacher   = useUpsertTeacherCatalog();
+  const deleteTeacher   = useDeleteTeacherCatalog();
+  const createClass     = useCreateClass();
+  const deleteClass     = useDeleteClass();
+  const createTerm      = useCreateTerm();
+  const deleteTerm      = useDeleteTerm();
 
   const [selectedFamily, setSelectedFamily] = useState<AdminFamily | null>(null);
   const [editingSubject, setEditingSubject] = useState<SubjectRow | null>(null);
@@ -56,6 +65,10 @@ export function AdminOverviewPage() {
   const [editingTeacher, setEditingTeacher] = useState<TeacherCatalogRow | null>(null);
   const [teacherErr, setTeacherErr] = useState('');
   const [editingClassTerm, setEditingClassTerm] = useState(false);
+  const [newClassName, setNewClassName]     = useState('');
+  const [newTermName, setNewTermName]       = useState('');
+  const [classErr, setClassErr]             = useState('');
+  const [termErr, setTermErr]               = useState('');
 
   async function saveSubject() {
     if (!editingSubject) return;
@@ -74,6 +87,30 @@ export function AdminOverviewPage() {
     await upsertTeacher.mutateAsync({ id: editingTeacher.id || undefined, name: editingTeacher.name.trim(), subject: editingTeacher.subject.trim(), className: editingTeacher.className.trim() });
     setEditingTeacher(null);
     setTeacherErr('');
+  }
+
+  async function handleAddClass() {
+    if (!newClassName.trim()) return;
+    try {
+      const cls = await createClass.mutateAsync(newClassName.trim()) as { id: string; name: string };
+      setNewClassName('');
+      setClassErr('');
+      setActiveClassId(cls.id);
+    } catch (e: unknown) {
+      setClassErr(e instanceof Error ? e.message : 'Failed');
+    }
+  }
+
+  async function handleAddTerm() {
+    if (!newTermName.trim()) return;
+    try {
+      const t = await createTerm.mutateAsync(newTermName.trim()) as { id: string; name: string };
+      setNewTermName('');
+      setTermErr('');
+      setActiveTermId(t.id);
+    } catch (e: unknown) {
+      setTermErr(e instanceof Error ? e.message : 'Failed');
+    }
   }
 
   const d = data;
@@ -126,7 +163,7 @@ export function AdminOverviewPage() {
           )}
         </div>
 
-        {/* Single-line display: "M.3 · Term 1" */}
+        {/* Display row */}
         <div className="flex items-center gap-2 mb-3">
           {activeClassName && activeTermName ? (
             <div className="flex-1 flex items-center gap-2">
@@ -140,36 +177,83 @@ export function AdminOverviewPage() {
         </div>
 
         {editingClassTerm && (
-          <>
-            {classes.length > 0 && (
-              <>
-                <div className="text-xs text-muted mb-1.5">เลือก Class</div>
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                  {classes.map((c) => (
-                    <button key={c.id} onClick={() => setActiveClassId(c.id)}
-                      className={`h-9 px-4 rounded-full text-sm font-bold transition ${c.id === activeClassId ? 'bg-accent text-white' : 'bg-bg text-ink border border-line hover:border-accent'}`}>
+          <div className="border-t border-line pt-3">
+            {/* Class section */}
+            <div className="mb-4">
+              <div className="text-xs font-bold text-muted uppercase tracking-wide mb-2">Class</div>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {classes.map((c) => (
+                  <div key={c.id} className="flex items-center gap-1">
+                    <button
+                      onClick={() => setActiveClassId(c.id)}
+                      className={`h-9 px-4 rounded-full text-sm font-bold transition ${c.id === activeClassId ? 'bg-accent text-white shadow-sm' : 'bg-bg text-ink border border-line hover:border-accent'}`}>
                       {c.name}
                     </button>
-                  ))}
-                </div>
-              </>
-            )}
-            {terms.length > 0 && (
-              <>
-                <div className="text-xs text-muted mb-1.5">เลือก Term</div>
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                  {terms.map((t) => (
-                    <button key={t.id} onClick={() => setActiveTermId(t.id)}
+                    {c.id !== activeClassId && (
+                      <button
+                        onClick={() => deleteClass.mutate(c.id)}
+                        className="w-5 h-5 rounded-full flex items-center justify-center text-faint hover:text-status-overdue hover:bg-status-overdue/10 transition"
+                        title="Delete class">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {/* Add new class */}
+              <div className="flex gap-2">
+                <input
+                  value={newClassName}
+                  onChange={(e) => { setNewClassName(e.target.value); setClassErr(''); }}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddClass()}
+                  placeholder="e.g. M.4"
+                  className="flex-1 h-9 rounded-xl border border-line px-3 text-sm outline-none focus:border-accent" />
+                <Button className="h-9 px-3 text-xs flex-none" onClick={handleAddClass} disabled={!newClassName.trim() || createClass.isPending}>
+                  {createClass.isPending ? '…' : '+ Add'}
+                </Button>
+              </div>
+              {classErr && <div className="text-status-overdue text-xs mt-1">{classErr}</div>}
+            </div>
+
+            {/* Term section */}
+            <div className="mb-4">
+              <div className="text-xs font-bold text-muted uppercase tracking-wide mb-2">Term</div>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {terms.map((t) => (
+                  <div key={t.id} className="flex items-center gap-1">
+                    <button
+                      onClick={() => setActiveTermId(t.id)}
                       className={`h-9 px-4 rounded-full text-sm font-bold transition ${t.id === activeTermId ? 'bg-accent/15 text-accent-ink border border-accent' : 'bg-bg text-ink border border-line hover:border-accent'}`}>
                       {t.name}
                     </button>
-                  ))}
-                </div>
-              </>
-            )}
-            {classes.length === 0 && <div className="text-faint text-xs mb-3">ยังไม่มี Class — เพิ่ม Assignment ก่อน</div>}
+                    {t.id !== activeTermId && (
+                      <button
+                        onClick={() => deleteTerm.mutate(t.id)}
+                        className="w-5 h-5 rounded-full flex items-center justify-center text-faint hover:text-status-overdue hover:bg-status-overdue/10 transition"
+                        title="Delete term">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {/* Add new term */}
+              <div className="flex gap-2">
+                <input
+                  value={newTermName}
+                  onChange={(e) => { setNewTermName(e.target.value); setTermErr(''); }}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddTerm()}
+                  placeholder="e.g. Term 2"
+                  className="flex-1 h-9 rounded-xl border border-line px-3 text-sm outline-none focus:border-accent" />
+                <Button className="h-9 px-3 text-xs flex-none" onClick={handleAddTerm} disabled={!newTermName.trim() || createTerm.isPending}>
+                  {createTerm.isPending ? '…' : '+ Add'}
+                </Button>
+              </div>
+              {termErr && <div className="text-status-overdue text-xs mt-1">{termErr}</div>}
+            </div>
+
             <Button className="w-full h-9 text-sm" onClick={() => setEditingClassTerm(false)}>Done</Button>
-          </>
+          </div>
         )}
       </Card>
 
@@ -226,7 +310,7 @@ export function AdminOverviewPage() {
             {subjectErr && <div className="text-status-overdue text-xs mb-2">{subjectErr}</div>}
             <div className="flex gap-2">
               <Button variant="ghost" className="flex-1 h-8 text-xs" onClick={() => { setEditingSubject(null); setSubjectErr(''); }}>Cancel</Button>
-              <Button className="flex-1 h-8 text-xs" onClick={saveSubject}>Save</Button>
+              <Button className="flex-1 h-8 text-xs" onClick={saveSubject}>{upsertSubject.isPending ? 'Saving…' : 'Save'}</Button>
             </div>
           </div>
         )}
@@ -274,14 +358,13 @@ export function AdminOverviewPage() {
             <select value={editingTeacher.className} onChange={(e) => setEditingTeacher({ ...editingTeacher, className: e.target.value })}
               className="w-full h-9 rounded-lg border border-line px-3 text-xs mt-0.5 mb-2 outline-none focus:border-accent">
               <option value="">— select class —</option>
-              {CLASSES.map((c) => <option key={c} value={c}>{c}</option>)}
-              {classes.filter((c) => !CLASSES.includes(c.name)).map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
+              {classes.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
             </select>
 
             {teacherErr && <div className="text-status-overdue text-xs mb-2">{teacherErr}</div>}
             <div className="flex gap-2">
               <Button variant="ghost" className="flex-1 h-8 text-xs" onClick={() => { setEditingTeacher(null); setTeacherErr(''); }}>Cancel</Button>
-              <Button className="flex-1 h-8 text-xs" onClick={saveTeacher}>Save</Button>
+              <Button className="flex-1 h-8 text-xs" onClick={saveTeacher}>{upsertTeacher.isPending ? 'Saving…' : 'Save'}</Button>
             </div>
           </div>
         )}

@@ -23,6 +23,32 @@ export class OversightController {
     return this.svc.getTerms();
   }
 
+  @Post('admin/classes')
+  @Roles('admin')
+  createClass(@Body() body: { name: string }) {
+    if (!body.name?.trim()) throw AppError.validation('name is required');
+    return this.svc.createClassroom(body.name);
+  }
+
+  @Delete('admin/classes/:id')
+  @Roles('admin')
+  deleteClass(@Param('id') id: string) {
+    return this.svc.deleteClassroom(id);
+  }
+
+  @Post('admin/terms')
+  @Roles('admin')
+  createTerm(@Body() body: { name: string }) {
+    if (!body.name?.trim()) throw AppError.validation('name is required');
+    return this.svc.createTerm(body.name);
+  }
+
+  @Delete('admin/terms/:id')
+  @Roles('admin')
+  deleteTerm(@Param('id') id: string) {
+    return this.svc.deleteTerm(id);
+  }
+
   /** Teacher: progress matrix for the teacher's class(es). */
   @Get('teacher')
   @Roles('teacher', 'admin')

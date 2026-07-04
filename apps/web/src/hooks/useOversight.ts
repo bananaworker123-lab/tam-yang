@@ -14,11 +14,43 @@ export function useClasses() {
   });
 }
 
+export function useCreateClass() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (name: string) => api.post('/oversight/admin/classes', { name }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['oversight', 'classes'] }),
+  });
+}
+
+export function useDeleteClass() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.delete(`/oversight/admin/classes/${id}`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['oversight', 'classes'] }),
+  });
+}
+
 export function useTerms() {
   return useQuery<TermRow[]>({
     queryKey: ['oversight', 'terms'],
     queryFn: () => api.get('/oversight/terms'),
     staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useCreateTerm() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (name: string) => api.post('/oversight/admin/terms', { name }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['oversight', 'terms'] }),
+  });
+}
+
+export function useDeleteTerm() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.delete(`/oversight/admin/terms/${id}`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['oversight', 'terms'] }),
   });
 }
 

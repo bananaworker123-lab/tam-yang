@@ -252,6 +252,34 @@ export class OversightService {
     return { ok: true };
   }
 
+  // ---------- Class & Term management ----------
+
+  async createClassroom(name: string) {
+    const existing = await this.prisma.classRoom.findFirst({ where: { name: name.trim() } });
+    if (existing) throw AppError.conflict('Class already exists');
+    return this.prisma.classRoom.create({ data: { name: name.trim() } });
+  }
+
+  async deleteClassroom(id: string) {
+    const inUse = await this.prisma.masterAssignment.count({ where: { classId: id } });
+    if (inUse > 0) throw AppError.conflict('Class has assignments — remove them first');
+    await this.prisma.classRoom.delete({ where: { id } });
+    return { ok: true };
+  }
+
+  async createTerm(name: string) {
+    const existing = await this.prisma.term.findFirst({ where: { name: name.trim() } });
+    if (existing) throw AppError.conflict('Term already exists');
+    return this.prisma.term.create({ data: { name: name.trim() } });
+  }
+
+  async deleteTerm(id: string) {
+    const inUse = await this.prisma.masterAssignment.count({ where: { termId: id } });
+    if (inUse > 0) throw AppError.conflict('Term has assignments — remove them first');
+    await this.prisma.term.delete({ where: { id } });
+    return { ok: true };
+  }
+
   // ---------- Subject catalog ----------
 
   private readonly DEFAULT_SUBJECTS = [

@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './index.css';
-import { StoreProvider } from './mock/store';
 import { LocaleProvider } from './i18n';
 import { AuthProvider } from './context/AuthContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -55,7 +54,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <QueryClientProvider client={queryClient}>
         <LocaleProvider>
           <AuthProvider>
-            <StoreProvider>
               <BrowserRouter>
                 <Suspense fallback={<PageSpinner />}>
                   <Routes>
@@ -83,7 +81,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                   </Routes>
                 </Suspense>
               </BrowserRouter>
-            </StoreProvider>
           </AuthProvider>
         </LocaleProvider>
       </QueryClientProvider>
