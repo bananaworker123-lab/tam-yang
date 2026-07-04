@@ -18,7 +18,7 @@ export class UserService {
   async upsertFromGoogle(p: GoogleProfileInput): Promise<string> {
     const user = await this.prisma.user.upsert({
       where: { googleSub: p.googleSub },
-      update: { email: p.email, name: p.name, pictureUrl: p.pictureUrl ?? null },
+      update: { email: p.email, pictureUrl: p.pictureUrl ?? null },
       create: {
         googleSub: p.googleSub,
         email: p.email,
