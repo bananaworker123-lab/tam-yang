@@ -19,8 +19,8 @@ export function AdminAssignmentsPage() {
   const updateAssignment = useUpdateAssignment();
   const deleteAssignment = useDeleteAssignment();
 
-  const allClassNames = [...new Set(assignments.map((a) => a.className))].sort();
-  const allTermNames  = [...new Set(assignments.map((a) => a.term))].sort();
+  const allClassNames = [...new Set(assignments.map((a) => a.className))].filter(Boolean).sort();
+  const allTermNames  = [...new Set(assignments.map((a) => a.term))].filter(Boolean).sort();
   const filtered = assignments.filter((a) => {
     if (filterClass && a.className !== filterClass) return false;
     if (filterTerm  && a.term      !== filterTerm)  return false;
