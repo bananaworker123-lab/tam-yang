@@ -19,7 +19,6 @@ const DashboardPage        = lazy(() => import('./routes/Dashboard').then(m => (
 const AssignmentDetailPage = lazy(() => import('./routes/AssignmentDetail').then(m => ({ default: m.AssignmentDetailPage })));
 const ReportIssuePage      = lazy(() => import('./routes/ReportIssue').then(m => ({ default: m.ReportIssuePage })));
 const RequestsPage         = lazy(() => import('./routes/Requests').then(m => ({ default: m.RequestsPage })));
-const FamilyPage           = lazy(() => import('./routes/Family').then(m => ({ default: m.FamilyPage })));
 const ProfilePage          = lazy(() => import('./routes/Profile').then(m => ({ default: m.ProfilePage })));
 const TeacherPage          = lazy(() => import('./routes/Teacher').then(m => ({ default: m.TeacherPage })));
 const AdminOverviewPage    = lazy(() => import('./routes/admin/Overview').then(m => ({ default: m.AdminOverviewPage })));
@@ -66,7 +65,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                       <Route path="/assignment/:id" element={<AssignmentDetailPage />} />
                       <Route path="/report" element={<ReportIssuePage />} />
                       <Route path="/requests" element={<RequestsPage />} />
-                      <Route path="/family" element={<FamilyPage />} />
+                      <Route path="/family" element={<Navigate to="/profile" replace />} />
                       <Route path="/profile" element={<ProfilePage />} />
                       <Route path="/teacher" element={<TeacherPage />} />
                       <Route path="/admin" element={<AdminOverviewPage />} />
