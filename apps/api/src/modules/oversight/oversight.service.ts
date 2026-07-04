@@ -165,15 +165,15 @@ export class OversightService {
 
     if (assignments.length === 0) return { assignments: [], rows: [] };
 
-    const progress = await this.prisma.progress.findMany({
-      where: { assignmentId: { in: assignments.map((a) => a.id) } },
-    });
-
-    const childIds = [...new Set(progress.map((p) => p.childUserId))];
-    const memberships = await this.prisma.membership.findMany({
-      where: { userId: { in: childIds }, role: 'child' },
-      include: { family: true, user: true },
-    });
+    const [progress, memberships] = await Promise.all([
+      this.prisma.progress.findMany({
+        where: { assignmentId: { in: assignments.map((a) => a.id) } },
+      }),
+      this.prisma.membership.findMany({
+        where: { role: 'child' },
+        include: { family: true, user: true },
+      }),
+    ]);
 
     const rows = memberships.map((m) => ({
       childId: m.userId,
