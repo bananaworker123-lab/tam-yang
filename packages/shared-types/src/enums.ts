@@ -17,6 +17,7 @@ export type FamilyRole = (typeof FamilyRole)[keyof typeof FamilyRole];
 
 export const ProgressStatus = {
   NotStarted: 'not_started',
+  WorkingOn: 'working_on',
   Done: 'done',
   Submitted: 'submitted',
 } as const;

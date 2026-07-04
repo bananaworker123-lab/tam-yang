@@ -43,6 +43,7 @@ const DICT: Dict = {
 
   // status
   'status.not_started': { en: 'Not started', th: 'ยังไม่ทำ' },
+  'status.working_on': { en: 'Working on', th: 'กำลังทำ' },
   'status.done': { en: 'Done', th: 'ทำแล้ว' },
   'status.submitted': { en: 'Submitted', th: 'ส่งแล้ว' },
 
@@ -94,6 +95,8 @@ const DICT: Dict = {
   'dash.filter.todo': { en: 'To do', th: 'ต้องทำ' },
   'dash.todo': { en: 'to do', th: 'ต้องทำ' },
   'dash.notStarted': { en: 'not started', th: 'ยังไม่เริ่ม' },
+  'dash.workingOn': { en: 'working on', th: 'กำลังทำ' },
+  'dash.submittedCount': { en: 'submitted', th: 'ส่งแล้ว' },
   'dash.overdueCount': { en: 'overdue', th: 'เลยกำหนด' },
   'dash.nothingHere': { en: 'Nothing here 🎉', th: 'ไม่มีงานแล้ว 🎉' },
   'dash.noAssignments': { en: 'No assignments for', th: 'ไม่มีงานสำหรับ' },

@@ -34,7 +34,8 @@ export function DashboardPage() {
 
   async function handleCycleStatus(row: { progressId: string | null; assignmentId: string; status: ProgressStatus }) {
     const next: Record<ProgressStatus, ProgressStatus> = {
-      not_started: ProgressStatus.Done,
+      not_started: ProgressStatus.WorkingOn,
+      working_on: ProgressStatus.Done,
       done: ProgressStatus.Submitted,
       submitted: ProgressStatus.NotStarted,
     };
@@ -55,6 +56,7 @@ export function DashboardPage() {
   const submitted  = rows.filter((r) => r.p.status === ProgressStatus.Submitted).length;
   const doneOrSub  = rows.filter((r) => r.p.status !== ProgressStatus.NotStarted).length;
   const notStarted = rows.filter((r) => r.p.status === ProgressStatus.NotStarted).length;
+  const workingOn  = rows.filter((r) => r.p.status === ProgressStatus.WorkingOn).length;
   const todo       = rows.filter((r) => r.p.status !== ProgressStatus.Submitted).length;
   const overdue    = rows.filter((r) => r.due === 'overdue' && r.p.status !== ProgressStatus.Submitted).length;
   const pct = total ? Math.round((submitted / total) * 100) : 0;
@@ -105,11 +107,17 @@ export function DashboardPage() {
             <span className="inline-flex items-center gap-1.5 bg-white/20 rounded-lg px-2.5 py-1 text-[11.5px] font-semibold">
               <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#C0BFCF' }} />{notStarted} {t('dash.notStarted')}
             </span>
+            <span className="inline-flex items-center gap-1.5 bg-white/20 rounded-lg px-2.5 py-1 text-[11.5px] font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#7EC8E3' }} />{workingOn} {t('dash.workingOn')}
+            </span>
             {overdue > 0 && (
               <span className="inline-flex items-center gap-1.5 bg-white/20 rounded-lg px-2.5 py-1 text-[11.5px] font-semibold">
                 <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#FF9A8B' }} />{overdue} {t('dash.overdueCount')}
               </span>
             )}
+            <span className="inline-flex items-center gap-1.5 bg-white/20 rounded-lg px-2.5 py-1 text-[11.5px] font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#6EE7B7' }} />{submitted} {t('dash.submittedCount')}
+            </span>
           </div>
         </div>
       </div>
@@ -145,6 +153,7 @@ export function DashboardPage() {
             const dueChipLabel = due === 'overdue' ? t('due.overdue') : due === 'due_today' ? t('due.today') : due === 'near' ? t('due.near') : '';
             const STATUS_PILL: Record<ProgressStatus, { cls: string; dot: string }> = {
               not_started: { cls: 'bg-status-notstarted/30 text-ink', dot: 'bg-status-notstarted' },
+              working_on:  { cls: 'bg-[#7EC8E3]/20 text-[#1A6B8A]', dot: 'bg-[#7EC8E3]' },
               done:        { cls: 'bg-status-done/20 text-[#8A5D0E]', dot: 'bg-status-done' },
               submitted:   { cls: 'bg-status-submitted/15 text-[#1F7D52]', dot: 'bg-status-submitted' },
             };

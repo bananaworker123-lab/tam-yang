@@ -26,6 +26,7 @@ enum InviteStatus {
 
 enum ProgressStatus {
   not_started
+  working_on
   done
   submitted
 

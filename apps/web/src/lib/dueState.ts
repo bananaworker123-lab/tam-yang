@@ -30,13 +30,15 @@ export function computeDueState(
 
 export const STATUS_LABEL: Record<ProgressStatus, string> = {
   not_started: 'Not started',
+  working_on: 'Working on',
   done: 'Done',
   submitted: 'Submitted',
 };
 
-/** Cycle Not started → Done → Submitted → Not started. */
+/** Cycle Not started → Working on → Done → Submitted → Not started. */
 export function nextStatus(s: ProgressStatus): ProgressStatus {
-  if (s === ProgressStatus.NotStarted) return ProgressStatus.Done;
+  if (s === ProgressStatus.NotStarted) return ProgressStatus.WorkingOn;
+  if (s === ProgressStatus.WorkingOn) return ProgressStatus.Done;
   if (s === ProgressStatus.Done) return ProgressStatus.Submitted;
   return ProgressStatus.NotStarted;
 }
