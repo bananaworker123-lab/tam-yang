@@ -61,7 +61,7 @@ export function DashboardPage() {
   const overdue    = rows.filter((r) => r.due === 'overdue' && r.p.status !== ProgressStatus.Submitted).length;
   const pct = total ? Math.round((submitted / total) * 100) : 0;
 
-  const R = 29;
+  const R = 34;
   const CIRC = 2 * Math.PI * R;
   const ringDash = `${(pct / 100) * CIRC} ${CIRC}`;
 
@@ -83,36 +83,46 @@ export function DashboardPage() {
 
   return (
     <div>
-      {/* progress ring */}
-      <div className="rounded-[22px] p-5 text-white flex items-center gap-5" style={{ background: 'linear-gradient(140deg,#5B53E0 0%,#7A5AF0 100%)', boxShadow: '0 18px 34px -16px rgba(91,83,224,.7)' }}>
-        <div className="relative w-[70px] h-[70px] flex-none">
-          <svg width="70" height="70" viewBox="0 0 70 70">
-            <circle cx="35" cy="35" r={R} fill="none" stroke="rgba(255,255,255,.25)" strokeWidth="8" />
-            <circle cx="35" cy="35" r={R} fill="none" stroke="#fff" strokeWidth="8" strokeLinecap="round" strokeDasharray={ringDash} transform="rotate(-90 35 35)" />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="font-display font-extrabold text-xl leading-none">{pct}</span>
-            <span className="text-[9px] opacity-85 -mt-0.5">%</span>
-          </div>
+      {/* progress header */}
+      <div className="rounded-[22px] p-5 text-white" style={{ background: 'linear-gradient(140deg,#5B53E0 0%,#7A5AF0 100%)', boxShadow: '0 18px 34px -16px rgba(91,83,224,.7)' }}>
+        <div className="text-sm opacity-90 font-semibold mb-3 text-center">
+          {isChild ? t('dash.myHomeworkLabel') : `${t('dash.homeworkOf2')} ${activeClassName} ${activeTermName}`}
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="text-sm opacity-90 font-semibold">
-            {isChild ? t('dash.myHomeworkLabel') : `${t('dash.homeworkOf2')} ${activeClassName} ${activeTermName}`}
+        <div className="flex items-center gap-4">
+          {/* Ring */}
+          <div className="flex flex-col items-center flex-none">
+            <div className="relative w-[86px] h-[86px]">
+              <svg width="86" height="86" viewBox="0 0 86 86">
+                <circle cx="43" cy="43" r={R} fill="none" stroke="rgba(255,255,255,.2)" strokeWidth="9" />
+                <circle cx="43" cy="43" r={R} fill="none" stroke="#fff" strokeWidth="9" strokeLinecap="round" strokeDasharray={ringDash} transform="rotate(-90 43 43)" />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="font-display font-extrabold text-2xl leading-none">{pct}%</span>
+              </div>
+            </div>
+            <div className="text-[9px] font-bold uppercase tracking-widest opacity-70 mt-1">Overall Status</div>
+            <div className="font-display font-bold text-base leading-tight">{t('dash.submittedOf2')} {submitted}/{total}</div>
           </div>
-          <div className="font-display font-bold text-lg mt-0.5">{t('dash.submittedOf2')} {submitted}/{total}</div>
-          <div className="flex gap-2 mt-2.5 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 bg-white/20 rounded-lg px-2.5 py-1 text-[11.5px] font-semibold">
-              <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#FFC56B' }} />{todo} {t('dash.todo')}
-            </span>
-            <span className="inline-flex items-center gap-1.5 bg-white/20 rounded-lg px-2.5 py-1 text-[11.5px] font-semibold">
-              <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#C0BFCF' }} />{notStarted} {t('dash.notStarted')}
-            </span>
-            <span className="inline-flex items-center gap-1.5 bg-white/20 rounded-lg px-2.5 py-1 text-[11.5px] font-semibold">
-              <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#7EC8E3' }} />{workingOn} {t('dash.workingOn')}
-            </span>
-            <span className="inline-flex items-center gap-1.5 bg-white/20 rounded-lg px-2.5 py-1 text-[11.5px] font-semibold">
-              <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#FF9A8B' }} />{overdue} {t('dash.overdueCount')}
-            </span>
+
+          {/* 2×2 stat grid */}
+          <div className="flex-1 grid grid-cols-2 gap-2">
+            {[
+              { label: t('dash.todo'),       count: todo,       color: '#F97316', bar: '#F97316' },
+              { label: t('dash.notStarted'), count: notStarted, color: '#9CA3AF', bar: '#9CA3AF' },
+              { label: t('dash.workingOn'),  count: workingOn,  color: '#38BDF8', bar: '#38BDF8' },
+              { label: t('dash.overdueCount'), count: overdue,  color: '#F87171', bar: '#F87171' },
+            ].map(({ label, count, color, bar }) => (
+              <div key={label} className="bg-white/15 rounded-xl px-3 py-2.5">
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill={color}><rect x="1" y="12" width="4" height="11" rx="1"/><rect x="9" y="7" width="4" height="16" rx="1"/><rect x="17" y="2" width="4" height="21" rx="1"/></svg>
+                  <span className="text-[11px] font-semibold opacity-90">{label}: <span className="font-extrabold">{count}</span></span>
+                </div>
+                <div className="h-1 rounded-full bg-white/20 overflow-hidden">
+                  <div className="h-full rounded-full transition-all duration-500"
+                    style={{ width: total ? `${Math.round((count / total) * 100)}%` : '0%', background: bar }} />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
