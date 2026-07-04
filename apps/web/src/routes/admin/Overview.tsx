@@ -153,19 +153,6 @@ export function AdminOverviewPage() {
             </div>
           ))}
         </div>
-        <div className="grid grid-cols-3 divide-x divide-white/15 border-t border-white/15">
-          {stats.slice(3).map((s) => (
-            <div key={s.label} className="flex flex-col items-center py-4 px-2">
-              <span className="text-xl mb-1">{s.icon}</span>
-              {s.value === undefined ? (
-                <div className="w-8 h-7 rounded-lg bg-white/20 animate-pulse mb-1" />
-              ) : (
-                <span className="font-display font-extrabold text-3xl leading-none" style={{ color: s.color ? '#FCA5A5' : '#fff' }}>{s.value}</span>
-              )}
-              <span className="text-[10px] font-semibold opacity-70 mt-1.5 text-center">{s.label}</span>
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* Active class & term inline */}
