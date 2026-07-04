@@ -125,15 +125,28 @@ export function AdminOverviewPage() {
           )}
         </div>
 
-        {editingClassTerm ? (
+        {/* Single-line display: "M.3 · Term 1" */}
+        <div className="flex items-center gap-2 mb-3">
+          {activeClassName && activeTermName ? (
+            <div className="flex-1 flex items-center gap-2">
+              <span className="inline-flex items-center h-8 px-3 rounded-full bg-accent text-white text-sm font-bold">{activeClassName}</span>
+              <span className="text-muted text-sm">·</span>
+              <span className="inline-flex items-center h-8 px-3 rounded-full bg-accent/15 text-accent-ink text-sm font-bold">{activeTermName}</span>
+            </div>
+          ) : (
+            <div className="flex-1 text-sm text-status-overdue font-semibold">⚠ ยังไม่ได้เลือก Class / Term</div>
+          )}
+        </div>
+
+        {editingClassTerm && (
           <>
             {classes.length > 0 && (
               <>
-                <div className="text-xs text-muted mb-1">Class</div>
-                <div className="grid grid-cols-3 gap-1.5 mb-3">
+                <div className="text-xs text-muted mb-1.5">เลือก Class</div>
+                <div className="flex flex-wrap gap-1.5 mb-3">
                   {classes.map((c) => (
                     <button key={c.id} onClick={() => setActiveClassId(c.id)}
-                      className={`h-10 rounded-xl text-xs font-bold transition ${c.id === activeClassId ? 'bg-accent text-white' : 'bg-bg text-muted border border-line hover:text-ink'}`}>
+                      className={`h-9 px-4 rounded-full text-sm font-bold transition ${c.id === activeClassId ? 'bg-accent text-white' : 'bg-bg text-ink border border-line hover:border-accent'}`}>
                       {c.name}
                     </button>
                   ))}
@@ -142,31 +155,20 @@ export function AdminOverviewPage() {
             )}
             {terms.length > 0 && (
               <>
-                <div className="text-xs text-muted mb-1">Term</div>
-                <div className="grid grid-cols-2 gap-1.5 mb-3">
+                <div className="text-xs text-muted mb-1.5">เลือก Term</div>
+                <div className="flex flex-wrap gap-1.5 mb-3">
                   {terms.map((t) => (
                     <button key={t.id} onClick={() => setActiveTermId(t.id)}
-                      className={`h-10 rounded-xl text-xs font-bold transition ${t.id === activeTermId ? 'bg-accent text-white' : 'bg-bg text-muted border border-line hover:text-ink'}`}>
+                      className={`h-9 px-4 rounded-full text-sm font-bold transition ${t.id === activeTermId ? 'bg-accent/15 text-accent-ink border border-accent' : 'bg-bg text-ink border border-line hover:border-accent'}`}>
                       {t.name}
                     </button>
                   ))}
                 </div>
               </>
             )}
-            {classes.length === 0 && <div className="text-faint text-xs mb-3">No classes yet — add assignments first</div>}
+            {classes.length === 0 && <div className="text-faint text-xs mb-3">ยังไม่มี Class — เพิ่ม Assignment ก่อน</div>}
             <Button className="w-full h-9 text-sm" onClick={() => setEditingClassTerm(false)}>Done</Button>
           </>
-        ) : (
-          <div className="flex items-center gap-3">
-            <div className="flex-1 bg-accent-soft rounded-xl px-4 py-3">
-              <div className="text-[10px] text-accent-ink font-bold uppercase tracking-wide mb-0.5">Class</div>
-              <div className="font-bold text-accent-ink text-sm">{activeClassName || '—'}</div>
-            </div>
-            <div className="flex-1 bg-accent-soft rounded-xl px-4 py-3">
-              <div className="text-[10px] text-accent-ink font-bold uppercase tracking-wide mb-0.5">Term</div>
-              <div className="font-bold text-accent-ink text-sm">{activeTermName || '—'}</div>
-            </div>
-          </div>
         )}
       </Card>
 
