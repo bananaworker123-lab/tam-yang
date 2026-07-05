@@ -339,7 +339,7 @@ export function AdminOverviewPage() {
                   <div className="flex -space-x-1.5 flex-none">
                     {f.members.slice(0, 3).map((m) => (
                       <span key={m.userId} className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-accent-soft text-accent-ink text-[10px] font-bold border-2 border-white">
-                        {m.name.slice(0, 2).toUpperCase()}
+                        {m.shortName?.toUpperCase() || m.name.slice(0, 2).toUpperCase()}
                       </span>
                     ))}
                   </div>
