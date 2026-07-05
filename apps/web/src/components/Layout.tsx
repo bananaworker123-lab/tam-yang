@@ -63,8 +63,12 @@ export function Layout() {
     }
 
     if (!user.roles.includes('admin')) return;
-    qc.prefetchQuery({ queryKey: ['oversight', 'admin', 'overview'], queryFn: () => api.get('/oversight/admin/overview'), staleTime: 1000 * 60 * 2 });
-    qc.prefetchQuery({ queryKey: ['oversight', 'admin', 'families'], queryFn: () => api.get('/oversight/admin/families'), staleTime: 1000 * 60 * 2 });
+    // delay admin prefetches so progress loads first without competing for function slots
+    const t = setTimeout(() => {
+      qc.prefetchQuery({ queryKey: ['oversight', 'admin', 'overview'], queryFn: () => api.get('/oversight/admin/overview'), staleTime: 1000 * 60 * 2 });
+      qc.prefetchQuery({ queryKey: ['oversight', 'admin', 'families'], queryFn: () => api.get('/oversight/admin/families'), staleTime: 1000 * 60 * 2 });
+    }, 3000);
+    return () => clearTimeout(t);
   }, [user?.userId]);
 
   // Determine non-admin base role
