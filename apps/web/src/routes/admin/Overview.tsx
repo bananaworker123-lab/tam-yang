@@ -407,12 +407,11 @@ export function AdminOverviewPage() {
               className="w-full h-9 rounded-lg border border-line px-3 text-xs mt-0.5 mb-2 outline-none focus:border-accent" />
 
             <label className="text-[11px] text-muted">Subject</label>
-            <input value={editingTeacher.subject} onChange={(e) => setEditingTeacher({ ...editingTeacher, subject: e.target.value })}
-              placeholder="e.g. Mathematics" list="subject-options"
-              className="w-full h-9 rounded-lg border border-line px-3 text-xs mt-0.5 mb-2 outline-none focus:border-accent" />
-            <datalist id="subject-options">
-              {subjects.map((s) => <option key={s.id} value={s.name} />)}
-            </datalist>
+            <select value={editingTeacher.subject} onChange={(e) => setEditingTeacher({ ...editingTeacher, subject: e.target.value })}
+              className="w-full h-9 rounded-lg border border-line px-3 text-xs mt-0.5 mb-2 outline-none focus:border-accent">
+              <option value="">— select subject —</option>
+              {subjects.map((s) => <option key={s.id} value={s.name}>{s.name}</option>)}
+            </select>
 
             <label className="text-[11px] text-muted">Class</label>
             <select value={editingTeacher.className} onChange={(e) => setEditingTeacher({ ...editingTeacher, className: e.target.value })}
