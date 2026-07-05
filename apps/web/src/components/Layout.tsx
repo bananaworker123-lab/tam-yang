@@ -64,11 +64,18 @@ export function Layout() {
 
     if (!user.roles.includes('admin')) return;
     // delay admin prefetches so progress loads first without competing for function slots
-    const t = setTimeout(() => {
-      qc.prefetchQuery({ queryKey: ['oversight', 'admin', 'overview'], queryFn: () => api.get('/oversight/admin/overview'), staleTime: 1000 * 60 * 2 });
-      qc.prefetchQuery({ queryKey: ['oversight', 'admin', 'families'], queryFn: () => api.get('/oversight/admin/families'), staleTime: 1000 * 60 * 2 });
+    const t1 = setTimeout(() => {
+      qc.prefetchQuery({ queryKey: ['oversight', 'admin', 'overview'],      queryFn: () => api.get('/oversight/admin/overview'),      staleTime: 1000 * 60 * 10 });
+      qc.prefetchQuery({ queryKey: ['oversight', 'admin', 'families'],      queryFn: () => api.get('/oversight/admin/families'),      staleTime: 1000 * 60 * 10 });
     }, 3000);
-    return () => clearTimeout(t);
+    // prefetch Overview page data after overview/families — so navigating there hits cache
+    const t2 = setTimeout(() => {
+      qc.prefetchQuery({ queryKey: ['oversight', 'admin', 'subjects'],      queryFn: () => api.get('/oversight/admin/subjects'),      staleTime: 1000 * 60 * 10 });
+      qc.prefetchQuery({ queryKey: ['oversight', 'admin', 'teacher-catalog'], queryFn: () => api.get('/oversight/admin/teacher-catalog'), staleTime: 1000 * 60 * 10 });
+      qc.prefetchQuery({ queryKey: ['oversight', 'classes'],                queryFn: () => api.get('/oversight/classes'),              staleTime: 1000 * 60 * 10 });
+      qc.prefetchQuery({ queryKey: ['oversight', 'terms'],                  queryFn: () => api.get('/oversight/terms'),                staleTime: 1000 * 60 * 10 });
+    }, 6000);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [user?.userId]);
 
   // Determine non-admin base role

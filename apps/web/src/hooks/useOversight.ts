@@ -250,7 +250,8 @@ export function useAdminOverview() {
   return useQuery<AdminOverviewData>({
     queryKey: ['oversight', 'admin', 'overview'],
     queryFn: () => api.get('/oversight/admin/overview'),
-    staleTime: 1000 * 60 * 2,
+    staleTime: 1000 * 60 * 10,
+    gcTime:    1000 * 60 * 30,
   });
 }
 
@@ -258,7 +259,8 @@ export function useAdminFamilies() {
   return useQuery<AdminFamily[]>({
     queryKey: ['oversight', 'admin', 'families'],
     queryFn: () => api.get('/oversight/admin/families'),
-    staleTime: 1000 * 60 * 2,
+    staleTime: 1000 * 60 * 10,
+    gcTime:    1000 * 60 * 30,
   });
 }
 
