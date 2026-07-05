@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ProgressStatus } from '@homework-tracker/shared-types';
-import { useActiveClassTerm } from '../hooks/useOversight';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../hooks/useProgress';
 import { computeDueState, STATUS_LABEL } from '../lib/dueState';
@@ -13,7 +12,6 @@ type Filter = 'todo' | 'near' | 'overdue' | 'submitted';
 
 export function DashboardPage() {
   const { user } = useAuth();
-  const { activeClassName, activeTermName, isLoading: classTermLoading } = useActiveClassTerm();
   const navigate = useNavigate();
   const { t } = useT();
 
@@ -25,6 +23,10 @@ export function DashboardPage() {
   const [filter, setFilter] = useState<Filter>('todo');
 
   const { data: progressRows = [], isLoading } = useProgress(activeChildId);
+
+  // derive class/term from progress data — avoids 3 extra API calls
+  const activeClassName = progressRows[0]?.className ?? '';
+  const activeTermName  = progressRows[0]?.term ?? '';
 
   const rows = useMemo(() =>
     progressRows.map((p) => ({ p, due: computeDueState(p.dueDate, p.status) })),
