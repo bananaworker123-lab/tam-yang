@@ -110,6 +110,7 @@ const DICT: Dict = {
   'dash.myHomeworkLabel': { en: 'My homework', th: 'การบ้านของฉัน' },
   'dash.homeworkOf2': { en: 'Homework ·', th: 'การบ้าน ·' },
   'dash.submittedOf2': { en: 'Submitted', th: 'ส่งแล้ว' },
+  'dash.done': { en: 'done', th: 'เสร็จแล้ว' },
 
   // profile extras
   'profile.joined': { en: 'Joined', th: 'เข้าร่วมแล้ว' },

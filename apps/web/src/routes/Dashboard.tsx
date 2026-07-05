@@ -50,7 +50,7 @@ export function DashboardPage() {
 
   const total      = rows.length;
   const submitted  = rows.filter((r) => r.p.status === ProgressStatus.Submitted).length;
-  const doneOrSub  = rows.filter((r) => r.p.status !== ProgressStatus.NotStarted).length;
+  const done       = rows.filter((r) => r.p.status === ProgressStatus.Done).length;
   const notStarted = rows.filter((r) => r.p.status === ProgressStatus.NotStarted).length;
   const workingOn  = rows.filter((r) => r.p.status === ProgressStatus.WorkingOn).length;
   const todo       = rows.filter((r) => r.p.status !== ProgressStatus.Submitted).length;
@@ -97,7 +97,11 @@ export function DashboardPage() {
               {isChild ? t('dash.myHomeworkLabel') : `${activeClassName} · ${activeTermName}`}
             </div>
             <div className="font-display font-extrabold text-2xl mt-0.5">{submitted}<span className="text-base font-semibold opacity-70">/{total}</span></div>
-            <div className="text-xs opacity-75 font-semibold">{t('dash.submittedOf2')}</div>
+            <div className="flex items-center gap-2 mt-0.5">
+              <div className="text-xs opacity-75 font-semibold">{t('dash.submittedOf2')}</div>
+              <div className="w-px h-3 bg-white/30" />
+              <div className="text-xs font-semibold opacity-90">{done} <span className="opacity-70">{t('dash.done')}</span></div>
+            </div>
           </div>
         </div>
 
