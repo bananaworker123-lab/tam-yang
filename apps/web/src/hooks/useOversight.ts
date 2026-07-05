@@ -235,7 +235,7 @@ export function useTeacherOverview(className?: string, termName?: string) {
 
 // ---------- Admin ----------
 
-export interface AdminFamilyMember { userId: string; name: string; email: string; role: string; pictureUrl: string | null; }
+export interface AdminFamilyMember { userId: string; name: string; email: string; role: string; pictureUrl: string | null; shortName: string | null; }
 export interface AdminFamily { id: string; name: string; members: AdminFamilyMember[]; }
 
 export interface AdminOverviewData {
