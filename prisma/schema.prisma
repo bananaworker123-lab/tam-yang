@@ -5,9 +5,10 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  schemas  = ["identity", "family", "assignment", "progress", "requests_audit"]
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+  schemas   = ["identity", "family", "assignment", "progress", "requests_audit"]
 }
 
 enum FamilyRole {
