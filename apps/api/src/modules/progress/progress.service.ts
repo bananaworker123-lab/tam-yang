@@ -19,28 +19,30 @@ export class ProgressService {
   }
 
   async listForChild(childUserId: string, familyId: string, className?: string, termName?: string, assignmentId?: string) {
-    // assignments + progress are independent — run in parallel
-    const [assignments, progressRows] = await Promise.all([
-      this.prisma.masterAssignment.findMany({
-        where: {
-          active: true,
-          ...(assignmentId ? { id: assignmentId } : {}),
-          // filter by active flag directly on the relation — avoids a separate resolveActiveFilter round-trip
-          ...(className ? { classRoom: { name: className } } : { classRoom: { active: true } }),
-          ...(termName  ? { term:      { name: termName  } } : { term:      { active: true  } }),
-        },
-        include: { classRoom: true, term: true },
-        orderBy: { dueDate: 'asc' },
-      }),
+    // Round 1: everything that doesn't depend on each other runs in parallel
+    const [activeClass, activeTerm, progressRows, allSubjects] = await Promise.all([
+      className ? null : this.prisma.classRoom.findFirst({ where: { active: true } }),
+      termName  ? null : this.prisma.term.findFirst({ where: { active: true } }),
       this.prisma.progress.findMany({ where: { childUserId, familyId } }),
+      this.prisma.subject.findMany({ select: { name: true, short: true } }),
     ]);
 
-    const subjectNames = [...new Set(assignments.map((a) => a.subject))];
-    const subjectRows = await this.prisma.subject.findMany({
-      where: { name: { in: subjectNames } },
-      select: { name: true, short: true },
+    const resolvedClass = className ?? activeClass?.name;
+    const resolvedTerm  = termName  ?? activeTerm?.name;
+
+    // Round 2: assignments (needs resolved class/term from round 1)
+    const assignments = await this.prisma.masterAssignment.findMany({
+      where: {
+        active: true,
+        ...(assignmentId  ? { id: assignmentId } : {}),
+        ...(resolvedClass ? { classRoom: { name: resolvedClass } } : {}),
+        ...(resolvedTerm  ? { term:      { name: resolvedTerm  } } : {}),
+      },
+      include: { classRoom: true, term: true },
+      orderBy: { dueDate: 'asc' },
     });
-    const shortMap = new Map(subjectRows.map((s) => [s.name, s.short]));
+
+    const shortMap = new Map(allSubjects.map((s) => [s.name, s.short]));
 
     return assignments.map((a) => {
       const p = progressRows.find((x) => x.assignmentId === a.id);
