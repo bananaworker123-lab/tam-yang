@@ -81,46 +81,49 @@ export function DashboardPage() {
     <div>
       {/* progress header */}
       <div className="rounded-[22px] text-white overflow-hidden" style={{ background: 'linear-gradient(140deg,#5B53E0 0%,#7A5AF0 100%)', boxShadow: '0 18px 34px -16px rgba(91,83,224,.7)' }}>
-        {/* Top row: ring + title */}
+        {/* Top row: ring + class/term + total only — no repeated submitted/done counts */}
         <div className="flex items-center gap-4 px-5 pt-5 pb-4">
           <div className="relative w-[80px] h-[80px] flex-none">
             <svg width="80" height="80" viewBox="0 0 80 80">
               <circle cx="40" cy="40" r={R} fill="none" stroke="rgba(255,255,255,.2)" strokeWidth="9" />
               <circle cx="40" cy="40" r={R} fill="none" stroke="#fff" strokeWidth="9" strokeLinecap="round" strokeDasharray={ringDash} transform="rotate(-90 40 40)" />
             </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="font-display font-extrabold text-xl leading-none">{pct}%</span>
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
+              <span className="font-display font-extrabold text-lg leading-none">{pct}%</span>
+              <span className="text-[8px] font-bold opacity-60 uppercase tracking-widest leading-none">{t('dash.submitted')}</span>
             </div>
           </div>
           <div>
             <div className="text-xs opacity-75 font-semibold uppercase tracking-widest">
               {isChild ? t('dash.myHomeworkLabel') : `${activeClassName} · ${activeTermName}`}
             </div>
-            <div className="font-display font-extrabold text-2xl mt-0.5">{submitted}<span className="text-base font-semibold opacity-70">/{total}</span></div>
-            <div className="flex items-center gap-2 mt-1">
-              <div className="text-xs opacity-75 font-semibold">{t('dash.submittedOf2')}</div>
-              {done > 0 && (
-                <div className="inline-flex items-center gap-1 bg-white/20 rounded-full px-2 py-0.5">
-                  <span className="text-xs font-extrabold">{done}</span>
-                  <span className="text-[11px] font-semibold opacity-90">{t('dash.done')}</span>
-                </div>
-              )}
+            <div className="font-display font-extrabold text-2xl mt-0.5">
+              {total} <span className="text-base font-semibold opacity-55">{t('dash.assignments')}</span>
             </div>
+            <div className="text-xs opacity-60 font-semibold mt-1">{t('dash.progressOverview')}</div>
           </div>
         </div>
 
-        {/* Stat cards row */}
-        <div className="grid grid-cols-4 border-t border-white/15">
+        {/* 6-stat grid — each number appears exactly once */}
+        <div className="grid grid-cols-3 border-t border-white/15">
           {[
             { label: t('dash.todo'),         count: todo,       accent: '#FB923C' },
-            { label: t('dash.notStarted'),   count: notStarted, accent: '#CBD5E1' },
+            { label: t('dash.notStarted'),   count: notStarted, accent: '#94A3B8' },
             { label: t('dash.workingOn'),    count: workingOn,  accent: '#38BDF8' },
+            { label: t('dash.done'),         count: done,       accent: '#FBBF24' },
+            { label: t('dash.submitted'),    count: submitted,  accent: '#34D399' },
             { label: t('dash.overdueCount'), count: overdue,    accent: '#F87171' },
           ].map(({ label, count, accent }, i) => (
-            <div key={label} className={`flex flex-col items-center py-3 px-1 ${i < 3 ? 'border-r border-white/15' : ''}`}>
-              <span className="font-display font-extrabold text-2xl leading-none">{count}</span>
-              <span className="text-[10px] font-semibold opacity-70 mt-1 text-center leading-tight">{label}</span>
-              <div className="w-8 h-1 rounded-full mt-2" style={{ background: accent }} />
+            <div key={label} className={[
+              'flex items-stretch',
+              i % 3 !== 2 ? 'border-r border-white/15' : '',
+              i < 3      ? 'border-b border-white/15' : '',
+            ].join(' ')}>
+              <div className="w-[3px] flex-none rounded-r-sm my-3" style={{ background: accent }} />
+              <div className="flex flex-col items-center justify-center py-3.5 px-1 flex-1 gap-1">
+                <span className="font-display font-extrabold text-2xl leading-none">{count}</span>
+                <span className="text-[9.5px] font-bold opacity-65 uppercase tracking-[0.05em] text-center leading-tight">{label}</span>
+              </div>
             </div>
           ))}
         </div>
