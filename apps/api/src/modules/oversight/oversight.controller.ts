@@ -148,7 +148,7 @@ export class OversightController {
   createSubject(@Body() body: { name: string; short: string }) {
     if (!body.name?.trim() || !body.short?.trim())
       throw AppError.validation('name and short are required');
-    return this.svc.upsertSubject(undefined, body.name.trim(), body.short.trim().toUpperCase().slice(0, 4));
+    return this.svc.upsertSubject(undefined, body.name.trim(), body.short.trim().toUpperCase().slice(0, 3));
   }
 
   @Put('admin/subjects/:id')
@@ -156,7 +156,7 @@ export class OversightController {
   updateSubject(@Param('id') id: string, @Body() body: { name: string; short: string }) {
     if (!body.name?.trim() || !body.short?.trim())
       throw AppError.validation('name and short are required');
-    return this.svc.upsertSubject(id, body.name.trim(), body.short.trim().toUpperCase().slice(0, 4));
+    return this.svc.upsertSubject(id, body.name.trim(), body.short.trim().toUpperCase().slice(0, 3));
   }
 
   @Delete('admin/subjects/:id')

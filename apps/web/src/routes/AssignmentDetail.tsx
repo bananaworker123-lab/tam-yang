@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useProgress, useUpdateProgress } from '../hooks/useProgress';
 import { computeDueState } from '../lib/dueState';
 import { StatusSegment, StatusBanner } from '../components/ui';
-import { subjectColor, subjectShort } from '../lib/subjects';
+import { subjectColor } from '../lib/subjects';
 import { useT } from '../i18n';
 
 function InfoBox({ label, value }: { label: string; value: string }) {
@@ -51,7 +51,7 @@ export function AssignmentDetailPage() {
 
   const due = computeDueState(p.dueDate, p.status);
   const sc = subjectColor(p.subject);
-  const sh = subjectShort(p.subject);
+  const sh = p.subjectShort;
 
   const dueChipCls = due === 'overdue' ? 'bg-status-overdue text-white' : due === 'due_today' ? 'bg-[#EBA53A] text-white' : due === 'near' ? 'bg-status-done/30 text-[#8A5D0E]' : 'bg-bg text-muted';
   const dueChipLabel = due === 'overdue' ? `${t('detail.dueOverdue')} ${fmtDate(p.dueDate)}` : due === 'due_today' ? `${t('detail.dueToday')} ${fmtDate(p.dueDate)}` : due === 'near' ? `${t('detail.dueSoon')} ${fmtDate(p.dueDate)}` : p.status === ProgressStatus.Submitted ? t('detail.submittedCheck') : `${t('detail.dueOn')} ${fmtDate(p.dueDate)}`;

@@ -364,8 +364,8 @@ export function AdminOverviewPage() {
             <input value={editingSubject.name} onChange={(e) => setEditingSubject({ ...editingSubject, name: e.target.value })}
               placeholder="Subject name"
               className="w-full h-9 rounded-lg border border-line px-3 text-xs mb-2 outline-none focus:border-accent" />
-            <input value={editingSubject.short} onChange={(e) => setEditingSubject({ ...editingSubject, short: e.target.value.toUpperCase().slice(0, 4) })}
-              placeholder="Short code (e.g. MA)" maxLength={4}
+            <input value={editingSubject.short} onChange={(e) => setEditingSubject({ ...editingSubject, short: e.target.value.toUpperCase().slice(0, 3) })}
+              placeholder="Short code (e.g. ELS)" maxLength={3}
               className="w-full h-9 rounded-lg border border-line px-3 text-xs mb-2 outline-none focus:border-accent" />
             {subjectErr && <div className="text-status-overdue text-xs mb-2">{subjectErr}</div>}
             <div className="flex gap-2">

@@ -47,12 +47,20 @@ export class ProgressService {
       where: { childUserId, familyId },
     });
 
+    const subjectNames = [...new Set(assignments.map((a) => a.subject))];
+    const subjectRows = await this.prisma.subject.findMany({
+      where: { name: { in: subjectNames } },
+      select: { name: true, short: true },
+    });
+    const shortMap = new Map(subjectRows.map((s) => [s.name, s.short]));
+
     return assignments.map((a) => {
       const p = progressRows.find((x) => x.assignmentId === a.id);
       return {
         progressId: p?.id ?? null,
         assignmentId: a.id,
         subject: a.subject,
+        subjectShort: shortMap.get(a.subject) ?? a.subject.slice(0, 3).toUpperCase(),
         topic: (a as { topic?: string }).topic ?? '',
         teacherName: a.teacherName,
         className: a.classRoom.name,

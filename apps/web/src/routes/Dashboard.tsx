@@ -7,7 +7,7 @@ import { useProgress, useUpdateProgress } from '../hooks/useProgress';
 import { computeDueState, STATUS_LABEL } from '../lib/dueState';
 import { SubjectBadge, DueChip, SkeletonCard } from '../components/ui';
 import { useT } from '../i18n';
-import { subjectColor, subjectShort } from '../lib/subjects';
+import { subjectColor } from '../lib/subjects';
 
 type Filter = 'todo' | 'near' | 'overdue' | 'submitted';
 
@@ -147,7 +147,7 @@ export function DashboardPage() {
         <div className="flex flex-col gap-3">
           {filtered.map(({ p, due }) => {
             const sc = subjectColor(p.subject);
-            const sh = subjectShort(p.subject);
+            const sh = p.subjectShort;
             const dateStr = new Date(p.dueDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
             const dueChipCls = due === 'overdue' ? 'bg-status-overdue text-white' : due === 'due_today' ? 'bg-[#EBA53A] text-white' : due === 'near' ? 'bg-status-done/30 text-[#8A5D0E]' : '';
             const dueChipLabel = due === 'overdue' ? t('due.overdue') : due === 'due_today' ? t('due.today') : due === 'near' ? t('due.near') : '';

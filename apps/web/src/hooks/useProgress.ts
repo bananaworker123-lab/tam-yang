@@ -4,7 +4,7 @@ import type { ProgressStatus } from '@homework-tracker/shared-types';
 
 export interface ProgressRow {
   progressId: string | null;
-  assignmentId: string; subject: string; topic: string; teacherName: string;
+  assignmentId: string; subject: string; subjectShort: string; topic: string; teacherName: string;
   className: string; term: string;
   assignedDate: string; dueDate: string;
   status: ProgressStatus;
