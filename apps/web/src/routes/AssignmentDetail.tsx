@@ -56,9 +56,11 @@ export function AssignmentDetailPage() {
   const dueChipCls = due === 'overdue' ? 'bg-status-overdue text-white' : due === 'due_today' ? 'bg-[#EBA53A] text-white' : due === 'near' ? 'bg-status-done/30 text-[#8A5D0E]' : 'bg-bg text-muted';
   const dueChipLabel = due === 'overdue' ? `${t('detail.dueOverdue')} ${fmtDate(p.dueDate)}` : due === 'due_today' ? `${t('detail.dueToday')} ${fmtDate(p.dueDate)}` : due === 'near' ? `${t('detail.dueSoon')} ${fmtDate(p.dueDate)}` : p.status === ProgressStatus.Submitted ? t('detail.submittedCheck') : `${t('detail.dueOn')} ${fmtDate(p.dueDate)}`;
 
-  async function handleSave() {
+  function handleSave() {
     if (!pendingStatus || !p) return;
-    await updateProgress.mutateAsync({ assignmentId: p.assignmentId, progressId: p.progressId, childId, status: pendingStatus });
+    const status = pendingStatus;
+    setLocalStatus(null); // clear dirty state immediately — optimistic
+    updateProgress.mutate({ assignmentId: p.assignmentId, progressId: p.progressId, childId, status });
   }
 
   return (
@@ -96,12 +98,12 @@ export function AssignmentDetailPage() {
           <div className="text-sm text-muted bg-bg rounded-xl px-3 py-3">{t('detail.readonlyFull')}</div>
         ) : (
           <>
-            <StatusSegment value={pendingStatus ?? p.status} onChange={setLocalStatus} disabled={updateProgress.isPending} />
+            <StatusSegment value={pendingStatus ?? p.status} onChange={setLocalStatus} disabled={false} />
             <button
               onClick={handleSave}
-              disabled={!isDirty || updateProgress.isPending}
+              disabled={!isDirty}
               className="mt-3 w-full h-11 rounded-xl bg-accent text-white text-sm font-bold transition disabled:opacity-40 active:scale-[.98]">
-              {updateProgress.isPending ? t('detail.saving') : t('detail.save')}
+              {t('detail.save')}
             </button>
           </>
         )}

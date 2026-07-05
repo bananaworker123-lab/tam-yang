@@ -28,14 +28,14 @@ export function DashboardPage() {
 
   const updateProgress = useUpdateProgress();
 
-  async function handleCycleStatus(row: { progressId: string | null; assignmentId: string; status: ProgressStatus }) {
+  function handleCycleStatus(row: { progressId: string | null; assignmentId: string; status: ProgressStatus }) {
     const next: Record<ProgressStatus, ProgressStatus> = {
       not_started: ProgressStatus.WorkingOn,
       working_on: ProgressStatus.Done,
       done: ProgressStatus.Submitted,
       submitted: ProgressStatus.NotStarted,
     };
-    await updateProgress.mutateAsync({
+    updateProgress.mutate({
       assignmentId: row.assignmentId,
       progressId: row.progressId,
       childId: activeChildId,
