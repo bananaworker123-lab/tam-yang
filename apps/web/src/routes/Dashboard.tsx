@@ -7,6 +7,7 @@ import { computeDueState, STATUS_LABEL } from '../lib/dueState';
 import { SubjectBadge, DueChip, SkeletonCard } from '../components/ui';
 import { useT } from '../i18n';
 import { subjectColor } from '../lib/subjects';
+import { LoadingScreen } from '../components/LoadingScreen';
 
 type Filter = 'todo' | 'near' | 'overdue' | 'submitted';
 
@@ -61,6 +62,8 @@ export function DashboardPage() {
   ];
 
   const showSkeleton = isLoading && progressRows.length === 0;
+
+  if (isLoading && progressRows.length === 0) return <LoadingScreen />;
 
   return (
     <div>
