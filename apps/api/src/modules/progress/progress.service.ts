@@ -77,22 +77,20 @@ export class ProgressService {
     childUserId: string, familyId: string,
     newStatus: ProgressStatus, actor: AuthContext,
   ) {
-    let p = progressId ? await this.prisma.progress.findUnique({ where: { id: progressId } }) : null;
-    if (!p) {
-      p = await this.prisma.progress.findFirst({ where: { childUserId, assignmentId } });
-    }
+    const existing = progressId
+      ? await this.prisma.progress.findUnique({ where: { id: progressId }, select: { status: true } })
+      : await this.prisma.progress.findFirst({ where: { childUserId, assignmentId }, select: { status: true } });
 
-    const fromStatus = (p?.status ?? 'not_started') as ProgressStatus;
+    const fromStatus = (existing?.status ?? 'not_started') as ProgressStatus;
 
-    if (p) {
-      p = await this.prisma.progress.update({ where: { id: p.id }, data: { status: newStatus } });
-    } else {
-      p = await this.prisma.progress.create({
-        data: { childUserId, assignmentId, familyId, status: newStatus },
-      });
-    }
+    const p = await this.prisma.progress.upsert({
+      where: { childUserId_assignmentId: { childUserId, assignmentId } },
+      update: { status: newStatus },
+      create: { childUserId, assignmentId, familyId, status: newStatus },
+    });
 
-    await this.events.publish({
+    // fire-and-forget — audit log, not part of the response
+    void this.events.publish({
       eventId: randomUUID(),
       eventType: EventType.ProgressStatusChanged,
       timestamp: new Date().toISOString(),

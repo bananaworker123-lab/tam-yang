@@ -39,7 +39,8 @@ export function useUpdateProgress() {
   return useMutation({
     mutationFn: ({ assignmentId, progressId, childId, status }: {
       assignmentId: string; progressId: string | null; childId?: string; status: ProgressStatus;
-    }) => api.patch(`/progress/${assignmentId}`, { progressId, childId, status }),
+    }): Promise<{ progressId: string; status: ProgressStatus }> =>
+      api.patch(`/progress/${assignmentId}`, { progressId, childId, status }),
     onMutate: async ({ assignmentId, childId, status }) => {
       await qc.cancelQueries({ queryKey: ['progress', childId] });
       const snapshots = qc.getQueriesData<ProgressRow[]>({ queryKey: ['progress', childId] });
@@ -48,9 +49,16 @@ export function useUpdateProgress() {
       );
       return { snapshots };
     },
+    onSuccess: (data: { progressId: string; status: ProgressStatus }, { assignmentId, childId }) => {
+      // confirm optimistic update with server values — no full refetch needed
+      qc.setQueriesData<ProgressRow[]>({ queryKey: ['progress', childId] }, (old) =>
+        old?.map((r) => r.assignmentId === assignmentId
+          ? { ...r, progressId: data.progressId, status: data.status }
+          : r),
+      );
+    },
     onError: (_err, _vars, ctx) => {
       ctx?.snapshots.forEach(([key, val]) => qc.setQueryData(key, val));
     },
-    onSettled: (_d, _e, { childId }) => qc.invalidateQueries({ queryKey: ['progress', childId] }),
   });
 }
