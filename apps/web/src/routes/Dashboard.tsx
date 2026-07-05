@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ProgressStatus } from '@homework-tracker/shared-types';
 import { useActiveClassTerm } from '../hooks/useOversight';
 import { useAuth } from '../context/AuthContext';
-import { useProgress, useUpdateProgress } from '../hooks/useProgress';
+import { useProgress } from '../hooks/useProgress';
 import { computeDueState, STATUS_LABEL } from '../lib/dueState';
 import { SubjectBadge, DueChip, SkeletonCard } from '../components/ui';
 import { useT } from '../i18n';
@@ -25,23 +25,6 @@ export function DashboardPage() {
   const [filter, setFilter] = useState<Filter>('todo');
 
   const { data: progressRows = [], isLoading } = useProgress(activeChildId);
-
-  const updateProgress = useUpdateProgress();
-
-  function handleCycleStatus(row: { progressId: string | null; assignmentId: string; status: ProgressStatus }) {
-    const next: Record<ProgressStatus, ProgressStatus> = {
-      not_started: ProgressStatus.WorkingOn,
-      working_on: ProgressStatus.Done,
-      done: ProgressStatus.Submitted,
-      submitted: ProgressStatus.NotStarted,
-    };
-    updateProgress.mutate({
-      assignmentId: row.assignmentId,
-      progressId: row.progressId,
-      childId: activeChildId,
-      status: next[row.status],
-    });
-  }
 
   const rows = useMemo(() =>
     progressRows.map((p) => ({ p, due: computeDueState(p.dueDate, p.status) })),
@@ -182,11 +165,10 @@ export function DashboardPage() {
                     {dueChipLabel && <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full flex-none ${dueChipCls}`}>{dueChipLabel}</span>}
                   </div>
                   <div className="mt-2">
-                    <button onClick={(e) => { e.stopPropagation(); handleCycleStatus(p); }}
-                      className={`inline-flex items-center gap-2 h-8 px-3 rounded-full text-xs font-bold transition active:scale-95 ${pill.cls}`}>
+                    <span className={`inline-flex items-center gap-2 h-8 px-3 rounded-full text-xs font-bold ${pill.cls}`}>
                       <span className={`w-2 h-2 rounded-full ${pill.dot}`} />
                       {t(`status.${p.status}`)}
-                    </button>
+                    </span>
                   </div>
                 </div>
               </button>
