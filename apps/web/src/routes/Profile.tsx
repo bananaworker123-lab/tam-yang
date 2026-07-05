@@ -224,12 +224,10 @@ export function ProfilePage() {
                   <Avatar initials={m.shortName?.toUpperCase() || (m.name?.slice(0, 2) ?? '??').toUpperCase()} />
                   {editingMember?.userId === m.userId ? (() => {
                     const em = editingMember!;
-                    const isSaving = updateMemberName.isPending || updateMemberShort.isPending;
                     function saveAll() {
-                      let done = 0;
-                      const tryClose = () => { if (++done === 2) setEditingMember(null); };
-                      updateMemberName.mutate({ userId: m.userId, name: em.name }, { onSuccess: tryClose, onError: tryClose });
-                      updateMemberShort.mutate({ userId: m.userId, shortName: em.shortName }, { onSuccess: tryClose, onError: tryClose });
+                      setEditingMember(null);
+                      updateMemberName.mutate({ userId: m.userId, name: em.name });
+                      updateMemberShort.mutate({ userId: m.userId, shortName: em.shortName });
                     }
                     return (
                       <div className="flex-1 flex flex-col gap-1.5 min-w-0">
@@ -246,9 +244,9 @@ export function ProfilePage() {
                             className="w-16 h-8 px-2 text-sm rounded-lg border border-accent focus:outline-none text-center font-bold" />
                         </div>
                         <div className="flex gap-2">
-                          <button onClick={saveAll} disabled={isSaving}
-                            className="h-8 px-3 rounded-lg bg-accent text-white text-xs font-semibold disabled:opacity-60">
-                            {isSaving ? 'Saving…' : t('family.save')}
+                          <button onClick={saveAll}
+                            className="h-8 px-3 rounded-lg bg-accent text-white text-xs font-semibold">
+                            {t('family.save')}
                           </button>
                           <button onClick={() => setEditingMember(null)}
                             className="h-8 px-3 rounded-lg border border-line text-xs text-muted">

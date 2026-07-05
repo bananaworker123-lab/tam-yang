@@ -168,12 +168,10 @@ export function FamilyPage() {
                 <Avatar initials={m.shortName?.toUpperCase() || (m.name?.slice(0, 2) ?? '??').toUpperCase()} />
                 {editingMember?.userId === m.userId ? (() => {
                   const em = editingMember!;
-                  const isSaving = updateMemberName.isPending || updateMemberShort.isPending;
                   function saveAll() {
-                    let done = 0;
-                    const tryClose = () => { if (++done === 2) setEditingMember(null); };
-                    updateMemberName.mutate({ userId: m.userId, name: em.name }, { onSuccess: tryClose, onError: tryClose });
-                    updateMemberShort.mutate({ userId: m.userId, shortName: em.shortName }, { onSuccess: tryClose, onError: tryClose });
+                    setEditingMember(null);
+                    updateMemberName.mutate({ userId: m.userId, name: em.name });
+                    updateMemberShort.mutate({ userId: m.userId, shortName: em.shortName });
                   }
                   return (
                   <div className="flex-1 flex flex-col gap-1.5 min-w-0">
@@ -198,10 +196,9 @@ export function FamilyPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={saveAll}
-                        disabled={isSaving}
-                        className="h-8 px-3 rounded-lg bg-accent text-white text-xs font-semibold disabled:opacity-60 flex-none"
+                        className="h-8 px-3 rounded-lg bg-accent text-white text-xs font-semibold flex-none"
                       >
-                        {isSaving ? 'Saving…' : t('family.save')}
+                        {t('family.save')}
                       </button>
                       <button
                         onClick={() => setEditingMember(null)}

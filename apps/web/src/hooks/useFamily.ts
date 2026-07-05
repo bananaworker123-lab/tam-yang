@@ -24,21 +24,41 @@ export function useCreateFamily() {
 
 export function useUpdateMemberName() {
   const qc = useQueryClient();
-  const { refetch } = useAuth();
+  const { user, refetch } = useAuth();
+  const familyId = user?.familyId;
   return useMutation({
     mutationFn: ({ userId, name }: { userId: string; name: string }) =>
       api.patch(`/users/${userId}/name`, { name }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['family'] }); refetch(); },
+    onMutate: async ({ userId, name }) => {
+      await qc.cancelQueries({ queryKey: ['family', familyId] });
+      const prev = qc.getQueryData(['family', familyId]);
+      qc.setQueryData<any>(['family', familyId], (old: any) =>
+        old ? { ...old, members: old.members.map((m: any) => m.userId === userId ? { ...m, name } : m) } : old
+      );
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => qc.setQueryData(['family', familyId], ctx?.prev),
+    onSettled: () => { qc.invalidateQueries({ queryKey: ['family'] }); refetch(); },
   });
 }
 
 export function useUpdateMemberShort() {
   const qc = useQueryClient();
-  const { refetch } = useAuth();
+  const { user, refetch } = useAuth();
+  const familyId = user?.familyId;
   return useMutation({
     mutationFn: ({ userId, shortName }: { userId: string; shortName: string }) =>
       api.patch(`/users/${userId}/short-name`, { shortName }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['family'] }); refetch(); },
+    onMutate: async ({ userId, shortName }) => {
+      await qc.cancelQueries({ queryKey: ['family', familyId] });
+      const prev = qc.getQueryData(['family', familyId]);
+      qc.setQueryData<any>(['family', familyId], (old: any) =>
+        old ? { ...old, members: old.members.map((m: any) => m.userId === userId ? { ...m, shortName } : m) } : old
+      );
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => qc.setQueryData(['family', familyId], ctx?.prev),
+    onSettled: () => { qc.invalidateQueries({ queryKey: ['family'] }); refetch(); },
   });
 }
 

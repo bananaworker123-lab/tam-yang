@@ -143,7 +143,7 @@ export function LoadingScreen() {
 
       <div
         className="flex flex-col items-center justify-center min-h-screen px-6"
-        style={{ background: 'linear-gradient(160deg,#7B74EA 0%,#9A87F5 100%)' }}
+        style={{ background: 'linear-gradient(140deg,#5B53E0 0%,#7A5AF0 100%)' }}
       >
         <div className="flex flex-col items-center gap-0">
           {/* Logo badge */}
