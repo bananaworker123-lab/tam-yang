@@ -97,10 +97,14 @@ export function DashboardPage() {
               {isChild ? t('dash.myHomeworkLabel') : `${activeClassName} · ${activeTermName}`}
             </div>
             <div className="font-display font-extrabold text-2xl mt-0.5">{submitted}<span className="text-base font-semibold opacity-70">/{total}</span></div>
-            <div className="flex items-center gap-2 mt-0.5">
+            <div className="flex items-center gap-2 mt-1">
               <div className="text-xs opacity-75 font-semibold">{t('dash.submittedOf2')}</div>
-              <div className="w-px h-3 bg-white/30" />
-              <div className="text-xs font-semibold opacity-90">{done} <span className="opacity-70">{t('dash.done')}</span></div>
+              {done > 0 && (
+                <div className="inline-flex items-center gap-1 bg-white/20 rounded-full px-2 py-0.5">
+                  <span className="text-xs font-extrabold">{done}</span>
+                  <span className="text-[11px] font-semibold opacity-90">{t('dash.done')}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
