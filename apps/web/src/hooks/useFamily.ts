@@ -45,10 +45,20 @@ export function useUpdateMemberShort() {
 export function useRemoveMember() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const familyId = user?.familyId;
   return useMutation({
     mutationFn: (userId: string) =>
-      api.delete(`/families/${user?.familyId}/members/${userId}`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['family'] }),
+      api.delete(`/families/${familyId}/members/${userId}`),
+    onMutate: async (userId) => {
+      await qc.cancelQueries({ queryKey: ['family', familyId] });
+      const prev = qc.getQueryData(['family', familyId]);
+      qc.setQueryData<any>(['family', familyId], (old: any) =>
+        old ? { ...old, members: old.members.filter((m: any) => m.userId !== userId) } : old
+      );
+      return { prev };
+    },
+    onError: (_err, _userId, ctx) => qc.setQueryData(['family', familyId], ctx?.prev),
+    onSettled: () => qc.invalidateQueries({ queryKey: ['family'] }),
   });
 }
 

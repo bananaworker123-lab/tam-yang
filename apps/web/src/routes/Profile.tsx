@@ -149,10 +149,11 @@ export function ProfilePage() {
     }
   }
 
-  async function handleRemove() {
+  function handleRemove() {
     if (!confirmRemove) return;
-    try { await removeMember.mutateAsync(confirmRemove.userId); } catch (_) {}
+    const userId = confirmRemove.userId;
     setConfirmRemove(null);
+    removeMember.mutate(userId);
   }
 
   return (
@@ -170,9 +171,9 @@ export function ProfilePage() {
                 className="flex-1 h-10 rounded-xl border border-line text-sm text-muted">
                 {t('family.cancel')}
               </button>
-              <button onClick={handleRemove} disabled={removeMember.isPending}
-                className="flex-1 h-10 rounded-xl bg-red-500 text-white text-sm font-semibold disabled:opacity-60">
-                {removeMember.isPending ? t('family.removing') : t('family.remove')}
+              <button onClick={handleRemove}
+                className="flex-1 h-10 rounded-xl bg-red-500 text-white text-sm font-semibold">
+                {t('family.remove')}
               </button>
             </div>
           </div>

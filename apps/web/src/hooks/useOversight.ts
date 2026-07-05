@@ -43,7 +43,21 @@ export function useCreateClass() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (name: string) => api.post('/oversight/admin/classes', { name }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['oversight', 'classes'] }),
+    onMutate: async (name) => {
+      await qc.cancelQueries({ queryKey: ['oversight', 'classes'] });
+      const prev = qc.getQueryData(['oversight', 'classes']);
+      const tempId = `temp-${Date.now()}`;
+      qc.setQueryData<ClassRow[]>(['oversight', 'classes'], (old = []) => [...old, { id: tempId, name }]);
+      return { prev, tempId };
+    },
+    onSuccess: (data: unknown, _name, ctx) => {
+      const cls = data as ClassRow;
+      qc.setQueryData<ClassRow[]>(['oversight', 'classes'], (old) =>
+        old?.map((c) => c.id === ctx?.tempId ? cls : c)
+      );
+    },
+    onError: (_err, _name, ctx) => qc.setQueryData(['oversight', 'classes'], ctx?.prev),
+    onSettled: () => qc.invalidateQueries({ queryKey: ['oversight', 'classes'] }),
   });
 }
 
@@ -89,7 +103,21 @@ export function useCreateTerm() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (name: string) => api.post('/oversight/admin/terms', { name }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['oversight', 'terms'] }),
+    onMutate: async (name) => {
+      await qc.cancelQueries({ queryKey: ['oversight', 'terms'] });
+      const prev = qc.getQueryData(['oversight', 'terms']);
+      const tempId = `temp-${Date.now()}`;
+      qc.setQueryData<TermRow[]>(['oversight', 'terms'], (old = []) => [...old, { id: tempId, name }]);
+      return { prev, tempId };
+    },
+    onSuccess: (data: unknown, _name, ctx) => {
+      const term = data as TermRow;
+      qc.setQueryData<TermRow[]>(['oversight', 'terms'], (old) =>
+        old?.map((t) => t.id === ctx?.tempId ? term : t)
+      );
+    },
+    onError: (_err, _name, ctx) => qc.setQueryData(['oversight', 'terms'], ctx?.prev),
+    onSettled: () => qc.invalidateQueries({ queryKey: ['oversight', 'terms'] }),
   });
 }
 
@@ -298,7 +326,13 @@ export function useAssignTeacher() {
   return useMutation({
     mutationFn: ({ email, className }: { email: string; className: string }) =>
       api.post('/oversight/admin/teachers', { email, className }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['oversight', 'admin', 'teachers'] }),
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: ['oversight', 'admin', 'teachers'] });
+      const prev = qc.getQueryData(['oversight', 'admin', 'teachers']);
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => qc.setQueryData(['oversight', 'admin', 'teachers'], ctx?.prev),
+    onSettled: () => qc.invalidateQueries({ queryKey: ['oversight', 'admin', 'teachers'] }),
   });
 }
 
@@ -306,7 +340,14 @@ export function useRemoveTeacher() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api.delete(`/oversight/admin/teachers/${id}`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['oversight', 'admin', 'teachers'] }),
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: ['oversight', 'admin', 'teachers'] });
+      const prev = qc.getQueryData(['oversight', 'admin', 'teachers']);
+      qc.setQueryData<AdminTeacherRow[]>(['oversight', 'admin', 'teachers'], (old) => old?.filter((t) => t.id !== id));
+      return { prev };
+    },
+    onError: (_err, _id, ctx) => qc.setQueryData(['oversight', 'admin', 'teachers'], ctx?.prev),
+    onSettled: () => qc.invalidateQueries({ queryKey: ['oversight', 'admin', 'teachers'] }),
   });
 }
 
@@ -329,7 +370,18 @@ export function useUpsertSubject() {
       id
         ? api.put(`/oversight/admin/subjects/${id}`, { name, short })
         : api.post('/oversight/admin/subjects', { name, short }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['oversight', 'admin', 'subjects'] }),
+    onMutate: async ({ id, name, short }) => {
+      await qc.cancelQueries({ queryKey: ['oversight', 'admin', 'subjects'] });
+      const prev = qc.getQueryData(['oversight', 'admin', 'subjects']);
+      qc.setQueryData<SubjectRow[]>(['oversight', 'admin', 'subjects'], (old = []) =>
+        id
+          ? old.map((s) => s.id === id ? { ...s, name, short } : s)
+          : [...old, { id: `temp-${Date.now()}`, name, short }]
+      );
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => qc.setQueryData(['oversight', 'admin', 'subjects'], ctx?.prev),
+    onSettled: () => qc.invalidateQueries({ queryKey: ['oversight', 'admin', 'subjects'] }),
   });
 }
 
@@ -367,7 +419,18 @@ export function useUpsertTeacherCatalog() {
       id
         ? api.put(`/oversight/admin/teacher-catalog/${id}`, { name, subject, className })
         : api.post('/oversight/admin/teacher-catalog', { name, subject, className }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['oversight', 'admin', 'teacher-catalog'] }),
+    onMutate: async ({ id, name, subject, className }) => {
+      await qc.cancelQueries({ queryKey: ['oversight', 'admin', 'teacher-catalog'] });
+      const prev = qc.getQueryData(['oversight', 'admin', 'teacher-catalog']);
+      qc.setQueryData<TeacherCatalogRow[]>(['oversight', 'admin', 'teacher-catalog'], (old = []) =>
+        id
+          ? old.map((t) => t.id === id ? { ...t, name, subject, className } : t)
+          : [...old, { id: `temp-${Date.now()}`, name, subject, className }]
+      );
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => qc.setQueryData(['oversight', 'admin', 'teacher-catalog'], ctx?.prev),
+    onSettled: () => qc.invalidateQueries({ queryKey: ['oversight', 'admin', 'teacher-catalog'] }),
   });
 }
 

@@ -22,21 +22,20 @@ export function AdminTeachersPage() {
 
   const effectiveClass = className === '__custom__' ? customClass : className;
 
-  async function handleAssign() {
+  function handleAssign() {
     if (!email.trim() || !effectiveClass.trim()) {
       setErr('Email and class are required');
       return;
     }
-    try {
-      await assignTeacher.mutateAsync({ email: email.trim(), className: effectiveClass.trim() });
-      setEmail('');
-      setClassName('');
-      setCustomClass('');
-      setErr('');
-      setShowing(false);
-    } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Failed to assign teacher');
-    }
+    const payload = { email: email.trim(), className: effectiveClass.trim() };
+    setShowing(false);
+    setEmail('');
+    setClassName('');
+    setCustomClass('');
+    setErr('');
+    assignTeacher.mutate(payload, {
+      onError: (e) => setErr(e instanceof Error ? e.message : 'Failed to assign teacher'),
+    });
   }
 
   return (
@@ -70,9 +69,7 @@ export function AdminTeachersPage() {
 
           <div className="flex gap-2 mt-2">
             <Button variant="ghost" className="flex-1" onClick={() => { setShowing(false); setErr(''); }}>Cancel</Button>
-            <Button className="flex-1" onClick={handleAssign} disabled={assignTeacher.isPending}>
-              {assignTeacher.isPending ? 'Assigning…' : 'Assign teacher'}
-            </Button>
+            <Button className="flex-1" onClick={handleAssign}>Assign teacher</Button>
           </div>
         </Card>
       ) : (

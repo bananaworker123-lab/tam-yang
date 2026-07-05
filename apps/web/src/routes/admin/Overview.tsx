@@ -76,47 +76,45 @@ export function AdminOverviewPage() {
   const [renamingTermId, setRenamingTermId]   = useState('');
   const [renamingTermName, setRenamingTermName] = useState('');
 
-  async function saveSubject() {
+  function saveSubject() {
     if (!editingSubject) return;
     if (!editingSubject.name.trim() || !editingSubject.short.trim()) { setSubjectErr('Name and short code are required'); return; }
-    await upsertSubject.mutateAsync({ id: editingSubject.id || undefined, name: editingSubject.name.trim(), short: editingSubject.short.trim() });
     setEditingSubject(null);
     setSubjectErr('');
+    upsertSubject.mutate({ id: editingSubject.id || undefined, name: editingSubject.name.trim(), short: editingSubject.short.trim() });
   }
 
-  async function saveTeacher() {
+  function saveTeacher() {
     if (!editingTeacher) return;
     if (!editingTeacher.name.trim() || !editingTeacher.subject.trim() || !editingTeacher.className.trim()) {
       setTeacherErr('Name, subject and class are required');
       return;
     }
-    await upsertTeacher.mutateAsync({ id: editingTeacher.id || undefined, name: editingTeacher.name.trim(), subject: editingTeacher.subject.trim(), className: editingTeacher.className.trim() });
     setEditingTeacher(null);
     setTeacherErr('');
+    upsertTeacher.mutate({ id: editingTeacher.id || undefined, name: editingTeacher.name.trim(), subject: editingTeacher.subject.trim(), className: editingTeacher.className.trim() });
   }
 
-  async function handleAddClass() {
+  function handleAddClass() {
     if (!newClassName.trim()) return;
-    try {
-      const cls = await createClass.mutateAsync(newClassName.trim()) as { id: string; name: string };
-      setNewClassName('');
-      setClassErr('');
-      setActiveClassId(cls.id);
-    } catch (e: unknown) {
-      setClassErr(e instanceof Error ? e.message : 'Failed');
-    }
+    const name = newClassName.trim();
+    setNewClassName('');
+    setClassErr('');
+    createClass.mutate(name, {
+      onSuccess: (cls) => setActiveClassId((cls as { id: string }).id),
+      onError: (e) => setClassErr(e instanceof Error ? e.message : 'Failed'),
+    });
   }
 
-  async function handleAddTerm() {
+  function handleAddTerm() {
     if (!newTermName.trim()) return;
-    try {
-      const t = await createTerm.mutateAsync(newTermName.trim()) as { id: string; name: string };
-      setNewTermName('');
-      setTermErr('');
-      setActiveTermId(t.id);
-    } catch (e: unknown) {
-      setTermErr(e instanceof Error ? e.message : 'Failed');
-    }
+    const name = newTermName.trim();
+    setNewTermName('');
+    setTermErr('');
+    createTerm.mutate(name, {
+      onSuccess: (t) => setActiveTermId((t as { id: string }).id),
+      onError: (e) => setTermErr(e instanceof Error ? e.message : 'Failed'),
+    });
   }
 
   const d = data;
@@ -240,8 +238,8 @@ export function AdminOverviewPage() {
                   onKeyDown={(e) => e.key === 'Enter' && handleAddClass()}
                   placeholder="e.g. M.4"
                   className="flex-1 h-9 rounded-xl border border-line px-3 text-sm outline-none focus:border-accent" />
-                <Button className="h-9 px-3 text-xs flex-none" onClick={handleAddClass} disabled={!newClassName.trim() || createClass.isPending}>
-                  {createClass.isPending ? '…' : '+ Add'}
+                <Button className="h-9 px-3 text-xs flex-none" onClick={handleAddClass} disabled={!newClassName.trim()}>
+                  + Add
                 </Button>
               </div>
               {classErr && <div className="text-status-overdue text-xs mt-1">{classErr}</div>}
@@ -305,8 +303,8 @@ export function AdminOverviewPage() {
                   onKeyDown={(e) => e.key === 'Enter' && handleAddTerm()}
                   placeholder="e.g. Term 2"
                   className="flex-1 h-9 rounded-xl border border-line px-3 text-sm outline-none focus:border-accent" />
-                <Button className="h-9 px-3 text-xs flex-none" onClick={handleAddTerm} disabled={!newTermName.trim() || createTerm.isPending}>
-                  {createTerm.isPending ? '…' : '+ Add'}
+                <Button className="h-9 px-3 text-xs flex-none" onClick={handleAddTerm} disabled={!newTermName.trim()}>
+                  + Add
                 </Button>
               </div>
               {termErr && <div className="text-status-overdue text-xs mt-1">{termErr}</div>}
@@ -370,7 +368,7 @@ export function AdminOverviewPage() {
             {subjectErr && <div className="text-status-overdue text-xs mb-2">{subjectErr}</div>}
             <div className="flex gap-2">
               <Button variant="ghost" className="flex-1 h-8 text-xs" onClick={() => { setEditingSubject(null); setSubjectErr(''); }}>Cancel</Button>
-              <Button className="flex-1 h-8 text-xs" onClick={saveSubject}>{upsertSubject.isPending ? 'Saving…' : 'Save'}</Button>
+              <Button className="flex-1 h-8 text-xs" onClick={saveSubject}>Save</Button>
             </div>
           </div>
         )}
@@ -423,7 +421,7 @@ export function AdminOverviewPage() {
             {teacherErr && <div className="text-status-overdue text-xs mb-2">{teacherErr}</div>}
             <div className="flex gap-2">
               <Button variant="ghost" className="flex-1 h-8 text-xs" onClick={() => { setEditingTeacher(null); setTeacherErr(''); }}>Cancel</Button>
-              <Button className="flex-1 h-8 text-xs" onClick={saveTeacher}>{upsertTeacher.isPending ? 'Saving…' : 'Save'}</Button>
+              <Button className="flex-1 h-8 text-xs" onClick={saveTeacher}>Save</Button>
             </div>
           </div>
         )}

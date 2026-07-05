@@ -13,19 +13,19 @@ export function AdminSettingsPage() {
   const [editingSubject, setEditingSubject] = useState<SubjectRow | null>(null);
   const [err, setErr] = useState('');
 
-  async function saveSubject() {
+  function saveSubject() {
     if (!editingSubject) return;
     if (!editingSubject.name.trim() || !editingSubject.short.trim()) {
       setErr('Name and short code are required');
       return;
     }
-    await upsertSubject.mutateAsync({
+    setEditingSubject(null);
+    setErr('');
+    upsertSubject.mutate({
       id: editingSubject.id || undefined,
       name: editingSubject.name.trim(),
       short: editingSubject.short.trim().toUpperCase().slice(0, 4),
     });
-    setEditingSubject(null);
-    setErr('');
   }
 
   return (
@@ -96,9 +96,7 @@ export function AdminSettingsPage() {
             {err && <div className="text-status-overdue text-xs mb-2">{err}</div>}
             <div className="flex gap-2">
               <Button variant="ghost" className="flex-1 h-9 text-xs" onClick={() => { setEditingSubject(null); setErr(''); }}>Cancel</Button>
-              <Button className="flex-1 h-9 text-xs" onClick={saveSubject}>
-                {upsertSubject.isPending ? 'Saving…' : 'Save'}
-              </Button>
+              <Button className="flex-1 h-9 text-xs" onClick={saveSubject}>Save</Button>
             </div>
           </div>
         ) : null}

@@ -126,14 +126,11 @@ export function FamilyPage() {
     }
   }
 
-  async function handleRemove() {
+  function handleRemove() {
     if (!confirmRemove) return;
-    try {
-      await removeMember.mutateAsync(confirmRemove.userId);
-      setConfirmRemove(null);
-    } catch (e: unknown) {
-      setConfirmRemove(null);
-    }
+    const userId = confirmRemove.userId;
+    setConfirmRemove(null);
+    removeMember.mutate(userId);
   }
 
   const members = (data as any)?.members ?? [];
@@ -147,7 +144,7 @@ export function FamilyPage() {
           name={confirmRemove.name}
           onConfirm={handleRemove}
           onCancel={() => setConfirmRemove(null)}
-          loading={removeMember.isPending}
+          loading={false}
         />
       )}
 

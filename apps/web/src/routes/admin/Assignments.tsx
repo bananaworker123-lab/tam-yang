@@ -55,7 +55,7 @@ export function AdminAssignmentsPage() {
     setEditing((prev) => prev ? { ...prev, teacherName: t.name, subject: t.subject } : prev);
   }
 
-  async function save() {
+  function save() {
     if (!editing || !editing.topic?.trim() || !editing.teacherName?.trim() || !editing.subject?.trim()) return;
     const className = activeClassName || editing.className || '';
     const term = activeTermName || editing.term || '';
@@ -63,20 +63,20 @@ export function AdminAssignmentsPage() {
       setSaveErr('Please set an active Class and Term in Overview first');
       return;
     }
-    setSaveErr('');
     const payload = {
       ...editing,
       topic: editing.topic.slice(0, TOPIC_MAX),
       className,
       term,
     } as AssignmentRow;
+    setEditing(null);
+    setSaveErr('');
     if (editing.id) {
       const { id: _id, ...rest } = payload;
-      await updateAssignment.mutateAsync({ id: editing.id, ...rest });
+      updateAssignment.mutate({ id: editing.id, ...rest });
     } else {
-      await createAssignment.mutateAsync(payload);
+      createAssignment.mutate(payload);
     }
-    setEditing(null);
   }
 
   return (
@@ -142,7 +142,7 @@ export function AdminAssignmentsPage() {
           {saveErr && <div className="text-status-overdue text-xs mb-2">{saveErr}</div>}
           <div className="flex gap-2">
             <Button variant="ghost" className="flex-1" onClick={() => { setEditing(null); setSaveErr(''); }}>Cancel</Button>
-            <Button className="flex-1" onClick={save}>{createAssignment.isPending || updateAssignment.isPending ? 'Saving…' : editing.id ? 'Save' : 'Add assignment'}</Button>
+            <Button className="flex-1" onClick={save}>{editing.id ? 'Save' : 'Add assignment'}</Button>
           </div>
         </Card>
       ) : (
