@@ -59,8 +59,9 @@ export function AssignmentDetailPage() {
   function handleSave() {
     if (!pendingStatus || !p) return;
     const status = pendingStatus;
-    setLocalStatus(null); // clear dirty state immediately — optimistic
+    setLocalStatus(null);
     updateProgress.mutate({ assignmentId: p.assignmentId, progressId: p.progressId, childId, status });
+    navigate(-1);
   }
 
   return (
