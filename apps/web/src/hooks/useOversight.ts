@@ -149,30 +149,39 @@ export function useActiveClassTerm() {
     }
   }, [activeDB?.classId, activeDB?.termId]);
 
-  // Fallback: auto-select first class/term if nothing active in DB yet
+  // Fallback: auto-select first class/term if nothing active in DB yet,
+  // and persist to DB so the backend knows which class/term is active.
   useEffect(() => {
-    if (classes.length > 0 && (!activeClassId || !classes.find((c) => c.id === activeClassId))) {
+    if (classes.length === 0 || activeDB === undefined) return;
+    if (!activeDB.classId) {
+      // DB has no active class — pick first and save to DB
       const cls = classes[0]!;
       setActiveClassIdState(cls.id);
       localStorage.setItem('activeClassId', cls.id);
       localStorage.setItem('activeClassName', cls.name);
-    } else if (activeClassId) {
+      const termId = activeDB.termId ?? terms[0]?.id;
+      if (termId) setActiveDB.mutate({ classId: cls.id, termId });
+    } else {
       const cls = classes.find((c) => c.id === activeClassId);
       if (cls) localStorage.setItem('activeClassName', cls.name);
     }
-  }, [classes, activeClassId]);
+  }, [classes, activeDB?.classId]);
 
   useEffect(() => {
-    if (terms.length > 0 && (!activeTermId || !terms.find((t) => t.id === activeTermId))) {
+    if (terms.length === 0 || activeDB === undefined) return;
+    if (!activeDB.termId) {
+      // DB has no active term — pick first and save to DB
       const term = terms[0]!;
       setActiveTermIdState(term.id);
       localStorage.setItem('activeTermId', term.id);
       localStorage.setItem('activeTermName', term.name);
-    } else if (activeTermId) {
+      const classId = activeDB.classId ?? classes[0]?.id;
+      if (classId) setActiveDB.mutate({ classId, termId: term.id });
+    } else {
       const term = terms.find((t) => t.id === activeTermId);
       if (term) localStorage.setItem('activeTermName', term.name);
     }
-  }, [terms, activeTermId]);
+  }, [terms, activeDB?.termId]);
 
   function setActiveClassId(id: string) {
     setActiveClassIdState(id);
