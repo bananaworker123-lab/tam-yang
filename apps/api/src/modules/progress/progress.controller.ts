@@ -17,12 +17,13 @@ export class ProgressController {
     @Query('childId') childId?: string,
     @Query('className') className?: string,
     @Query('termName') termName?: string,
+    @Query('assignmentId') assignmentId?: string,
   ) {
     if (!user.familyId) throw AppError.forbidden('No family');
     const effectiveChildId = user.roles.includes('child')
       ? user.userId
       : (childId ?? await this.svc.resolveChildUserId(user.familyId, user.userId));
-    return this.svc.listForChild(effectiveChildId, user.familyId, className, termName);
+    return this.svc.listForChild(effectiveChildId, user.familyId, className, termName, assignmentId);
   }
 
   @Patch(':assignmentId')

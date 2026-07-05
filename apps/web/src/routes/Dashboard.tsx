@@ -24,11 +24,7 @@ export function DashboardPage() {
   );
   const [filter, setFilter] = useState<Filter>('todo');
 
-  const { data: progressRows = [], isLoading } = useProgress(
-    activeChildId,
-    activeClassName,
-    activeTermName,
-  );
+  const { data: progressRows = [], isLoading } = useProgress(activeChildId);
 
   const updateProgress = useUpdateProgress();
 
@@ -79,7 +75,7 @@ export function DashboardPage() {
     { key: 'submitted', label: t('dash.filter.submitted') },
   ];
 
-  const showSkeleton = classTermLoading || (isLoading && progressRows.length === 0);
+  const showSkeleton = isLoading && progressRows.length === 0;
 
   return (
     <div>

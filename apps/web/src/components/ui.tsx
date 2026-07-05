@@ -117,6 +117,7 @@ export function Button({
 
 const STATUS_PILL: Record<ProgressStatus, string> = {
   not_started: 'bg-status-notstarted/30 text-ink',
+  working_on:  'bg-[#7EC8E3]/20 text-[#1A6B8A]',
   done: 'bg-status-done/20 text-[#9A6B12]',
   submitted: 'bg-status-submitted/15 text-[#1F7D52]',
 };
@@ -135,6 +136,7 @@ export function StatusPill({
   const { t } = useT();
   const dot: Record<ProgressStatus, string> = {
     not_started: 'bg-status-notstarted',
+    working_on:  'bg-[#7EC8E3]',
     done: 'bg-status-done',
     submitted: 'bg-status-submitted',
   };

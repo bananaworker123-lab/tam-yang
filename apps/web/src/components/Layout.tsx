@@ -47,11 +47,21 @@ export function Layout() {
   const { t } = useT();
   const qc = useQueryClient();
 
-  // Prefetch classes+terms for every user (Dashboard and Teacher need these to fire their queries)
   useEffect(() => {
     if (!user?.userId) return;
-    qc.prefetchQuery({ queryKey: ['oversight', 'classes'], queryFn: () => api.get('/oversight/classes'), staleTime: 1000 * 60 * 5 });
-    qc.prefetchQuery({ queryKey: ['oversight', 'terms'],   queryFn: () => api.get('/oversight/terms'),   staleTime: 1000 * 60 * 5 });
+
+    if (!user.roles.includes('admin')) {
+      // Prefetch progress immediately — backend resolves active class/term from DB (no waterfall)
+      const childId = user.roles.includes('child') ? user.userId : undefined;
+      const params  = new URLSearchParams();
+      if (childId) params.set('childId', childId);
+      qc.prefetchQuery({
+        queryKey: ['progress', childId],
+        queryFn:  () => api.get(`/progress?${params}`),
+        staleTime: 1000 * 60 * 2,
+      });
+    }
+
     if (!user.roles.includes('admin')) return;
     qc.prefetchQuery({ queryKey: ['oversight', 'admin', 'overview'], queryFn: () => api.get('/oversight/admin/overview'), staleTime: 1000 * 60 * 2 });
     qc.prefetchQuery({ queryKey: ['oversight', 'admin', 'families'], queryFn: () => api.get('/oversight/admin/families'), staleTime: 1000 * 60 * 2 });

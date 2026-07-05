@@ -14,6 +14,29 @@ export class OversightService {
     return this.prisma.term.findMany({ where: { name: { not: '' } }, orderBy: { name: 'asc' } });
   }
 
+  async getActiveClassTerm() {
+    const [cls, term] = await Promise.all([
+      this.prisma.classRoom.findFirst({ where: { active: true } }),
+      this.prisma.term.findFirst({ where: { active: true } }),
+    ]);
+    return {
+      classId:   cls?.id   ?? null,
+      className: cls?.name ?? null,
+      termId:    term?.id   ?? null,
+      termName:  term?.name ?? null,
+    };
+  }
+
+  async setActiveClassTerm(classId: string, termId: string) {
+    await this.prisma.$transaction([
+      this.prisma.classRoom.updateMany({ data: { active: false } }),
+      this.prisma.term.updateMany({ data: { active: false } }),
+      this.prisma.classRoom.update({ where: { id: classId }, data: { active: true } }),
+      this.prisma.term.update({ where: { id: termId }, data: { active: true } }),
+    ]);
+    return this.getActiveClassTerm();
+  }
+
   /** Teacher: get progress matrix for classes the teacher is assigned to. */
   async getTeacherOverview(teacherUserId: string, className?: string, termName?: string) {
     const teacherAssignments = await this.prisma.teacherAssignment.findMany({

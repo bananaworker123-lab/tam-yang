@@ -6,6 +6,31 @@ import type { ProgressStatus } from '@homework-tracker/shared-types';
 export interface ClassRow { id: string; name: string; }
 export interface TermRow  { id: string; name: string; }
 
+export interface ActiveClassTermRow {
+  classId: string | null; className: string | null;
+  termId: string | null;  termName: string | null;
+}
+
+export function useActiveClassTermDB() {
+  return useQuery<ActiveClassTermRow>({
+    queryKey: ['oversight', 'active-class-term'],
+    queryFn: () => api.get('/oversight/active-class-term'),
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useSetActiveClassTerm() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ classId, termId }: { classId: string; termId: string }) =>
+      api.patch('/oversight/admin/active-class-term', { classId, termId }),
+    onSuccess: (data) => {
+      qc.setQueryData(['oversight', 'active-class-term'], data);
+      qc.invalidateQueries({ queryKey: ['progress'] });
+    },
+  });
+}
+
 export function useClasses() {
   return useQuery<ClassRow[]>({
     queryKey: ['oversight', 'classes'],
@@ -98,10 +123,12 @@ export function useDeleteTerm() {
   });
 }
 
-/** Persists active class/term in localStorage; auto-selects first when data loads. */
+/** Active class/term — source of truth is DB; localStorage used for instant display on reload. */
 export function useActiveClassTerm() {
   const { data: classes = [], isLoading: classesLoading } = useClasses();
   const { data: terms = [], isLoading: termsLoading } = useTerms();
+  const { data: activeDB } = useActiveClassTermDB();
+  const setActiveDB = useSetActiveClassTerm();
 
   const [activeClassId, setActiveClassIdState] = useState<string>(
     () => localStorage.getItem('activeClassId') ?? '',
@@ -110,30 +137,57 @@ export function useActiveClassTerm() {
     () => localStorage.getItem('activeTermId') ?? '',
   );
 
+  // Sync from DB whenever the server value loads/changes
+  useEffect(() => {
+    if (activeDB?.classId && activeDB.classId !== activeClassId) {
+      setActiveClassIdState(activeDB.classId);
+      localStorage.setItem('activeClassId', activeDB.classId);
+    }
+    if (activeDB?.termId && activeDB.termId !== activeTermId) {
+      setActiveTermIdState(activeDB.termId);
+      localStorage.setItem('activeTermId', activeDB.termId);
+    }
+  }, [activeDB?.classId, activeDB?.termId]);
+
+  // Fallback: auto-select first class/term if nothing active in DB yet
   useEffect(() => {
     if (classes.length > 0 && (!activeClassId || !classes.find((c) => c.id === activeClassId))) {
-      const id = classes[0]!.id;
-      setActiveClassIdState(id);
-      localStorage.setItem('activeClassId', id);
+      const cls = classes[0]!;
+      setActiveClassIdState(cls.id);
+      localStorage.setItem('activeClassId', cls.id);
+      localStorage.setItem('activeClassName', cls.name);
+    } else if (activeClassId) {
+      const cls = classes.find((c) => c.id === activeClassId);
+      if (cls) localStorage.setItem('activeClassName', cls.name);
     }
   }, [classes, activeClassId]);
 
   useEffect(() => {
     if (terms.length > 0 && (!activeTermId || !terms.find((t) => t.id === activeTermId))) {
-      const id = terms[0]!.id;
-      setActiveTermIdState(id);
-      localStorage.setItem('activeTermId', id);
+      const term = terms[0]!;
+      setActiveTermIdState(term.id);
+      localStorage.setItem('activeTermId', term.id);
+      localStorage.setItem('activeTermName', term.name);
+    } else if (activeTermId) {
+      const term = terms.find((t) => t.id === activeTermId);
+      if (term) localStorage.setItem('activeTermName', term.name);
     }
   }, [terms, activeTermId]);
 
   function setActiveClassId(id: string) {
     setActiveClassIdState(id);
     localStorage.setItem('activeClassId', id);
+    const name = classes.find((c) => c.id === id)?.name ?? '';
+    if (name) localStorage.setItem('activeClassName', name);
+    if (id && activeTermId) setActiveDB.mutate({ classId: id, termId: activeTermId });
   }
 
   function setActiveTermId(id: string) {
     setActiveTermIdState(id);
     localStorage.setItem('activeTermId', id);
+    const name = terms.find((t) => t.id === id)?.name ?? '';
+    if (name) localStorage.setItem('activeTermName', name);
+    if (activeClassId && id) setActiveDB.mutate({ classId: activeClassId, termId: id });
   }
 
   const activeClass = classes.find((c) => c.id === activeClassId);
@@ -144,8 +198,8 @@ export function useActiveClassTerm() {
     terms,
     activeClassId,
     activeTermId,
-    activeClassName: activeClass?.name ?? '',
-    activeTermName:  activeTerm?.name  ?? '',
+    activeClassName: activeClass?.name ?? activeDB?.className ?? localStorage.getItem('activeClassName') ?? '',
+    activeTermName:  activeTerm?.name  ?? activeDB?.termName  ?? localStorage.getItem('activeTermName')  ?? '',
     setActiveClassId,
     setActiveTermId,
     isLoading: classesLoading || termsLoading,
@@ -155,7 +209,7 @@ export function useActiveClassTerm() {
 // ---------- Teacher ----------
 
 export interface TeacherOverviewCell { assignmentId: string; status: ProgressStatus; }
-export interface TeacherOverviewRow  { childId: string; childName: string; pictureUrl: string | null; cells: TeacherOverviewCell[]; }
+export interface TeacherOverviewRow  { childId: string; childName: string; childShort: string | null; pictureUrl: string | null; cells: TeacherOverviewCell[]; }
 export interface TeacherAssignmentInfo { id: string; subject: string; topic: string; dueDate: string; className: string; term: string; }
 export interface TeacherOverview { assignments: TeacherAssignmentInfo[]; rows: TeacherOverviewRow[]; }
 
@@ -200,7 +254,7 @@ export function useAdminFamilies() {
 }
 
 export interface AdminProgressAssignment { id: string; subject: string; topic: string; dueDate: string; className: string; term: string; }
-export interface AdminProgressRow { childId: string; childName: string; familyName: string; cells: { assignmentId: string; status: ProgressStatus }[]; }
+export interface AdminProgressRow { childId: string; childName: string; childShort: string | null; familyName: string; cells: { assignmentId: string; status: ProgressStatus }[]; }
 export interface AdminProgressData { assignments: AdminProgressAssignment[]; rows: AdminProgressRow[]; }
 
 export function useAdminAllProgress(className?: string, termName?: string) {

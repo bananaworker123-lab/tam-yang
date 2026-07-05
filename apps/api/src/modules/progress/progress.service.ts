@@ -18,12 +18,26 @@ export class ProgressService {
     return m?.userId ?? fallbackId;
   }
 
-  async listForChild(childUserId: string, familyId: string, className?: string, termName?: string) {
+  private async resolveActiveFilter(className?: string, termName?: string) {
+    if (className && termName) return { className, termName };
+    const [cls, term] = await Promise.all([
+      className ? null : this.prisma.classRoom.findFirst({ where: { active: true } }),
+      termName  ? null : this.prisma.term.findFirst({ where: { active: true } }),
+    ]);
+    return {
+      className: className ?? cls?.name,
+      termName:  termName  ?? term?.name,
+    };
+  }
+
+  async listForChild(childUserId: string, familyId: string, className?: string, termName?: string, assignmentId?: string) {
+    const resolved = await this.resolveActiveFilter(className, termName);
     const assignments = await this.prisma.masterAssignment.findMany({
       where: {
         active: true,
-        ...(className ? { classRoom: { name: className } } : {}),
-        ...(termName  ? { term: { name: termName } } : {}),
+        ...(assignmentId ? { id: assignmentId } : {}),
+        ...(resolved.className ? { classRoom: { name: resolved.className } } : {}),
+        ...(resolved.termName  ? { term: { name: resolved.termName } } : {}),
       },
       include: { classRoom: true, term: true },
       orderBy: { dueDate: 'asc' },

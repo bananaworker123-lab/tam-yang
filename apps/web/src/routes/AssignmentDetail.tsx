@@ -2,7 +2,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { ProgressStatus } from '@homework-tracker/shared-types';
 import { useAuth } from '../context/AuthContext';
-import { useActiveClassTerm } from '../hooks/useOversight';
 import { useProgress, useUpdateProgress } from '../hooks/useProgress';
 import { computeDueState } from '../lib/dueState';
 import { StatusSegment, StatusBanner } from '../components/ui';
@@ -27,13 +26,11 @@ export function AssignmentDetailPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { t } = useT();
-  const { activeClassName, activeTermName } = useActiveClassTerm();
-
   const isChild = user?.roles.includes('child') ?? false;
   const isTeacher = user?.roles.includes('teacher') ?? false;
   const childId = isChild ? user?.userId : undefined;
 
-  const { data: progressRows = [], isLoading } = useProgress(childId, activeClassName, activeTermName);
+  const { data: progressRows = [], isLoading } = useProgress(childId, id);
   const updateProgress = useUpdateProgress();
 
   const p = progressRows.find((x) => x.assignmentId === id);

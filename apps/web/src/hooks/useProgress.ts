@@ -10,17 +10,27 @@ export interface ProgressRow {
   status: ProgressStatus;
 }
 
-export function useProgress(childId?: string, className?: string, termName?: string) {
+export function useProgress(childId?: string, assignmentId?: string) {
+  const qc = useQueryClient();
   const params = new URLSearchParams();
-  if (childId)   params.set('childId', childId);
-  if (className) params.set('className', className);
-  if (termName)  params.set('termName', termName);
+  if (childId)      params.set('childId', childId);
+  if (assignmentId) params.set('assignmentId', assignmentId);
+
+  // When fetching a single item, seed from the full-list cache so navigating from
+  // Dashboard shows the detail instantly without a new network round-trip.
+  const initialData = assignmentId
+    ? qc.getQueryData<ProgressRow[]>(['progress', childId])
+        ?.filter((r) => r.assignmentId === assignmentId)
+    : undefined;
 
   return useQuery<ProgressRow[]>({
-    queryKey: ['progress', childId, className, termName],
+    queryKey: assignmentId ? ['progress', childId, assignmentId] : ['progress', childId],
     queryFn: () => api.get(`/progress?${params.toString()}`),
-    enabled: !!className && !!termName,
     staleTime: 1000 * 60 * 2,
+    initialData,
+    initialDataUpdatedAt: initialData
+      ? qc.getQueryState(['progress', childId])?.dataUpdatedAt
+      : undefined,
   });
 }
 
@@ -30,10 +40,10 @@ export function useUpdateProgress() {
     mutationFn: ({ assignmentId, progressId, childId, status }: {
       assignmentId: string; progressId: string | null; childId?: string; status: ProgressStatus;
     }) => api.patch(`/progress/${assignmentId}`, { progressId, childId, status }),
-    onMutate: async ({ assignmentId, status }) => {
-      await qc.cancelQueries({ queryKey: ['progress'] });
-      const snapshots = qc.getQueriesData<ProgressRow[]>({ queryKey: ['progress'] });
-      qc.setQueriesData<ProgressRow[]>({ queryKey: ['progress'] }, (old) =>
+    onMutate: async ({ assignmentId, childId, status }) => {
+      await qc.cancelQueries({ queryKey: ['progress', childId] });
+      const snapshots = qc.getQueriesData<ProgressRow[]>({ queryKey: ['progress', childId] });
+      qc.setQueriesData<ProgressRow[]>({ queryKey: ['progress', childId] }, (old) =>
         old?.map((r) => r.assignmentId === assignmentId ? { ...r, status } : r),
       );
       return { snapshots };
@@ -41,6 +51,6 @@ export function useUpdateProgress() {
     onError: (_err, _vars, ctx) => {
       ctx?.snapshots.forEach(([key, val]) => qc.setQueryData(key, val));
     },
-    onSettled: () => qc.invalidateQueries({ queryKey: ['progress'] }),
+    onSettled: (_d, _e, { childId }) => qc.invalidateQueries({ queryKey: ['progress', childId] }),
   });
 }

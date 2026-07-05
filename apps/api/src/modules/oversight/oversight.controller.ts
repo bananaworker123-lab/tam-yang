@@ -23,6 +23,20 @@ export class OversightController {
     return this.svc.getTerms();
   }
 
+  /** Active class & term from DB — readable by all authenticated users. */
+  @Get('active-class-term')
+  getActiveClassTerm() {
+    return this.svc.getActiveClassTerm();
+  }
+
+  /** Set active class & term in DB — admin only. */
+  @Patch('admin/active-class-term')
+  @Roles('admin')
+  setActiveClassTerm(@Body() body: { classId: string; termId: string }) {
+    if (!body.classId || !body.termId) throw AppError.validation('classId and termId are required');
+    return this.svc.setActiveClassTerm(body.classId, body.termId);
+  }
+
   @Post('admin/classes')
   @Roles('admin')
   createClass(@Body() body: { name: string }) {
