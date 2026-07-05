@@ -18,34 +18,22 @@ export class ProgressService {
     return m?.userId ?? fallbackId;
   }
 
-  private async resolveActiveFilter(className?: string, termName?: string) {
-    if (className && termName) return { className, termName };
-    const [cls, term] = await Promise.all([
-      className ? null : this.prisma.classRoom.findFirst({ where: { active: true } }),
-      termName  ? null : this.prisma.term.findFirst({ where: { active: true } }),
-    ]);
-    return {
-      className: className ?? cls?.name,
-      termName:  termName  ?? term?.name,
-    };
-  }
-
   async listForChild(childUserId: string, familyId: string, className?: string, termName?: string, assignmentId?: string) {
-    const resolved = await this.resolveActiveFilter(className, termName);
-    const assignments = await this.prisma.masterAssignment.findMany({
-      where: {
-        active: true,
-        ...(assignmentId ? { id: assignmentId } : {}),
-        ...(resolved.className ? { classRoom: { name: resolved.className } } : {}),
-        ...(resolved.termName  ? { term: { name: resolved.termName } } : {}),
-      },
-      include: { classRoom: true, term: true },
-      orderBy: { dueDate: 'asc' },
-    });
-
-    const progressRows = await this.prisma.progress.findMany({
-      where: { childUserId, familyId },
-    });
+    // assignments + progress are independent — run in parallel
+    const [assignments, progressRows] = await Promise.all([
+      this.prisma.masterAssignment.findMany({
+        where: {
+          active: true,
+          ...(assignmentId ? { id: assignmentId } : {}),
+          // filter by active flag directly on the relation — avoids a separate resolveActiveFilter round-trip
+          ...(className ? { classRoom: { name: className } } : { classRoom: { active: true } }),
+          ...(termName  ? { term:      { name: termName  } } : { term:      { active: true  } }),
+        },
+        include: { classRoom: true, term: true },
+        orderBy: { dueDate: 'asc' },
+      }),
+      this.prisma.progress.findMany({ where: { childUserId, familyId } }),
+    ]);
 
     const subjectNames = [...new Set(assignments.map((a) => a.subject))];
     const subjectRows = await this.prisma.subject.findMany({
