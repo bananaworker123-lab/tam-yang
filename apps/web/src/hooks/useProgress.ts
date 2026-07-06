@@ -26,7 +26,8 @@ export function useProgress(childId?: string, assignmentId?: string) {
   return useQuery<ProgressRow[]>({
     queryKey: assignmentId ? ['progress', childId, assignmentId] : ['progress', childId],
     queryFn: () => api.get(`/progress?${params.toString()}`),
-    staleTime: 1000 * 60 * 10,
+    // detail queries always refetch to pick up assignment edits from admin
+    staleTime: assignmentId ? 0 : 1000 * 60 * 10,
     gcTime:    1000 * 60 * 30,
     initialData,
     initialDataUpdatedAt: initialData
