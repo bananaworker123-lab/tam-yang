@@ -10,6 +10,51 @@ const ACTION_LABEL: Record<string, string> = {
   assignment_deleted: 'ลบ assignment',
 };
 
+interface Snapshot { subject: string; topic: string; assignedDate: string; dueDate: string }
+
+function fmtDate(iso: string) {
+  if (!iso) return '—';
+  const [y, m, d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function DiffRow({ label, before, after }: { label: string; before?: string; after?: string }) {
+  const changed = before !== undefined && after !== undefined && before !== after;
+  return (
+    <div className="flex items-center gap-1 text-xs text-faint">
+      <span className="w-20 shrink-0">{label}</span>
+      {changed ? (
+        <>
+          <span className="line-through text-red-400">{before || '—'}</span>
+          <span className="text-faint mx-0.5">→</span>
+          <span className="text-[#1F7D52] font-semibold">{after || '—'}</span>
+        </>
+      ) : (
+        <span className="text-ink font-semibold">{after || before || '—'}</span>
+      )}
+    </div>
+  );
+}
+
+function AssignmentDetail({ eventType, metadata }: { eventType: string; metadata?: string | null }) {
+  if (!metadata) return null;
+  let parsed: { before?: Snapshot; after: Snapshot } | null = null;
+  try { parsed = JSON.parse(metadata); } catch { return null; }
+  if (!parsed) return null;
+
+  const { before, after } = parsed;
+  const isUpdate = eventType === 'assignment_updated';
+
+  return (
+    <div className="mt-2 flex flex-col gap-0.5 border-t border-line pt-2">
+      <DiffRow label="วิชา"        before={isUpdate ? before?.subject     : undefined} after={after.subject} />
+      <DiffRow label="topic"       before={isUpdate ? before?.topic       : undefined} after={after.topic} />
+      <DiffRow label="วันที่สั่ง"   before={isUpdate ? fmtDate(before?.assignedDate ?? '') : undefined} after={fmtDate(after.assignedDate)} />
+      <DiffRow label="กำหนดส่ง"    before={isUpdate ? fmtDate(before?.dueDate ?? '')       : undefined} after={fmtDate(after.dueDate)} />
+    </div>
+  );
+}
+
 export function AdminAuditPage() {
   const [q, setQ] = useState('');
   const { data: entries = [], isLoading } = useAuditLog(q || undefined);
@@ -42,23 +87,12 @@ export function AdminAuditPage() {
                       {e.actorName ?? '—'}
                       <span className="text-xs text-faint font-normal ml-1">· {e.actorRole}</span>
                     </div>
-
-                    {isAssignmentEvent ? (
-                      <div className="text-xs text-muted mt-0.5 truncate">
-                        {ACTION_LABEL[e.eventType] ?? e.eventType}
-                      </div>
-                    ) : (
-                      <div className="text-xs text-muted mt-0.5 truncate">
-                        เปลี่ยนให้ <span className="font-semibold text-ink">{e.childName ?? '—'}</span>
-                      </div>
-                    )}
-
-                    {(e.subject || e.topic) && (
-                      <div className="text-xs text-faint mt-0.5 truncate">
-                        {e.subject && <span className="font-semibold text-accent-ink">{e.subject}</span>}
-                        {e.topic && <span>{e.subject ? ' · ' : ''}{e.topic}</span>}
-                      </div>
-                    )}
+                    <div className="text-xs text-muted mt-0.5">
+                      {isAssignmentEvent
+                        ? (ACTION_LABEL[e.eventType] ?? e.eventType)
+                        : <>เปลี่ยนให้ <span className="font-semibold text-ink">{e.childName ?? '—'}</span></>
+                      }
+                    </div>
                   </div>
                   <div className="text-right flex-none">
                     <div className="text-xs text-faint">{dateStr}</div>
@@ -66,20 +100,22 @@ export function AdminAuditPage() {
                   </div>
                 </div>
 
-                {!isAssignmentEvent && (
-                  <div className="flex items-center gap-2 mt-2 text-xs">
-                    <span className="bg-bg text-faint rounded px-2 py-0.5 font-semibold">{STATUS_LABEL[e.fromStatus as ProgressStatus] ?? e.fromStatus}</span>
-                    <span className="text-faint">→</span>
-                    <span className="bg-status-submitted/15 text-[#1F7D52] rounded px-2 py-0.5 font-semibold">{STATUS_LABEL[e.toStatus as ProgressStatus] ?? e.toStatus}</span>
-                  </div>
-                )}
-
-                {e.eventType === 'assignment_updated' && e.fromStatus !== null && e.fromStatus !== e.toStatus && (
-                  <div className="flex items-center gap-2 mt-2 text-xs">
-                    <span className="bg-bg text-faint rounded px-2 py-0.5 font-semibold">{e.fromStatus || '—'}</span>
-                    <span className="text-faint">→</span>
-                    <span className="bg-status-submitted/15 text-[#1F7D52] rounded px-2 py-0.5 font-semibold">{e.toStatus || '—'}</span>
-                  </div>
+                {isAssignmentEvent ? (
+                  <AssignmentDetail eventType={e.eventType} metadata={e.metadata} />
+                ) : (
+                  <>
+                    {(e.subject || e.topic) && (
+                      <div className="text-xs text-faint mt-1 truncate">
+                        {e.subject && <span className="font-semibold text-accent-ink">{e.subject}</span>}
+                        {e.topic && <span>{e.subject ? ' · ' : ''}{e.topic}</span>}
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 mt-2 text-xs">
+                      <span className="bg-bg text-faint rounded px-2 py-0.5 font-semibold">{STATUS_LABEL[e.fromStatus as ProgressStatus] ?? e.fromStatus}</span>
+                      <span className="text-faint">→</span>
+                      <span className="bg-status-submitted/15 text-[#1F7D52] rounded px-2 py-0.5 font-semibold">{STATUS_LABEL[e.toStatus as ProgressStatus] ?? e.toStatus}</span>
+                    </div>
+                  </>
                 )}
               </Card>
             );

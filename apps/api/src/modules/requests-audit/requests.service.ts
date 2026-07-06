@@ -28,7 +28,7 @@ export class RequestsAuditService {
     });
 
     events.subscribe(EventType.AssignmentChanged, async (e) => {
-      const d = e.data as { assignmentId: string; action: string; actorUserId: string; actorRole: string; subject: string; topic: string; oldTopic?: string };
+      const d = e.data as { assignmentId: string; action: string; actorUserId: string; actorRole: string; after: { subject: string; topic: string; assignedDate: string; dueDate: string }; before?: { subject: string; topic: string; assignedDate: string; dueDate: string } };
       if (!d.actorUserId) return;
       await this.prisma.auditEntry.create({
         data: {
@@ -36,10 +36,9 @@ export class RequestsAuditService {
           eventType: `assignment_${d.action}`,
           actorUserId: d.actorUserId, actorRole: d.actorRole,
           assignmentId: d.action !== 'deleted' ? d.assignmentId : null,
-          subject: d.subject || null,
-          topic: d.topic || null,
-          fromStatus: d.action === 'updated' && d.oldTopic !== undefined ? d.oldTopic : null,
-          toStatus:   d.action === 'updated' && d.oldTopic !== undefined ? d.topic    : null,
+          subject: d.after.subject || null,
+          topic: d.after.topic || null,
+          metadata: JSON.stringify({ before: d.before ?? null, after: d.after }),
         },
       });
     });

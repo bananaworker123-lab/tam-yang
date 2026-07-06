@@ -24,14 +24,20 @@ export interface FamilyMemberRemovedData {
   userId: string;
 }
 
+export interface AssignmentSnapshot {
+  subject: string;
+  topic: string;
+  assignedDate: string;
+  dueDate: string;
+}
+
 export interface AssignmentChangedData {
   assignmentId: string;
   action: 'created' | 'updated' | 'deleted';
   actorUserId: string;
   actorRole: string;
-  subject: string;
-  topic: string;
-  oldTopic?: string;
+  after: AssignmentSnapshot;
+  before?: AssignmentSnapshot;
 }
 
 export interface TeacherAssignmentChangedData {

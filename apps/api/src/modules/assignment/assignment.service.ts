@@ -87,7 +87,8 @@ export class AssignmentService {
       },
       include: { classRoom: true, term: true },
     });
-    await this.events.publish({ eventId: randomUUID(), eventType: EventType.AssignmentChanged, timestamp: new Date().toISOString(), source: 'assignment', data: { assignmentId: a.id, action: 'created', actorUserId, actorRole, subject: a.subject, topic: a.topic } });
+    const after = { subject: a.subject, topic: a.topic, assignedDate: a.assignedDate.toISOString().slice(0, 10), dueDate: a.dueDate.toISOString().slice(0, 10) };
+    await this.events.publish({ eventId: randomUUID(), eventType: EventType.AssignmentChanged, timestamp: new Date().toISOString(), source: 'assignment', data: { assignmentId: a.id, action: 'created', actorUserId, actorRole, after } });
     return this.mapRow(a);
   }
 
@@ -123,14 +124,19 @@ export class AssignmentService {
       },
       include: { classRoom: true, term: true },
     });
-    await this.events.publish({ eventId: randomUUID(), eventType: EventType.AssignmentChanged, timestamp: new Date().toISOString(), source: 'assignment', data: { assignmentId: a.id, action: 'updated', actorUserId, actorRole, subject: a.subject, topic: a.topic, oldTopic: existing.topic } });
+    const before = { subject: existing.subject, topic: existing.topic, assignedDate: existing.assignedDate.toISOString().slice(0, 10), dueDate: existing.dueDate.toISOString().slice(0, 10) };
+    const after  = { subject: a.subject, topic: a.topic, assignedDate: a.assignedDate.toISOString().slice(0, 10), dueDate: a.dueDate.toISOString().slice(0, 10) };
+    await this.events.publish({ eventId: randomUUID(), eventType: EventType.AssignmentChanged, timestamp: new Date().toISOString(), source: 'assignment', data: { assignmentId: a.id, action: 'updated', actorUserId, actorRole, before, after } });
     return this.mapRow(a);
   }
 
   async delete(id: string, actorUserId = '', actorRole = 'admin') {
-    const existing = await this.prisma.masterAssignment.findUnique({ where: { id }, select: { subject: true, topic: true } });
+    const existing = await this.prisma.masterAssignment.findUnique({ where: { id } });
     await this.prisma.masterAssignment.delete({ where: { id } });
-    await this.events.publish({ eventId: randomUUID(), eventType: EventType.AssignmentChanged, timestamp: new Date().toISOString(), source: 'assignment', data: { assignmentId: id, action: 'deleted', actorUserId, actorRole, subject: existing?.subject ?? '', topic: existing?.topic ?? '' } });
+    const after = existing
+      ? { subject: existing.subject, topic: existing.topic, assignedDate: existing.assignedDate.toISOString().slice(0, 10), dueDate: existing.dueDate.toISOString().slice(0, 10) }
+      : { subject: '', topic: '', assignedDate: '', dueDate: '' };
+    await this.events.publish({ eventId: randomUUID(), eventType: EventType.AssignmentChanged, timestamp: new Date().toISOString(), source: 'assignment', data: { assignmentId: id, action: 'deleted', actorUserId, actorRole, after } });
     return { ok: true };
   }
 }
