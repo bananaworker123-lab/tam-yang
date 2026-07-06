@@ -11,11 +11,17 @@ export class RequestsAuditService {
     // Subscribe to progress events to write audit
     events.subscribe(EventType.ProgressStatusChanged, async (e) => {
       const d = e.data as { actorUserId: string; actorRole: string; childUserId: string; assignmentId: string; from: ProgressStatus; to: ProgressStatus };
+      const assignment = await this.prisma.masterAssignment.findUnique({
+        where: { id: d.assignmentId },
+        select: { subject: true, topic: true },
+      });
       await this.prisma.auditEntry.create({
         data: {
           eventId: e.eventId,
           actorUserId: d.actorUserId, actorRole: d.actorRole,
           childUserId: d.childUserId, assignmentId: d.assignmentId,
+          subject: assignment?.subject ?? null,
+          topic: assignment?.topic || null,
           fromStatus: d.from, toStatus: d.to,
         },
       });
@@ -46,40 +52,28 @@ export class RequestsAuditService {
       take: 200,
     });
 
-    // Collect unique IDs to resolve in parallel
-    const actorIds  = [...new Set(entries.map((e) => e.actorUserId))];
-    const childIds  = [...new Set(entries.map((e) => e.childUserId))];
-    const assignIds = [...new Set(entries.map((e) => e.assignmentId))];
-
-    const [actors, children, assignments] = await Promise.all([
+    // Resolve actor/child names only (subject+topic are stored in entry)
+    const actorIds = [...new Set(entries.map((e) => e.actorUserId))];
+    const childIds = [...new Set(entries.map((e) => e.childUserId))];
+    const [actors, children] = await Promise.all([
       this.prisma.user.findMany({ where: { id: { in: actorIds } }, select: { id: true, name: true, shortName: true } }),
       this.prisma.user.findMany({ where: { id: { in: childIds } }, select: { id: true, name: true, shortName: true } }),
-      this.prisma.masterAssignment.findMany({ where: { id: { in: assignIds } }, select: { id: true, subject: true, topic: true } }),
     ]);
+    const actorMap = new Map(actors.map((u) => [u.id, u]));
+    const childMap = new Map(children.map((u) => [u.id, u]));
 
-    const actorMap  = new Map(actors.map((u) => [u.id, u]));
-    const childMap  = new Map(children.map((u) => [u.id, u]));
-    const assignMap = new Map(assignments.map((a) => [a.id, a]));
-
-    const enriched = entries.map((e) => {
-      const actor      = actorMap.get(e.actorUserId);
-      const child      = childMap.get(e.childUserId);
-      const assignment = assignMap.get(e.assignmentId);
-      return {
-        ...e,
-        actorName:  actor?.name ?? null,
-        actorShort: actor?.shortName ?? null,
-        childName:  child?.name ?? null,
-        childShort: child?.shortName ?? null,
-        subject:    assignment?.subject ?? null,
-        topic:      assignment?.topic || null,
-      };
-    });
+    const enriched = entries.map((e) => ({
+      ...e,
+      actorName:  actorMap.get(e.actorUserId)?.name ?? null,
+      actorShort: actorMap.get(e.actorUserId)?.shortName ?? null,
+      childName:  childMap.get(e.childUserId)?.name ?? null,
+      childShort: childMap.get(e.childUserId)?.shortName ?? null,
+    }));
 
     if (!q) return enriched;
     const lq = q.toLowerCase();
     return enriched.filter((e) =>
-      [e.actorName, e.actorRole, e.childName, e.assignmentTopic, e.subject, e.actorUserId, e.childUserId, e.assignmentId]
+      [e.actorName, e.actorRole, e.childName, e.subject, e.topic, e.actorUserId, e.childUserId]
         .some((v) => v?.toLowerCase().includes(lq)),
     );
   }
