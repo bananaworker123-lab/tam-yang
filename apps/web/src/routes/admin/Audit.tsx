@@ -35,12 +35,14 @@ export function AdminAuditPage() {
                       <span className="text-xs text-faint font-normal ml-1">· {e.actorRole}</span>
                     </div>
                     <div className="text-xs text-muted mt-0.5 truncate">
-                      เปลี่ยนให้ <span className="font-semibold text-ink">{e.childName ?? e.childUserId.slice(0, 8)}</span>
+                      เปลี่ยนให้ <span className="font-semibold text-ink">{e.childName ?? '—'}</span>
                     </div>
-                    <div className="text-xs text-faint mt-0.5 truncate">
-                      {e.assignmentTopic ?? e.assignmentId.slice(0, 8)}
-                      {e.subject ? <span className="ml-1 text-accent-ink">· {e.subject}</span> : null}
-                    </div>
+                    {(e.subject || e.topic) && (
+                      <div className="text-xs text-faint mt-0.5 truncate">
+                        {e.subject && <span className="font-semibold text-accent-ink">{e.subject}</span>}
+                        {e.topic && <span>{e.subject ? ' · ' : ''}{e.topic}</span>}
+                      </div>
+                    )}
                   </div>
                   <div className="text-right flex-none">
                     <div className="text-xs text-faint">{dateStr}</div>

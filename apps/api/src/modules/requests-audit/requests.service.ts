@@ -67,12 +67,12 @@ export class RequestsAuditService {
       const assignment = assignMap.get(e.assignmentId);
       return {
         ...e,
-        actorName:       actor?.name ?? e.actorUserId.slice(0, 8),
-        actorShort:      actor?.shortName ?? null,
-        childName:       child?.name ?? e.childUserId.slice(0, 8),
-        childShort:      child?.shortName ?? null,
-        assignmentTopic: assignment?.topic || assignment?.subject || e.assignmentId.slice(0, 8),
-        subject:         assignment?.subject ?? '',
+        actorName:  actor?.name ?? null,
+        actorShort: actor?.shortName ?? null,
+        childName:  child?.name ?? null,
+        childShort: child?.shortName ?? null,
+        subject:    assignment?.subject ?? null,
+        topic:      assignment?.topic || null,
       };
     });
 
