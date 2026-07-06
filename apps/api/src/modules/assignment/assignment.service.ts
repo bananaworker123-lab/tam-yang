@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AppError } from '@homework-tracker/shared-errors';
 import { EventBus } from '../../common/event-bus';
@@ -86,7 +87,7 @@ export class AssignmentService {
       },
       include: { classRoom: true, term: true },
     });
-    await this.events.publish({ eventId: `asgn-${a.id}`, eventType: EventType.AssignmentChanged, timestamp: new Date().toISOString(), source: 'assignment', data: { assignmentId: a.id, action: 'created', actorUserId, actorRole, subject: a.subject, topic: a.topic } });
+    await this.events.publish({ eventId: randomUUID(), eventType: EventType.AssignmentChanged, timestamp: new Date().toISOString(), source: 'assignment', data: { assignmentId: a.id, action: 'created', actorUserId, actorRole, subject: a.subject, topic: a.topic } });
     return this.mapRow(a);
   }
 
@@ -122,14 +123,14 @@ export class AssignmentService {
       },
       include: { classRoom: true, term: true },
     });
-    await this.events.publish({ eventId: `asgn-upd-${a.id}-${Date.now()}`, eventType: EventType.AssignmentChanged, timestamp: new Date().toISOString(), source: 'assignment', data: { assignmentId: a.id, action: 'updated', actorUserId, actorRole, subject: a.subject, topic: a.topic } });
+    await this.events.publish({ eventId: randomUUID(), eventType: EventType.AssignmentChanged, timestamp: new Date().toISOString(), source: 'assignment', data: { assignmentId: a.id, action: 'updated', actorUserId, actorRole, subject: a.subject, topic: a.topic } });
     return this.mapRow(a);
   }
 
   async delete(id: string, actorUserId = '', actorRole = 'admin') {
     const existing = await this.prisma.masterAssignment.findUnique({ where: { id }, select: { subject: true, topic: true } });
     await this.prisma.masterAssignment.delete({ where: { id } });
-    await this.events.publish({ eventId: `asgn-del-${id}-${Date.now()}`, eventType: EventType.AssignmentChanged, timestamp: new Date().toISOString(), source: 'assignment', data: { assignmentId: id, action: 'deleted', actorUserId, actorRole, subject: existing?.subject ?? '', topic: existing?.topic ?? '' } });
+    await this.events.publish({ eventId: randomUUID(), eventType: EventType.AssignmentChanged, timestamp: new Date().toISOString(), source: 'assignment', data: { assignmentId: id, action: 'deleted', actorUserId, actorRole, subject: existing?.subject ?? '', topic: existing?.topic ?? '' } });
     return { ok: true };
   }
 }
