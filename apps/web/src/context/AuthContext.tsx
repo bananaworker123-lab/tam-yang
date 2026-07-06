@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, type ReactNode } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import type { AuthContext as AuthCtx } from '@homework-tracker/shared-types';
 
@@ -25,15 +25,25 @@ function readCached(): AuthCtx | null {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const cached = readCached();
+  const qc = useQueryClient();
 
   const { data, isLoading, refetch } = useQuery<AuthCtx | null>({
     queryKey: ['me'],
-    queryFn: () => api.get<AuthCtx>('/me').catch(() => null),
+    queryFn: () => api.get<AuthCtx & { familyMembers?: unknown }>('/me').catch(() => null),
     staleTime: 1000 * 60 * 5,
     retry: false,
     // Show cached user immediately — API result updates it in background
     initialData: cached ?? undefined,
     initialDataUpdatedAt: cached ? Date.now() - 1000 * 60 * 6 : 0, // treat cache as slightly stale so background refetch still runs
+    select: (raw) => {
+      if (!raw) return null;
+      const { familyMembers, ...authCtx } = raw as AuthCtx & { familyMembers?: unknown };
+      // Seed family cache immediately so Profile renders without a loading state
+      if (familyMembers && authCtx.familyId) {
+        qc.setQueryData(['family', authCtx.familyId], familyMembers);
+      }
+      return authCtx as AuthCtx;
+    },
   });
 
   useEffect(() => {

@@ -79,4 +79,31 @@ export class UserService {
       onboardingComplete: roles.length > 0,
     };
   }
+
+  /** Build AuthContext + inline family members for /me bootstrap (saves a round-trip). */
+  async buildAuthContextWithFamily(userId: string): Promise<(AuthContext & { familyMembers?: unknown }) | null> {
+    const ctx = await this.buildAuthContext(userId);
+    if (!ctx || !ctx.familyId) return ctx;
+
+    const family = await this.prisma.family.findUnique({
+      where: { id: ctx.familyId },
+      include: { members: { include: { user: true } }, invites: true },
+    });
+    if (!family) return ctx;
+
+    return {
+      ...ctx,
+      familyMembers: {
+        familyName: family.name,
+        members: family.members.map((m) => ({
+          userId: m.user.id,
+          name: m.user.name,
+          shortName: m.user.shortName,
+          email: m.user.email,
+          role: m.role,
+        })),
+        invites: family.invites,
+      },
+    };
+  }
 }
