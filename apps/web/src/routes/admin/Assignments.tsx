@@ -22,11 +22,13 @@ export function AdminAssignmentsPage() {
 
   const allClassNames = [...new Set(assignments.map((a) => a.className))].filter(Boolean).sort();
   const allTermNames  = [...new Set(assignments.map((a) => a.term))].filter(Boolean).sort();
-  const filtered = assignments.filter((a) => {
-    if (filterClass && a.className !== filterClass) return false;
-    if (filterTerm  && a.term      !== filterTerm)  return false;
-    return true;
-  });
+  const filtered = assignments
+    .filter((a) => {
+      if (filterClass && a.className !== filterClass) return false;
+      if (filterTerm  && a.term      !== filterTerm)  return false;
+      return true;
+    })
+    .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
 
   function openNew() {
     setEditing({
@@ -173,8 +175,8 @@ export function AdminAssignmentsPage() {
               </button>
             </div>
             <div className="flex gap-2 mt-3">
-              <Button variant="ghost" className="flex-1 h-9 text-xs" onClick={() => openEdit(a)}>Edit</Button>
-              <Button variant="danger" className="h-9 px-3 text-xs" onClick={() => deleteAssignment.mutate(a.id)}>Delete</Button>
+              <Button variant="ghost" className="flex-1 h-9 text-xs" disabled={a.id === '__optimistic__'} onClick={() => openEdit(a)}>Edit</Button>
+              <Button variant="danger" className="h-9 px-3 text-xs" disabled={a.id === '__optimistic__'} onClick={() => deleteAssignment.mutate(a.id)}>Delete</Button>
             </div>
           </Card>
         ))}
