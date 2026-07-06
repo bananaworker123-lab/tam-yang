@@ -13,7 +13,7 @@ export function AdminAuditPage() {
       <PageHeader kicker="Admin" title="Audit log" sub="Every status change is recorded" />
       <div className="flex items-center gap-2 bg-white border border-line rounded-xl px-3 h-11 mb-4">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9B99AD" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m21 21-3.5-3.5" /></svg>
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search (user ID / assignment ID)…" className="flex-1 text-sm outline-none" />
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="ค้นหาชื่อ, วิชา, topic…" className="flex-1 text-sm outline-none" />
       </div>
 
       {isLoading && entries.length === 0 ? (
@@ -22,20 +22,39 @@ export function AdminAuditPage() {
         <EmptyState title="No matching entries" />
       ) : (
         <div className="flex flex-col gap-2">
-          {entries.map((e) => (
-            <Card key={e.id}>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-bold text-ink truncate max-w-[55%]">{e.actorUserId.slice(0, 8)}… <span className="text-xs text-faint font-semibold">· {e.actorRole}</span></span>
-                <span className="text-xs text-faint">{new Date(e.createdAt).toLocaleDateString('en-GB')}</span>
-              </div>
-              <div className="text-xs text-muted mt-1 truncate">child: {e.childUserId.slice(0, 8)}…</div>
-              <div className="flex items-center gap-2 mt-2 text-xs">
-                <span className="bg-bg text-faint rounded px-2 py-0.5 font-semibold">{STATUS_LABEL[e.fromStatus as ProgressStatus] ?? e.fromStatus}</span>
-                <span className="text-faint">→</span>
-                <span className="bg-status-submitted/15 text-[#1F7D52] rounded px-2 py-0.5 font-semibold">{STATUS_LABEL[e.toStatus as ProgressStatus] ?? e.toStatus}</span>
-              </div>
-            </Card>
-          ))}
+          {entries.map((e: any) => {
+            const dt = new Date(e.createdAt);
+            const dateStr = dt.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const timeStr = dt.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+            return (
+              <Card key={e.id}>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-bold text-ink truncate">
+                      {e.actorName ?? e.actorUserId.slice(0, 8)}
+                      <span className="text-xs text-faint font-normal ml-1">· {e.actorRole}</span>
+                    </div>
+                    <div className="text-xs text-muted mt-0.5 truncate">
+                      เปลี่ยนให้ <span className="font-semibold text-ink">{e.childName ?? e.childUserId.slice(0, 8)}</span>
+                    </div>
+                    <div className="text-xs text-faint mt-0.5 truncate">
+                      {e.assignmentTopic ?? e.assignmentId.slice(0, 8)}
+                      {e.subject ? <span className="ml-1 text-accent-ink">· {e.subject}</span> : null}
+                    </div>
+                  </div>
+                  <div className="text-right flex-none">
+                    <div className="text-xs text-faint">{dateStr}</div>
+                    <div className="text-xs text-faint">{timeStr}</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 mt-2 text-xs">
+                  <span className="bg-bg text-faint rounded px-2 py-0.5 font-semibold">{STATUS_LABEL[e.fromStatus as ProgressStatus] ?? e.fromStatus}</span>
+                  <span className="text-faint">→</span>
+                  <span className="bg-status-submitted/15 text-[#1F7D52] rounded px-2 py-0.5 font-semibold">{STATUS_LABEL[e.toStatus as ProgressStatus] ?? e.toStatus}</span>
+                </div>
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>

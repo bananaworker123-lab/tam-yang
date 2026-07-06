@@ -41,11 +41,46 @@ export class RequestsAuditService {
   }
 
   async searchAudit(q?: string) {
-    const entries = await this.prisma.auditEntry.findMany({ orderBy: { createdAt: 'desc' }, take: 100 });
-    if (!q) return entries;
+    const entries = await this.prisma.auditEntry.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 200,
+    });
+
+    // Collect unique IDs to resolve in parallel
+    const actorIds  = [...new Set(entries.map((e) => e.actorUserId))];
+    const childIds  = [...new Set(entries.map((e) => e.childUserId))];
+    const assignIds = [...new Set(entries.map((e) => e.assignmentId))];
+
+    const [actors, children, assignments] = await Promise.all([
+      this.prisma.user.findMany({ where: { id: { in: actorIds } }, select: { id: true, name: true, shortName: true } }),
+      this.prisma.user.findMany({ where: { id: { in: childIds } }, select: { id: true, name: true, shortName: true } }),
+      this.prisma.masterAssignment.findMany({ where: { id: { in: assignIds } }, select: { id: true, subject: true, topic: true } }),
+    ]);
+
+    const actorMap  = new Map(actors.map((u) => [u.id, u]));
+    const childMap  = new Map(children.map((u) => [u.id, u]));
+    const assignMap = new Map(assignments.map((a) => [a.id, a]));
+
+    const enriched = entries.map((e) => {
+      const actor      = actorMap.get(e.actorUserId);
+      const child      = childMap.get(e.childUserId);
+      const assignment = assignMap.get(e.assignmentId);
+      return {
+        ...e,
+        actorName:       actor?.name ?? e.actorUserId.slice(0, 8),
+        actorShort:      actor?.shortName ?? null,
+        childName:       child?.name ?? e.childUserId.slice(0, 8),
+        childShort:      child?.shortName ?? null,
+        assignmentTopic: assignment?.topic || assignment?.subject || e.assignmentId.slice(0, 8),
+        subject:         assignment?.subject ?? '',
+      };
+    });
+
+    if (!q) return enriched;
     const lq = q.toLowerCase();
-    return entries.filter((e) =>
-      [e.actorUserId, e.actorRole, e.childUserId, e.assignmentId].some((v) => v.toLowerCase().includes(lq)),
+    return enriched.filter((e) =>
+      [e.actorName, e.actorRole, e.childName, e.assignmentTopic, e.subject, e.actorUserId, e.childUserId, e.assignmentId]
+        .some((v) => v?.toLowerCase().includes(lq)),
     );
   }
 }
