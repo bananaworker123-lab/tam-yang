@@ -28,7 +28,17 @@ export function useCreateAssignment() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (body: Omit<AssignmentRow, 'id'>) => api.post<AssignmentRow>('/assignments', body),
-    onSuccess: () => {
+    onMutate: async (body) => {
+      await qc.cancelQueries({ queryKey: ['assignments', 'all'] });
+      const prev = qc.getQueryData(['assignments', 'all']);
+      qc.setQueryData<AssignmentRow[]>(['assignments', 'all'], (old = []) => [
+        ...old,
+        { ...body, id: '__optimistic__' } as AssignmentRow,
+      ]);
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => qc.setQueryData(['assignments', 'all'], ctx?.prev),
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ['assignments'] });
       qc.invalidateQueries({ queryKey: ['progress'] });
     },
@@ -39,7 +49,16 @@ export function useUpdateAssignment() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, ...body }: Partial<AssignmentRow> & { id: string }) => api.patch(`/assignments/${id}`, body),
-    onSuccess: () => {
+    onMutate: async ({ id, ...body }) => {
+      await qc.cancelQueries({ queryKey: ['assignments', 'all'] });
+      const prev = qc.getQueryData(['assignments', 'all']);
+      qc.setQueryData<AssignmentRow[]>(['assignments', 'all'], (old = []) =>
+        old.map((a) => a.id === id ? { ...a, ...body } : a),
+      );
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => qc.setQueryData(['assignments', 'all'], ctx?.prev),
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ['assignments'] });
       qc.invalidateQueries({ queryKey: ['progress'] });
     },
@@ -50,7 +69,16 @@ export function useDeleteAssignment() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api.delete(`/assignments/${id}`),
-    onSuccess: () => {
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: ['assignments', 'all'] });
+      const prev = qc.getQueryData(['assignments', 'all']);
+      qc.setQueryData<AssignmentRow[]>(['assignments', 'all'], (old = []) =>
+        old.filter((a) => a.id !== id),
+      );
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => qc.setQueryData(['assignments', 'all'], ctx?.prev),
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ['assignments'] });
       qc.invalidateQueries({ queryKey: ['progress'] });
     },
