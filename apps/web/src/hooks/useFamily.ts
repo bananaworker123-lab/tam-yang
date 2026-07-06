@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
+import type { AuthContext as AuthCtx } from '@homework-tracker/shared-types';
 
 export function useFamily() {
   const { user } = useAuth();
@@ -35,6 +36,10 @@ export function useUpdateMemberName() {
       qc.setQueryData<any>(['family', familyId], (old: any) =>
         old ? { ...old, members: old.members.map((m: any) => m.userId === userId ? { ...m, name } : m) } : old
       );
+      // update sidebar user card instantly if editing own name
+      if (userId === user?.userId) {
+        qc.setQueryData<AuthCtx>(['me'], (old) => old ? { ...old, name } : old);
+      }
       return { prev };
     },
     onError: (_err, _vars, ctx) => qc.setQueryData(['family', familyId], ctx?.prev),
@@ -55,6 +60,10 @@ export function useUpdateMemberShort() {
       qc.setQueryData<any>(['family', familyId], (old: any) =>
         old ? { ...old, members: old.members.map((m: any) => m.userId === userId ? { ...m, shortName } : m) } : old
       );
+      // update sidebar user card instantly if editing own shortName
+      if (userId === user?.userId) {
+        qc.setQueryData<AuthCtx>(['me'], (old) => old ? { ...old, shortName } : old);
+      }
       return { prev };
     },
     onError: (_err, _vars, ctx) => qc.setQueryData(['family', familyId], ctx?.prev),

@@ -43,9 +43,10 @@ export class ProgressService {
     });
 
     const shortMap = new Map(allSubjects.map((s) => [s.name, s.short]));
+    const progressMap = new Map(progressRows.map((p) => [p.assignmentId, p]));
 
     return assignments.map((a) => {
-      const p = progressRows.find((x) => x.assignmentId === a.id);
+      const p = progressMap.get(a.id);
       return {
         progressId: p?.id ?? null,
         assignmentId: a.id,

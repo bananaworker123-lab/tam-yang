@@ -60,6 +60,14 @@ export function Layout() {
         queryFn:  () => api.get(`/progress?${params}`),
         staleTime: 1000 * 60 * 2,
       });
+      // Prefetch family members so Profile tab is instant
+      if (user.familyId) {
+        qc.prefetchQuery({
+          queryKey: ['family', user.familyId],
+          queryFn:  () => api.get(`/families/${user.familyId}/members`),
+          staleTime: 1000 * 60 * 5,
+        });
+      }
     }
 
     if (!user.roles.includes('admin')) return;
@@ -104,6 +112,7 @@ export function Layout() {
 
   function switchToUser() {
     setViewingAdmin(false);
+    qc.invalidateQueries({ queryKey: ['progress'] });
     navigate('/dashboard', { replace: true });
   }
 

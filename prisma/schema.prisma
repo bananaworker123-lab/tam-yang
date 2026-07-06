@@ -90,6 +90,7 @@ model Membership {
   @@unique([familyId, userId])
   @@index([familyId])
   @@index([userId])
+  @@index([familyId, role])
   @@map("memberships")
   @@schema("family")
 }
@@ -121,6 +122,7 @@ model ClassRoom {
   teacherAssignments TeacherAssignment[]
 
   @@unique([name, schoolId])
+  @@index([active])
   @@map("classrooms")
   @@schema("assignment")
 }
@@ -132,6 +134,7 @@ model Term {
 
   assignments MasterAssignment[]
 
+  @@index([active])
   @@map("terms")
   @@schema("assignment")
 }
@@ -155,6 +158,9 @@ model MasterAssignment {
 
   @@index([classId])
   @@index([termId])
+  @@index([active])
+  @@index([classId, active])
+  @@index([termId, active])
   @@map("master_assignments")
   @@schema("assignment")
 }
