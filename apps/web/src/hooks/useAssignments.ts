@@ -28,7 +28,10 @@ export function useCreateAssignment() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (body: Omit<AssignmentRow, 'id'>) => api.post<AssignmentRow>('/assignments', body),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['assignments'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['assignments'] });
+      qc.invalidateQueries({ queryKey: ['progress'] });
+    },
   });
 }
 
@@ -36,7 +39,10 @@ export function useUpdateAssignment() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, ...body }: Partial<AssignmentRow> & { id: string }) => api.patch(`/assignments/${id}`, body),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['assignments'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['assignments'] });
+      qc.invalidateQueries({ queryKey: ['progress'] });
+    },
   });
 }
 
@@ -44,6 +50,9 @@ export function useDeleteAssignment() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api.delete(`/assignments/${id}`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['assignments'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['assignments'] });
+      qc.invalidateQueries({ queryKey: ['progress'] });
+    },
   });
 }
