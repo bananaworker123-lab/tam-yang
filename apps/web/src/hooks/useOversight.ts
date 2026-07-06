@@ -463,5 +463,7 @@ export function useAuditLog(q?: string) {
   return useQuery<AuditEntry[]>({
     queryKey: ['audit', q],
     queryFn: () => api.get(`/audit?${params}`),
+    refetchInterval: 15_000,
+    staleTime: 0,
   });
 }

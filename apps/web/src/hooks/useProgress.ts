@@ -57,8 +57,9 @@ export function useUpdateProgress() {
           ? { ...r, progressId: data.progressId, status: data.status }
           : r),
       );
-      // invalidate admin progress view so it reflects the change
+      // invalidate admin progress + audit so they reflect the change immediately
       qc.invalidateQueries({ queryKey: ['oversight', 'admin', 'progress'] });
+      qc.invalidateQueries({ queryKey: ['audit'] });
     },
     onError: (_err, _vars, ctx) => {
       ctx?.snapshots.forEach(([key, val]) => qc.setQueryData(key, val));
