@@ -67,7 +67,7 @@ export class AssignmentService {
     return rows.map((r) => this.mapRow(r));
   }
 
-  async create(input: AssignmentInput) {
+  async create(input: AssignmentInput, actorUserId = '', actorRole = 'admin') {
     if (!input.className?.trim()) throw AppError.validation('className is required');
     if (!input.term?.trim())      throw AppError.validation('term is required');
 
@@ -86,11 +86,11 @@ export class AssignmentService {
       },
       include: { classRoom: true, term: true },
     });
-    await this.events.publish({ eventId: `asgn-${a.id}`, eventType: EventType.AssignmentChanged, timestamp: new Date().toISOString(), source: 'assignment', data: { assignmentId: a.id, action: 'created' } });
+    await this.events.publish({ eventId: `asgn-${a.id}`, eventType: EventType.AssignmentChanged, timestamp: new Date().toISOString(), source: 'assignment', data: { assignmentId: a.id, action: 'created', actorUserId, actorRole, subject: a.subject, topic: a.topic } });
     return this.mapRow(a);
   }
 
-  async update(id: string, input: Partial<AssignmentInput> & { active?: boolean }) {
+  async update(id: string, input: Partial<AssignmentInput> & { active?: boolean }, actorUserId = '', actorRole = 'admin') {
     const existing = await this.prisma.masterAssignment.findUnique({ where: { id } });
     if (!existing) throw AppError.notFound('Assignment not found');
 
@@ -122,12 +122,14 @@ export class AssignmentService {
       },
       include: { classRoom: true, term: true },
     });
-    await this.events.publish({ eventId: `asgn-upd-${a.id}-${Date.now()}`, eventType: EventType.AssignmentChanged, timestamp: new Date().toISOString(), source: 'assignment', data: { assignmentId: a.id, action: 'updated' } });
+    await this.events.publish({ eventId: `asgn-upd-${a.id}-${Date.now()}`, eventType: EventType.AssignmentChanged, timestamp: new Date().toISOString(), source: 'assignment', data: { assignmentId: a.id, action: 'updated', actorUserId, actorRole, subject: a.subject, topic: a.topic } });
     return this.mapRow(a);
   }
 
-  async delete(id: string) {
+  async delete(id: string, actorUserId = '', actorRole = 'admin') {
+    const existing = await this.prisma.masterAssignment.findUnique({ where: { id }, select: { subject: true, topic: true } });
     await this.prisma.masterAssignment.delete({ where: { id } });
+    await this.events.publish({ eventId: `asgn-del-${id}-${Date.now()}`, eventType: EventType.AssignmentChanged, timestamp: new Date().toISOString(), source: 'assignment', data: { assignmentId: id, action: 'deleted', actorUserId, actorRole, subject: existing?.subject ?? '', topic: existing?.topic ?? '' } });
     return { ok: true };
   }
 }

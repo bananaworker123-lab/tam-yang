@@ -243,14 +243,15 @@ model TeacherCatalog {
 model AuditEntry {
   id           String   @id @default(uuid()) @db.Uuid
   eventId      String   @unique @map("event_id") @db.Uuid
+  eventType    String   @default("progress_status_changed") @map("event_type")
   actorUserId  String   @map("actor_user_id") @db.Uuid
   actorRole    String   @map("actor_role")
-  childUserId  String   @map("child_user_id") @db.Uuid
-  assignmentId String   @map("assignment_id") @db.Uuid
+  childUserId  String?  @map("child_user_id") @db.Uuid
+  assignmentId String?  @map("assignment_id") @db.Uuid
   subject      String?
   topic        String?
-  fromStatus   String   @map("from_status")
-  toStatus     String   @map("to_status")
+  fromStatus   String?  @map("from_status")
+  toStatus     String?  @map("to_status")
   createdAt    DateTime @default(now()) @map("created_at")
 
   @@index([createdAt])

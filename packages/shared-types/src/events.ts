@@ -27,6 +27,10 @@ export interface FamilyMemberRemovedData {
 export interface AssignmentChangedData {
   assignmentId: string;
   action: 'created' | 'updated' | 'deleted';
+  actorUserId: string;
+  actorRole: string;
+  subject: string;
+  topic: string;
 }
 
 export interface TeacherAssignmentChangedData {

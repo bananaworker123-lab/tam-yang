@@ -8,7 +8,6 @@ import { EventBus } from '../../common/event-bus';
 @Injectable()
 export class RequestsAuditService {
   constructor(private readonly prisma: PrismaService, private readonly events: EventBus) {
-    // Subscribe to progress events to write audit
     events.subscribe(EventType.ProgressStatusChanged, async (e) => {
       const d = e.data as { actorUserId: string; actorRole: string; childUserId: string; assignmentId: string; from: ProgressStatus; to: ProgressStatus };
       const assignment = await this.prisma.masterAssignment.findUnique({
@@ -18,11 +17,27 @@ export class RequestsAuditService {
       await this.prisma.auditEntry.create({
         data: {
           eventId: e.eventId,
+          eventType: 'progress_status_changed',
           actorUserId: d.actorUserId, actorRole: d.actorRole,
           childUserId: d.childUserId, assignmentId: d.assignmentId,
           subject: assignment?.subject ?? null,
           topic: assignment?.topic || null,
           fromStatus: d.from, toStatus: d.to,
+        },
+      });
+    });
+
+    events.subscribe(EventType.AssignmentChanged, async (e) => {
+      const d = e.data as { assignmentId: string; action: string; actorUserId: string; actorRole: string; subject: string; topic: string };
+      if (!d.actorUserId) return; // guard against legacy events without actor info
+      await this.prisma.auditEntry.create({
+        data: {
+          eventId: e.eventId,
+          eventType: `assignment_${d.action}`,
+          actorUserId: d.actorUserId, actorRole: d.actorRole,
+          assignmentId: d.action !== 'deleted' ? d.assignmentId : null,
+          subject: d.subject || null,
+          topic: d.topic || null,
         },
       });
     });
@@ -52,12 +67,13 @@ export class RequestsAuditService {
       take: 200,
     });
 
-    // Resolve actor/child names only (subject+topic are stored in entry)
     const actorIds = [...new Set(entries.map((e) => e.actorUserId))];
-    const childIds = [...new Set(entries.map((e) => e.childUserId))];
+    const childIds = [...new Set(entries.map((e) => e.childUserId).filter((id): id is string => id !== null))];
     const [actors, children] = await Promise.all([
       this.prisma.user.findMany({ where: { id: { in: actorIds } }, select: { id: true, name: true, shortName: true } }),
-      this.prisma.user.findMany({ where: { id: { in: childIds } }, select: { id: true, name: true, shortName: true } }),
+      childIds.length > 0
+        ? this.prisma.user.findMany({ where: { id: { in: childIds } }, select: { id: true, name: true, shortName: true } })
+        : Promise.resolve([]),
     ]);
     const actorMap = new Map(actors.map((u) => [u.id, u]));
     const childMap = new Map(children.map((u) => [u.id, u]));
@@ -66,14 +82,14 @@ export class RequestsAuditService {
       ...e,
       actorName:  actorMap.get(e.actorUserId)?.name ?? null,
       actorShort: actorMap.get(e.actorUserId)?.shortName ?? null,
-      childName:  childMap.get(e.childUserId)?.name ?? null,
-      childShort: childMap.get(e.childUserId)?.shortName ?? null,
+      childName:  e.childUserId ? (childMap.get(e.childUserId)?.name ?? null) : null,
+      childShort: e.childUserId ? (childMap.get(e.childUserId)?.shortName ?? null) : null,
     }));
 
     if (!q) return enriched;
     const lq = q.toLowerCase();
     return enriched.filter((e) =>
-      [e.actorName, e.actorRole, e.childName, e.subject, e.topic, e.actorUserId, e.childUserId]
+      [e.actorName, e.actorRole, e.childName, e.subject, e.topic]
         .some((v) => v?.toLowerCase().includes(lq)),
     );
   }

@@ -18,20 +18,20 @@ export class AssignmentController {
 
   @Post()
   @Roles('admin')
-  create(@Body() body: AssignmentInput) {
+  create(@Body() body: AssignmentInput, @CurrentUser() actor: AuthContext) {
     if (!body.topic?.trim() || !body.teacherName) throw AppError.validation('Topic and teacher are required');
-    return this.svc.create(body);
+    return this.svc.create(body, actor.userId, actor.roles[0] ?? 'admin');
   }
 
   @Patch(':id')
   @Roles('admin')
-  update(@Param('id') id: string, @Body() body: Partial<AssignmentInput> & { active?: boolean }) {
-    return this.svc.update(id, body);
+  update(@Param('id') id: string, @Body() body: Partial<AssignmentInput> & { active?: boolean }, @CurrentUser() actor: AuthContext) {
+    return this.svc.update(id, body, actor.userId, actor.roles[0] ?? 'admin');
   }
 
   @Delete(':id')
   @Roles('admin')
-  delete(@Param('id') id: string) {
-    return this.svc.delete(id);
+  delete(@Param('id') id: string, @CurrentUser() actor: AuthContext) {
+    return this.svc.delete(id, actor.userId, actor.roles[0] ?? 'admin');
   }
 }
