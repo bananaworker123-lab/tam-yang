@@ -27,24 +27,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const cached = readCached();
   const qc = useQueryClient();
 
-  const { data, isLoading, refetch } = useQuery<AuthCtx | null>({
+  const { data: rawData, isLoading, refetch } = useQuery<(AuthCtx & { familyMembers?: unknown }) | null>({
     queryKey: ['me'],
     queryFn: () => api.get<AuthCtx & { familyMembers?: unknown }>('/me').catch(() => null),
     staleTime: 1000 * 60 * 5,
     retry: false,
-    // Show cached user immediately — API result updates it in background
     initialData: cached ?? undefined,
-    initialDataUpdatedAt: cached ? Date.now() - 1000 * 60 * 6 : 0, // treat cache as slightly stale so background refetch still runs
-    select: (raw) => {
-      if (!raw) return null;
-      const { familyMembers, ...authCtx } = raw as AuthCtx & { familyMembers?: unknown };
-      // Seed family cache immediately so Profile renders without a loading state
-      if (familyMembers && authCtx.familyId) {
-        qc.setQueryData(['family', authCtx.familyId], familyMembers);
-      }
-      return authCtx as AuthCtx;
-    },
+    initialDataUpdatedAt: cached ? Date.now() - 1000 * 60 * 6 : 0,
   });
+
+  // Strip familyMembers from auth context (it's only for cache seeding)
+  const data: AuthCtx | null = rawData
+    ? (({ familyMembers: _fm, ...ctx }) => ctx as AuthCtx)(rawData as AuthCtx & { familyMembers?: unknown })
+    : null;
+
+  // Seed ['family'] cache only when fresh /me data arrives — not on every render.
+  // Check cache is empty first so we never overwrite optimistic updates or live mutations.
+  useEffect(() => {
+    const raw = rawData as (AuthCtx & { familyMembers?: unknown }) | null | undefined;
+    if (raw?.familyId && raw.familyMembers && !qc.getQueryData(['family', raw.familyId])) {
+      qc.setQueryData(['family', raw.familyId], raw.familyMembers);
+    }
+  }, [rawData]);
 
   useEffect(() => {
     if (data?.userId) {
