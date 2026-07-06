@@ -91,7 +91,7 @@ export function TeacherPage() {
                   <div className="flex flex-wrap gap-2">
                     {cells.map((x) => (
                       <span key={x.a.id} className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${cellClass(x.status, x.overdue)}`}>
-                        {x.a.subject}: {x.overdue && x.status !== ProgressStatus.Submitted ? 'Overdue' : STATUS_LABEL[x.status as ProgressStatus]}
+                        {x.a.topic || x.a.subject}: {x.overdue && x.status !== ProgressStatus.Submitted ? 'Overdue' : STATUS_LABEL[x.status as ProgressStatus]}
                       </span>
                     ))}
                   </div>
