@@ -28,8 +28,8 @@ export class RequestsAuditService {
     });
 
     events.subscribe(EventType.AssignmentChanged, async (e) => {
-      const d = e.data as { assignmentId: string; action: string; actorUserId: string; actorRole: string; subject: string; topic: string };
-      if (!d.actorUserId) return; // guard against legacy events without actor info
+      const d = e.data as { assignmentId: string; action: string; actorUserId: string; actorRole: string; subject: string; topic: string; oldTopic?: string };
+      if (!d.actorUserId) return;
       await this.prisma.auditEntry.create({
         data: {
           eventId: e.eventId,
@@ -38,6 +38,8 @@ export class RequestsAuditService {
           assignmentId: d.action !== 'deleted' ? d.assignmentId : null,
           subject: d.subject || null,
           topic: d.topic || null,
+          fromStatus: d.action === 'updated' && d.oldTopic !== undefined ? d.oldTopic : null,
+          toStatus:   d.action === 'updated' && d.oldTopic !== undefined ? d.topic    : null,
         },
       });
     });

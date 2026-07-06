@@ -73,6 +73,14 @@ export function AdminAuditPage() {
                     <span className="bg-status-submitted/15 text-[#1F7D52] rounded px-2 py-0.5 font-semibold">{STATUS_LABEL[e.toStatus as ProgressStatus] ?? e.toStatus}</span>
                   </div>
                 )}
+
+                {e.eventType === 'assignment_updated' && e.fromStatus !== null && e.fromStatus !== e.toStatus && (
+                  <div className="flex items-center gap-2 mt-2 text-xs">
+                    <span className="bg-bg text-faint rounded px-2 py-0.5 font-semibold">{e.fromStatus || '—'}</span>
+                    <span className="text-faint">→</span>
+                    <span className="bg-status-submitted/15 text-[#1F7D52] rounded px-2 py-0.5 font-semibold">{e.toStatus || '—'}</span>
+                  </div>
+                )}
               </Card>
             );
           })}

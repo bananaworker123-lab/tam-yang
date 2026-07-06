@@ -123,7 +123,7 @@ export class AssignmentService {
       },
       include: { classRoom: true, term: true },
     });
-    await this.events.publish({ eventId: randomUUID(), eventType: EventType.AssignmentChanged, timestamp: new Date().toISOString(), source: 'assignment', data: { assignmentId: a.id, action: 'updated', actorUserId, actorRole, subject: a.subject, topic: a.topic } });
+    await this.events.publish({ eventId: randomUUID(), eventType: EventType.AssignmentChanged, timestamp: new Date().toISOString(), source: 'assignment', data: { assignmentId: a.id, action: 'updated', actorUserId, actorRole, subject: a.subject, topic: a.topic, oldTopic: existing.topic } });
     return this.mapRow(a);
   }
 

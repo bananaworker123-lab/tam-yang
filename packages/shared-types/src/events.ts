@@ -31,6 +31,7 @@ export interface AssignmentChangedData {
   actorRole: string;
   subject: string;
   topic: string;
+  oldTopic?: string;
 }
 
 export interface TeacherAssignmentChangedData {
