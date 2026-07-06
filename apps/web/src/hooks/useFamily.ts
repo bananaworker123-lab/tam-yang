@@ -28,7 +28,7 @@ export function useCreateFamily() {
 
 export function useUpdateMemberName() {
   const qc = useQueryClient();
-  const { user, refetch } = useAuth();
+  const { user } = useAuth();
   const familyId = user?.familyId;
   return useMutation({
     mutationFn: ({ userId, name }: { userId: string; name: string }) =>
@@ -46,13 +46,13 @@ export function useUpdateMemberName() {
       return { prev };
     },
     onError: (_err, _vars, ctx) => qc.setQueryData(['family', familyId], ctx?.prev),
-    onSettled: () => { qc.invalidateQueries({ queryKey: ['family'] }); refetch(); },
+    onSettled: () => qc.invalidateQueries({ queryKey: ['family'] }),
   });
 }
 
 export function useUpdateMemberShort() {
   const qc = useQueryClient();
-  const { user, refetch } = useAuth();
+  const { user } = useAuth();
   const familyId = user?.familyId;
   return useMutation({
     mutationFn: ({ userId, shortName }: { userId: string; shortName: string }) =>
@@ -70,7 +70,7 @@ export function useUpdateMemberShort() {
       return { prev };
     },
     onError: (_err, _vars, ctx) => qc.setQueryData(['family', familyId], ctx?.prev),
-    onSettled: () => { qc.invalidateQueries({ queryKey: ['family'] }); refetch(); },
+    onSettled: () => qc.invalidateQueries({ queryKey: ['family'] }),
   });
 }
 
