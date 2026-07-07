@@ -157,6 +157,121 @@ const DICT: Dict = {
 
   // common
   'common.exampleUser': { en: 'Example user', th: 'ผู้ใช้ตัวอย่าง' },
+
+  // exam types
+  'exam.type.midterm':         { en: 'Midterm',         th: 'กลางภาค' },
+  'exam.type.final':           { en: 'Final',           th: 'ปลายภาค' },
+  'exam.type.out_of_schedule': { en: 'Out of Schedule', th: 'นอกเวลา' },
+  'exam.type.competition':     { en: 'Competition',     th: 'แข่งขัน' },
+
+  // exam page / views
+  'exam.title':         { en: 'Exam Schedule', th: 'ตารางสอบ' },
+  'exam.empty':         { en: 'No exams yet',  th: 'ยังไม่มีตารางสอบ' },
+  'exam.view.timeline': { en: 'Timeline',      th: 'ไทม์ไลน์' },
+  'exam.view.calendar': { en: 'Calendar',      th: 'ปฏิทิน' },
+  'exam.view.subject':  { en: 'Subject',       th: 'วิชา' },
+
+  // exam card
+  'exam.card.completed': { en: 'Done ✓',    th: 'เสร็จแล้ว' },
+  'exam.card.today':     { en: 'Today',      th: 'วันนี้' },
+  'exam.card.past':      { en: 'Past',       th: 'ผ่านไปแล้ว' },
+  'exam.card.join':      { en: 'Join',       th: 'เข้าร่วม' },
+  'exam.card.joined':    { en: 'Joined ✓',   th: 'เข้าร่วมแล้ว ✓' },
+  'exam.card.markDone':  { en: 'Mark done',  th: 'กดเมื่อสอบเสร็จ' },
+  'exam.card.examDone':  { en: 'Done ✓',     th: 'สอบเสร็จแล้ว ✓' },
+  'exam.days.prefix':    { en: '',           th: 'อีก ' },
+  'exam.days.suffix':    { en: ' days',      th: ' วัน' },
+
+  // competition info labels
+  'exam.comp.registration': { en: 'Register:',   th: 'สมัคร:' },
+  'exam.comp.announcement': { en: 'Results:',    th: 'ประกาศผล:' },
+  'exam.comp.admitCard':    { en: 'Admit card:', th: 'พิมพ์บัตร:' },
+
+  // timeline sections
+  'exam.section.today': { en: 'Today',     th: 'วันนี้' },
+  'exam.section.week':  { en: 'This Week', th: 'สัปดาห์นี้' },
+  'exam.section.later': { en: 'Later',     th: 'ถัดไป' },
+  'exam.section.past':  { en: 'Past',      th: 'ผ่านมาแล้ว' },
+
+  // calendar weekday headers
+  'exam.cal.sun': { en: 'Sun', th: 'อา' },
+  'exam.cal.mon': { en: 'Mon', th: 'จ' },
+  'exam.cal.tue': { en: 'Tue', th: 'อ' },
+  'exam.cal.wed': { en: 'Wed', th: 'พ' },
+  'exam.cal.thu': { en: 'Thu', th: 'พฤ' },
+  'exam.cal.fri': { en: 'Fri', th: 'ศ' },
+  'exam.cal.sat': { en: 'Sat', th: 'ส' },
+
+  // upcoming banner
+  'exam.banner.examLabel':   { en: 'Exam: ',                th: 'สอบ' },
+  'exam.banner.multiPrefix': { en: '',                       th: 'มีสอบ ' },
+  'exam.banner.multiSuffix': { en: ' exams in next 7 days', th: ' รายการใน 7 วันนี้' },
+
+  // admin exam page
+  'exam.admin.sub':                 { en: 'Manage all exam schedules', th: 'จัดการกำหนดการสอบทั้งหมด' },
+  'exam.admin.addBtn':              { en: '+ Add exam',                th: '+ เพิ่มตารางสอบ' },
+  'exam.admin.createTitle':         { en: 'Add new exam',              th: 'เพิ่มตารางสอบใหม่' },
+  'exam.admin.editTitle':           { en: 'Edit exam',                 th: 'แก้ไขตารางสอบ' },
+  'exam.admin.openWindow':          { en: '· Open window',            th: '· ช่วงเวลา' },
+  'exam.admin.edit':                { en: 'Edit',                      th: 'แก้ไข' },
+  'exam.admin.delete':              { en: 'Delete',                    th: 'ลบ' },
+  'exam.admin.deleting':            { en: 'Deleting…',                 th: 'กำลังลบ…' },
+  'exam.admin.confirmDeletePrefix': { en: 'Delete "',                  th: 'ยืนยันลบ "' },
+  'exam.admin.confirmDeleteSuffix': { en: '"?',                        th: '"?' },
+
+  // exam form fields
+  'exam.form.type':                { en: 'Exam type',                            th: 'ประเภทการสอบ' },
+  'exam.form.subject':             { en: 'Subject',                              th: 'วิชา' },
+  'exam.form.subjectPlaceholder':  { en: 'e.g. Math',                            th: 'เช่น คณิตศาสตร์' },
+  'exam.form.examDate':            { en: 'Exam date',                            th: 'วันสอบ' },
+  'exam.form.startTime':           { en: 'Start time',                           th: 'เวลาเริ่ม' },
+  'exam.form.endTime':             { en: 'End time',                             th: 'เวลาสิ้นสุด' },
+  'exam.form.location':            { en: 'Location',                             th: 'สถานที่' },
+  'exam.form.locationPlaceholder': { en: 'Exam room...',                         th: 'ห้องสอบ...' },
+  'exam.form.openWindow':          { en: 'Open window (must mark done manually)', th: 'เป็นช่วงเวลา (ต้องกดแจ้งสอบเสร็จ)' },
+  'exam.form.cancel':              { en: 'Cancel',                               th: 'ยกเลิก' },
+  'exam.form.save':                { en: 'Save',                                 th: 'บันทึก' },
+  'exam.form.saving':              { en: 'Saving…',                              th: 'กำลังบันทึก…' },
+  'exam.form.compTitle':           { en: 'Competition',                          th: 'สนามแข่งขัน' },
+  'exam.form.regDeadline':         { en: 'Registration deadline',                th: 'วันสมัคร (ก่อน)' },
+  'exam.form.announcement':        { en: 'Results announcement',                 th: 'ประกาศรายชื่อ' },
+  'exam.form.admitCard':           { en: 'Admit card date',                      th: 'พิมพ์บัตรสอบ' },
+
+  // report / request page
+  'report.title':                { en: 'Request',                             th: 'ขอเพิ่มข้อมูล' },
+  'report.back':                 { en: '← Back',                            th: '← กลับ' },
+  'report.hw.type':              { en: 'Homework',                            th: 'การบ้าน' },
+  'report.hw.desc':              { en: 'Report or add homework info',         th: 'แจ้งแก้ไขหรือเพิ่มเติมข้อมูลการบ้าน' },
+  'report.exam.type':            { en: 'Exam Schedule',                       th: 'ตารางสอบ' },
+  'report.exam.desc':            { en: 'Request to add an exam',              th: 'ขอเพิ่มกำหนดการสอบใหม่' },
+  'report.hw.title':             { en: 'Report homework',                     th: 'แจ้งเรื่องการบ้าน' },
+  'report.exam.title':           { en: 'Request exam schedule',               th: 'ขอเพิ่มตารางสอบ' },
+  'report.hw.assignLabel':       { en: 'Related assignment',                  th: 'การบ้านที่เกี่ยวข้อง' },
+  'report.hw.assignNone':        { en: '— None —',                           th: '— ไม่ระบุ —' },
+  'report.hw.detailLabel':       { en: 'Details',                             th: 'รายละเอียด' },
+  'report.hw.detailPlaceholder': { en: 'Describe what needs to be changed...', th: 'อธิบายสิ่งที่ต้องการแก้ไข...' },
+  'report.exam.compTitle':       { en: 'Competition info',                    th: 'ข้อมูลสนามแข่งขัน' },
+  'report.exam.regDeadline':     { en: 'Registration deadline',               th: 'วันสุดท้ายของการสมัคร' },
+  'report.exam.announcement':    { en: 'Announcement date',                   th: 'วันประกาศรายชื่อ' },
+  'report.exam.admitCard':       { en: 'Admit card date',                     th: 'วันพิมพ์บัตรสอบ' },
+  'report.exam.note':            { en: 'Additional notes',                    th: 'หมายเหตุเพิ่มเติม' },
+  'report.exam.notePlaceholder': { en: 'Additional info...',                  th: 'ข้อมูลเพิ่มเติม...' },
+  'report.err.detail':           { en: 'Please fill in details',              th: 'กรุณากรอกรายละเอียด' },
+  'report.err.exam':             { en: 'Please fill in subject and date',     th: 'กรุณากรอกวิชาและวันสอบ' },
+  'report.err.unknown':          { en: 'An error occurred',                   th: 'เกิดข้อผิดพลาด' },
+  'report.submit':               { en: 'Submit request',                      th: 'ส่งคำขอ' },
+  'report.submitting':           { en: 'Sending…',                            th: 'กำลังส่ง…' },
+
+  // admin requests — exam data display
+  'req.exam.badge':        { en: 'Exam Schedule', th: 'ตารางสอบ' },
+  'req.exam.subject':      { en: 'Subject:',      th: 'วิชา:' },
+  'req.exam.date':         { en: 'Date:',          th: 'วันสอบ:' },
+  'req.exam.time':         { en: 'Time:',          th: 'เวลา:' },
+  'req.exam.location':     { en: 'Location:',     th: 'สถานที่:' },
+  'req.exam.regDeadline':  { en: 'Register by:',  th: 'วันสมัคร:' },
+  'req.exam.announcement': { en: 'Results:',      th: 'ประกาศผล:' },
+  'req.exam.admitCard':    { en: 'Admit card:',   th: 'พิมพ์บัตร:' },
+  'req.exam.note':         { en: 'Note:',          th: 'หมายเหตุ:' },
 };
 
 interface I18n {

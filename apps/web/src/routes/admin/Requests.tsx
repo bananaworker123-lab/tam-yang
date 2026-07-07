@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useT } from '../../i18n';
 import { useAllRequests, useResolveRequest, useRejectRequest } from '../../hooks/useRequests';
 import { Card, Button, PageHeader, EmptyState, SkeletonCard } from '../../components/ui';
 
 export function AdminRequestsPage() {
+  const { t } = useT();
   const { data: requests = [], isLoading } = useAllRequests();
   const resolveRequest = useResolveRequest();
   const rejectRequest  = useRejectRequest();
@@ -26,7 +28,7 @@ export function AdminRequestsPage() {
                 </span>
               </div>
               {r.requestType === 'exam' && (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 mt-1 inline-block">ตารางสอบ</span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 mt-1 inline-block">{t('req.exam.badge')}</span>
               )}
               <div className="text-sm text-ink mt-2">{r.detail}</div>
               {r.requestType === 'exam' && r.examData && (() => {
@@ -34,14 +36,14 @@ export function AdminRequestsPage() {
                   const d = JSON.parse(r.examData);
                   return (
                     <div className="mt-2 bg-bg rounded-xl px-3 py-2 text-xs text-faint flex flex-col gap-0.5">
-                      {d.subject && <span><b>วิชา:</b> {d.subject}</span>}
-                      {d.examDate && <span><b>วันสอบ:</b> {d.examDate}</span>}
-                      {d.examTime && <span><b>เวลา:</b> {d.examTime}{d.endTime ? `–${d.endTime}` : ''}</span>}
-                      {d.location && <span><b>สถานที่:</b> {d.location}</span>}
-                      {d.registrationDeadline && <span><b>วันสมัคร:</b> {d.registrationDeadline}</span>}
-                      {d.announcementDate     && <span><b>ประกาศผล:</b> {d.announcementDate}</span>}
-                      {d.admitCardDate        && <span><b>พิมพ์บัตร:</b> {d.admitCardDate}</span>}
-                      {d.note && <span><b>หมายเหตุ:</b> {d.note}</span>}
+                      {d.subject  && <span><b>{t('req.exam.subject')}</b> {d.subject}</span>}
+                      {d.examDate && <span><b>{t('req.exam.date')}</b> {d.examDate}</span>}
+                      {d.examTime && <span><b>{t('req.exam.time')}</b> {d.examTime}{d.endTime ? `–${d.endTime}` : ''}</span>}
+                      {d.location && <span><b>{t('req.exam.location')}</b> {d.location}</span>}
+                      {d.registrationDeadline && <span><b>{t('req.exam.regDeadline')}</b> {d.registrationDeadline}</span>}
+                      {d.announcementDate     && <span><b>{t('req.exam.announcement')}</b> {d.announcementDate}</span>}
+                      {d.admitCardDate        && <span><b>{t('req.exam.admitCard')}</b> {d.admitCardDate}</span>}
+                      {d.note     && <span><b>{t('req.exam.note')}</b> {d.note}</span>}
                     </div>
                   );
                 } catch { return null; }
