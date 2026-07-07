@@ -8,7 +8,7 @@ datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
-  schemas   = ["identity", "family", "assignment", "progress", "requests_audit"]
+  schemas   = ["identity", "family", "assignment", "progress", "requests_audit", "exam"]
 }
 
 enum FamilyRole {
@@ -208,8 +208,10 @@ model Request {
   id           String        @id @default(uuid()) @db.Uuid
   createdBy    String        @map("created_by") @db.Uuid
   role         String
+  requestType  String        @default("homework") @map("request_type")
   assignmentId String?       @map("assignment_id") @db.Uuid
   detail       String
+  examData     String?       @map("exam_data")
   status       RequestStatus @default(pending)
   reply        String?
   createdAt    DateTime      @default(now()) @map("created_at")
@@ -260,4 +262,58 @@ model AuditEntry {
   @@index([childUserId])
   @@map("audit_entries")
   @@schema("requests_audit")
+}
+
+// ---------- exam ----------
+model ExamEvent {
+  id                   String    @id @default(uuid()) @db.Uuid
+  examType             String    @map("exam_type")
+  subject              String
+  examDate             DateTime  @map("exam_date") @db.Date
+  examTime             String?   @map("exam_time")
+  endTime              String?   @map("end_time")
+  location             String?
+  isOpenWindow         Boolean   @default(false) @map("is_open_window")
+  registrationDeadline DateTime? @map("registration_deadline") @db.Date
+  announcementDate     DateTime? @map("announcement_date") @db.Date
+  admitCardDate        DateTime? @map("admit_card_date") @db.Date
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  participants ExamParticipant[]
+  completions  ExamCompletion[]
+
+  @@index([examDate])
+  @@map("exam_events")
+  @@schema("exam")
+}
+
+model ExamParticipant {
+  id          String   @id @default(uuid()) @db.Uuid
+  examId      String   @map("exam_id") @db.Uuid
+  childUserId String   @map("child_user_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  exam ExamEvent @relation(fields: [examId], references: [id], onDelete: Cascade)
+
+  @@unique([examId, childUserId])
+  @@index([examId])
+  @@index([childUserId])
+  @@map("exam_participants")
+  @@schema("exam")
+}
+
+model ExamCompletion {
+  id          String   @id @default(uuid()) @db.Uuid
+  examId      String   @map("exam_id") @db.Uuid
+  childUserId String   @map("child_user_id") @db.Uuid
+  completedAt DateTime @default(now()) @map("completed_at")
+
+  exam ExamEvent @relation(fields: [examId], references: [id], onDelete: Cascade)
+
+  @@unique([examId, childUserId])
+  @@index([examId])
+  @@index([childUserId])
+  @@map("exam_completions")
+  @@schema("exam")
 }

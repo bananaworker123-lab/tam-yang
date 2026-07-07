@@ -11,9 +11,10 @@ import { AssignmentModule } from './modules/assignment/assignment.module';
 import { ProgressModule } from './modules/progress/progress.module';
 import { RequestsAuditModule } from './modules/requests-audit/requests.module';
 import { OversightModule } from './modules/oversight/oversight.module';
+import { ExamModule } from './modules/exam/exam.module';
 
 @Module({
-  imports: [CoreModule, PrismaModule, AuthModule, FamilyModule, AssignmentModule, ProgressModule, RequestsAuditModule, OversightModule],
+  imports: [CoreModule, PrismaModule, AuthModule, FamilyModule, AssignmentModule, ProgressModule, RequestsAuditModule, OversightModule, ExamModule],
   controllers: [HealthController, IdentityController],
   providers: [UserService],
 })

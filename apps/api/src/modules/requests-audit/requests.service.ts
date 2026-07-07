@@ -44,8 +44,8 @@ export class RequestsAuditService {
     });
   }
 
-  async createRequest(createdBy: string, role: string, detail: string, assignmentId?: string) {
-    return this.prisma.request.create({ data: { createdBy, role, detail, assignmentId } });
+  async createRequest(createdBy: string, role: string, detail: string, assignmentId?: string, requestType?: string, examData?: string) {
+    return this.prisma.request.create({ data: { createdBy, role, detail, assignmentId, requestType: requestType ?? 'homework', examData: examData ?? null } });
   }
 
   async listMine(userId: string) {

@@ -28,6 +28,8 @@ const AdminRequestsPage    = lazy(() => import('./routes/admin/Requests').then(m
 const AdminAuditPage       = lazy(() => import('./routes/admin/Audit').then(m => ({ default: m.AdminAuditPage })));
 const AdminTeachersPage    = lazy(() => import('./routes/admin/Teachers').then(m => ({ default: m.AdminTeachersPage })));
 const AdminFamiliesPage    = lazy(() => import('./routes/admin/Families').then(m => ({ default: m.AdminFamiliesPage })));
+const ExamSchedulePage     = lazy(() => import('./routes/ExamSchedule').then(m => ({ default: m.ExamSchedulePage })));
+const AdminExamSchedulePage = lazy(() => import('./routes/admin/ExamSchedule').then(m => ({ default: m.AdminExamSchedulePage })));
 
 function PageSpinner() {
   return (
@@ -62,6 +64,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                     <Route path="/join" element={<JoinFamilyPage />} />
                     <Route element={<Layout />}>
                       <Route path="/dashboard" element={<DashboardPage />} />
+                      <Route path="/exam" element={<ExamSchedulePage />} />
                       <Route path="/assignment/:id" element={<AssignmentDetailPage />} />
                       <Route path="/report" element={<ReportIssuePage />} />
                       <Route path="/requests" element={<RequestsPage />} />
@@ -73,6 +76,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                       <Route path="/admin/progress" element={<AdminProgressPage />} />
                       <Route path="/admin/requests" element={<AdminRequestsPage />} />
                       <Route path="/admin/audit" element={<AdminAuditPage />} />
+                      <Route path="/admin/exam" element={<AdminExamSchedulePage />} />
                       <Route path="/admin/teachers" element={<AdminTeachersPage />} />
                       <Route path="/admin/families" element={<AdminFamiliesPage />} />
                     </Route>

@@ -5,7 +5,9 @@ export interface RequestRow {
   id: string;
   createdBy: string;
   role: string;
+  requestType: 'homework' | 'exam';
   assignmentId?: string | null;
+  examData?: string | null;
   detail: string;
   status: 'pending' | 'resolved' | 'rejected';
   reply?: string | null;
@@ -32,8 +34,8 @@ export function useAllRequests() {
 export function useCreateRequest() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ detail, assignmentId }: { detail: string; assignmentId?: string }) =>
-      api.post('/requests', { detail, assignmentId }),
+    mutationFn: ({ detail, assignmentId, requestType, examData }: { detail: string; assignmentId?: string; requestType?: string; examData?: string }) =>
+      api.post('/requests', { detail, assignmentId, requestType, examData }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['requests'] }),
   });
 }

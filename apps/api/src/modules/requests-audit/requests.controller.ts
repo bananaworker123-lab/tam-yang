@@ -12,10 +12,10 @@ export class RequestsController {
   constructor(private readonly svc: RequestsAuditService) {}
 
   @Post('requests')
-  createRequest(@Body() body: { detail: string; assignmentId?: string }, @CurrentUser() user: AuthContext) {
+  createRequest(@Body() body: { detail: string; assignmentId?: string; requestType?: string; examData?: string }, @CurrentUser() user: AuthContext) {
     if (!body.detail?.trim()) throw AppError.validation('Detail is required');
     if (user.roles.includes('admin')) throw AppError.forbidden('Admin cannot create requests');
-    return this.svc.createRequest(user.userId, user.roles[0]!, body.detail, body.assignmentId);
+    return this.svc.createRequest(user.userId, user.roles[0]!, body.detail, body.assignmentId, body.requestType, body.examData);
   }
 
   @Get('requests/mine')

@@ -27,7 +27,9 @@ const DICT: Dict = {
   // nav
   'nav.viewAs': { en: 'View as', th: 'ดูในบทบาท' },
   'nav.menu': { en: 'Menu', th: 'เมนู' },
-  'nav.homework': { en: 'Homework', th: 'การบ้าน' },
+  'nav.homework':      { en: 'Homework',      th: 'การบ้าน' },
+  'nav.examSchedule':  { en: 'Exam Schedule', th: 'ตารางสอบ' },
+  'nav.request':       { en: 'Request',       th: 'คำขอ' },
   'nav.myHomework': { en: 'My homework', th: 'การบ้านของฉัน' },
   'nav.family': { en: 'Family', th: 'ครอบครัว' },
   'nav.myRequests': { en: 'My requests', th: 'คำขอของฉัน' },
