@@ -287,15 +287,14 @@ export function ExamSchedulePage() {
   const { user } = useAuth();
   const [view, setView] = useState<View>('timeline');
 
-  const isAdmin = user?.roles.includes('admin') ?? false;
+  // /exam is always user-facing — admin managing exams goes to /admin/exam
   const childId = user?.roles.includes('child') ? user.userId : undefined;
 
-  const { data: exams = [], isLoading } = useExams(isAdmin ? undefined : childId);
+  const { data: exams = [], isLoading } = useExams(childId);
 
   const visibleExams = useMemo(() => {
-    if (isAdmin) return exams;
     return exams.filter((e) => e.examType !== 'competition' || e.isParticipating);
-  }, [exams, isAdmin]);
+  }, [exams]);
 
   const views: { key: View; label: string }[] = [
     { key: 'timeline', label: 'ไทม์ไลน์' },
@@ -327,8 +326,8 @@ export function ExamSchedulePage() {
       ) : (
         <>
           {view === 'calendar'  && <CalendarView exams={exams} />}
-          {view === 'timeline'  && <TimelineView exams={visibleExams} childId={childId} isAdmin={isAdmin} />}
-          {view === 'subject'   && <SubjectView  exams={visibleExams} childId={childId} isAdmin={isAdmin} />}
+          {view === 'timeline'  && <TimelineView exams={visibleExams} childId={childId} isAdmin={false} />}
+          {view === 'subject'   && <SubjectView  exams={visibleExams} childId={childId} isAdmin={false} />}
         </>
       )}
     </div>
